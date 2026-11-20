@@ -445,9 +445,17 @@
       $("btnTemaApp").onclick = alternarTema;
       atualizarIconesTema();
 
-      // Controle da Tela de Boas-Vindas
+      // Controle da Tela de Boas-Vindas (Acesso exclusivo via Login Google)
       const telaBV = $("telaBoasVindas");
+      function temSessaoGoogleAtiva() {
+        const st = window.EJStorageDrive ? window.EJStorageDrive.obterStatus() : null;
+        return !!(st && st.conectado && st.conta && st.conta.email);
+      }
       function entrarNoApp() {
+        if (!temSessaoGoogleAtiva()) {
+          telaBV.hidden = false;
+          return;
+        }
         telaBV.hidden = true;
         try { sessionStorage.setItem("ej_bv_entrou", "1"); } catch (e) {}
         if (window.interativos) window.interativos.carregar();
@@ -457,12 +465,17 @@
         try { sessionStorage.removeItem("ej_bv_entrou"); } catch (e) {}
       }
 
-      if (sessionStorage.getItem("ej_bv_entrou") === "1") {
+      if (temSessaoGoogleAtiva()) {
         telaBV.hidden = true;
+      } else {
+        telaBV.hidden = false;
+        try { sessionStorage.removeItem("ej_bv_entrou"); } catch (e) {}
       }
 
-      $("btnEntrarSistema").onclick = entrarNoApp;
-      $("btnEntrarGoogle").onclick = async () => {
+      const btnEntrarSemLogin = $("btnEntrarSistema");
+      if (btnEntrarSemLogin) btnEntrarSemLogin.remove();
+
+      async function acionarLoginGoogle() {
         try {
           await window.EJStorageDrive.entrarComGoogle();
           window.mostrarToast("Conectado ao Google Drive!");
@@ -470,18 +483,20 @@
         } catch (e) {
           window.mostrarToast(e.message || "Não foi possível conectar ao Google.", "erro", 4500);
         }
-      };
+      }
+
+      $("btnEntrarGoogle").onclick = acionarLoginGoogle;
       $("btnTelaInicial").onclick = mostrarBoasVindas;
       $("btnMarcaInicio").onclick = () => {
         if (window.interativos) window.interativos.fechar();
       };
 
-      // Atalho Enter na tela de boas-vindas para entrar direto
+      // Atalho Enter na tela de boas-vindas aciona o login com Google
       document.addEventListener("keydown", e => {
         if (!telaBV.hidden && e.key === "Enter" && !e.ctrlKey && !e.altKey && !e.metaKey) {
           if (document.activeElement && document.activeElement.tagName === "BUTTON") return;
           e.preventDefault();
-          entrarNoApp();
+          acionarLoginGoogle();
         }
       });
 
@@ -587,8 +602,9 @@
         const btnSair = fundo.querySelector('[data-acao="sair"]');
         if (btnSair) btnSair.onclick = () => {
           window.EJStorageDrive.sairDoGoogle();
-          window.mostrarToast("Conta Google desconectada. Seus dados continuam salvos neste navegador.");
+          window.mostrarToast("Conta Google desconectada.");
           fechar();
+          mostrarBoasVindas();
         };
 
         fundo.querySelector('[data-acao="exportar"]').onclick = () => {

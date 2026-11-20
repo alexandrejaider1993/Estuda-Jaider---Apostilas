@@ -16,7 +16,11 @@
   const CHAVE_DADOS = "ej_apostilas_dados_v1";
   const CHAVE_CONTA = "ej_google_conta_v1";
   const CHAVE_CLIENT_ID = "ej_google_client_id";
+  const CHAVE_WEBHOOK_VAGAS = "ej_webhook_vagas_url";
   const CLIENT_ID_PADRAO = "363099555044-2v1qfhn1an7j46op8foien17mo139qfl.apps.googleusercontent.com";
+  // Cole aqui a URL do seu Google Apps Script (Web App) para controlar as 20 vagas e registrar a planilha de alunos:
+  const URL_CONTROLE_VAGAS_PADRAO = "";
+  const LIMITE_VAGAS_PADRAO = 20;
   const ARQUIVO_DRIVE = "estuda_jaider_apostilas_v1.json";
   const ESCOPOS_DRIVE = "https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email";
 
@@ -955,6 +959,53 @@
     tokenClient = null;
   }
 
+  function obterUrlControleVagas() {
+    try {
+      return (localStorage.getItem(CHAVE_WEBHOOK_VAGAS) || "").trim() || window.EJ_WEBHOOK_VAGAS_URL || URL_CONTROLE_VAGAS_PADRAO;
+    } catch (e) {
+      return URL_CONTROLE_VAGAS_PADRAO;
+    }
+  }
+
+  function definirUrlControleVagas(novaUrl) {
+    const limpo = String(novaUrl || "").trim();
+    try {
+      if (limpo) localStorage.setItem(CHAVE_WEBHOOK_VAGAS, limpo);
+      else localStorage.removeItem(CHAVE_WEBHOOK_VAGAS);
+    } catch (e) {}
+  }
+
+  // Verifica e registra o aluno na Planilha Google (Google Apps Script) com limite de 20 vagas
+  async function verificarVagaNaPlanilha(perfil) {
+    const urlWebhook = obterUrlControleVagas();
+    if (!urlWebhook) return { autorizado: true };
+    try {
+      const r = await fetchNativo(urlWebhook, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+          email: (perfil.email || "").trim().toLowerCase(),
+          nome: perfil.nome || "Estudante",
+          foto: perfil.foto || "",
+          limite: LIMITE_VAGAS_PADRAO,
+          origem: location.origin,
+        }),
+      });
+      if (!r.ok) return { autorizado: true };
+      const d = await r.json();
+      if (d && d.autorizado === false) {
+        return {
+          autorizado: false,
+          mensagem: d.mensagem || `Limite de ${LIMITE_VAGAS_PADRAO} vagas atingido. Peça liberação ao administrador.`,
+        };
+      }
+      return { autorizado: true, vaga: d.vaga, total: d.total };
+    } catch (e) {
+      console.warn("Aviso ao consultar planilha de vagas:", e);
+      return { autorizado: true };
+    }
+  }
+
   function notificarStatusUI() {
     window.dispatchEvent(new CustomEvent("ej-sync-status", {
       detail: {
@@ -1023,6 +1074,19 @@
                 };
               }
             } catch (e) {}
+
+            // Verifica se o e-mail tem vaga na planilha (limite de 20 usuários ativos)
+            const checkVaga = await verificarVagaNaPlanilha(perfil);
+            if (!checkVaga.autorizado) {
+              try { window.google.accounts.oauth2.revoke(tokenAcesso, () => {}); } catch (e) {}
+              tokenAcesso = null;
+              contaGoogle = null;
+              try { localStorage.removeItem(CHAVE_CONTA); } catch (e) {}
+              statusSync = "erro";
+              msgErroSync = checkVaga.mensagem;
+              notificarStatusUI();
+              return reject(new Error(checkVaga.mensagem));
+            }
 
             contaGoogle = {
               ...perfil,
@@ -1319,6 +1383,8 @@
     sincronizarComDriveAgora,
     obterClientId,
     definirClientId,
+    obterUrlControleVagas,
+    definirUrlControleVagas,
     exportarBackupJson,
     importarBackupJson,
     obterStatus: () => ({

@@ -90,15 +90,12 @@
     const dica = tela.querySelector(".tela-boasvindas__atalho-dica");
 
     if (btnTema) raiz.querySelector('[data-slot="tema"]').append(btnTema);
-    if (btnEntrar) {
-      btnEntrar.innerHTML = `<span>Entrar</span>${icSeta}`;
-      raiz.querySelector('[data-slot="acoes"]').append(btnEntrar);
-    }
+    if (btnEntrar) btnEntrar.remove();
     if (btnGoogle) {
       btnGoogle.innerHTML = `${icGoogle}<span>Entrar com Google</span>`;
       raiz.querySelector('[data-slot="acoes"]').append(btnGoogle);
     }
-    if (dica) raiz.querySelector('[data-slot="dica"]').append(dica);
+    if (dica) dica.remove();
 
     raiz.querySelector(".bv11__l1").textContent = saudacaoHorario() + ",";
     raiz.querySelector(".bv11__l2").innerHTML = 'vamos <span class="bv11__ouro">estudar?</span>';
