@@ -1,5 +1,5 @@
 ﻿<!doctype html>
-<html lang="pt-BR" data-skin="eleven">
+<html lang="pt-BR" data-skin="eleven" data-tema="claro">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -13,8 +13,7 @@
 <script>
   try {
     const t = localStorage.getItem("ej_tema");
-    const h = new Date().getHours();
-    document.documentElement.dataset.tema = t || (h >= 6 && h < 18 ? "claro" : "escuro");
+    document.documentElement.dataset.tema = t === "escuro" ? "escuro" : "claro";
     document.documentElement.dataset.skin = "eleven";
   } catch (e) {}
 </script>
