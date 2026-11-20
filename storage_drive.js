@@ -32,10 +32,35 @@
   const BKT_PISO_CHUTE = 0.05;
 
   const fetchNativo = window.fetch.bind(window);
+  const SENHA_ADMIN = "@TAD1723e";
+  const CHAVE_ADMIN = "ej_modo_admin_ativo";
+
+  function ehAdmin() {
+    try { return sessionStorage.getItem(CHAVE_ADMIN) === "1"; } catch (e) { return false; }
+  }
+
+  function entrarModoAdmin(senha) {
+    if (String(senha || "") !== SENHA_ADMIN) return false;
+    try { sessionStorage.setItem(CHAVE_ADMIN, "1"); } catch (e) {}
+    document.documentElement.dataset.admin = "1";
+    window.dispatchEvent(new CustomEvent("ej-admin-mudou", { detail: { admin: true } }));
+    return true;
+  }
+
+  function sairModoAdmin() {
+    try { sessionStorage.removeItem(CHAVE_ADMIN); } catch (e) {}
+    delete document.documentElement.dataset.admin;
+    window.dispatchEvent(new CustomEvent("ej-admin-mudou", { detail: { admin: false } }));
+  }
+
+  if (ehAdmin()) {
+    document.documentElement.dataset.admin = "1";
+  }
 
   let catalogo = { apostilas: [], organizacao_padrao: { pastas: {}, apostilas: {} }, aparencia_padrao: {} };
   let indiceBusca = {};
   let prontoPromise = null;
+  let dirProjetoHandle = null; // FileSystemDirectoryHandle da pasta Apostilas-Vercel no PC do Admin
 
   // Estado persistido do aluno (localStorage + IndexedDB + Google Drive)
   let estado = {
@@ -110,6 +135,192 @@
         tx.onerror = () => resolve(false);
       } catch (e) { resolve(false); }
     });
+  }
+
+  async function idbGuardarHandlePasta(handle) {
+    const db = await abrirIDB();
+    if (!db) return;
+    return new Promise(resolve => {
+      try {
+        const tx = db.transaction("estado_kv", "readwrite");
+        tx.objectStore("estado_kv").put(handle, "dir_projeto_handle");
+        tx.oncomplete = () => resolve(true);
+        tx.onerror = () => resolve(false);
+      } catch (e) { resolve(false); }
+    });
+  }
+
+  async function idbLerHandlePasta() {
+    const db = await abrirIDB();
+    if (!db) return null;
+    return new Promise(resolve => {
+      try {
+        const tx = db.transaction("estado_kv", "readonly");
+        const req = tx.objectStore("estado_kv").get("dir_projeto_handle");
+        req.onsuccess = () => resolve(req.result || null);
+        req.onerror = () => resolve(null);
+      } catch (e) { resolve(null); }
+    });
+  }
+
+  async function tentarRestaurarPastaProjeto() {
+    try {
+      const h = await idbLerHandlePasta();
+      if (h) dirProjetoHandle = h;
+    } catch (e) {}
+  }
+
+  function dataUrlParaUint8Array(dataUrl) {
+    const partes = String(dataUrl || "").split(",");
+    if (partes.length < 2) return null;
+    const bin = atob(partes[1]);
+    const arr = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+    return arr;
+  }
+
+  async function escreverArquivoNoHandle(dirHandle, nomeArquivo, conteudo) {
+    const fh = await dirHandle.getFileHandle(nomeArquivo, { create: true });
+    const w = await fh.createWritable();
+    await w.write(conteudo);
+    await w.close();
+  }
+
+  // Vincula ou usa a pasta do PC (Apostilas-Vercel) e salva catalogo.json, indice_busca.json, capas_pastas/ e interativos/
+  async function salvarNaPastaDoPC(pedirPermissao = true) {
+    if (!window.showDirectoryPicker) {
+      throw new Error("Seu navegador não suporta gravação direta na pasta. Use Chrome ou Edge no PC.");
+    }
+    if (!dirProjetoHandle) {
+      if (!pedirPermissao) return { ok: false, motivo: "sem_pasta" };
+      dirProjetoHandle = await window.showDirectoryPicker({
+        id: "apostilas_vercel_raiz",
+        mode: "readwrite",
+        startIn: "desktop",
+      });
+      await idbGuardarHandlePasta(dirProjetoHandle);
+    } else {
+      const perm = await dirProjetoHandle.queryPermission({ mode: "readwrite" });
+      if (perm !== "granted") {
+        if (!pedirPermissao) return { ok: false, motivo: "sem_permissao" };
+        const req = await dirProjetoHandle.requestPermission({ mode: "readwrite" });
+        if (req !== "granted") throw new Error("Permissão negada para gravar na pasta do PC.");
+      }
+    }
+
+    // 1. Grava capas customizadas (data:image/...) como arquivos reais em capas_pastas/<hash>
+    const dirCapas = await dirProjetoHandle.getDirectoryHandle("capas_pastas", { create: true });
+    const aparenciaLimpa = JSON.parse(JSON.stringify(estado.aparencia || {}));
+
+    for (const [chave, ap] of Object.entries(aparenciaLimpa)) {
+      if (ap && typeof ap.capa === "string" && ap.capa.startsWith("data:")) {
+        const mime = (ap.capa.match(/^data:(image\/[a-z0-9.+-]+);base64,/i) || [])[1] || "image/webp";
+        const ext = mime === "image/gif" ? ".gif" : (mime === "image/png" ? ".png" : (mime === "image/jpeg" ? ".jpg" : ".webp"));
+        let hashNome = Object.keys(estado.capas_custom || {}).find(k => estado.capas_custom[k] === ap.capa);
+        if (!hashNome) {
+          hashNome = Array.from(crypto.getRandomValues(new Uint8Array(10))).map(x => x.toString(16).padStart(2, "0")).join("") + ext;
+        }
+        const bytes = dataUrlParaUint8Array(ap.capa);
+        if (bytes) {
+          await escreverArquivoNoHandle(dirCapas, hashNome, bytes);
+          ap.capa = hashNome;
+          if (estado.aparencia[chave]) estado.aparencia[chave].capa = hashNome;
+        }
+      }
+    }
+
+    // 2. Grava apostilas importadas no navegador dentro de interativos/<pasta>/
+    const dirInterativos = await dirProjetoHandle.getDirectoryHandle("interativos", { create: true });
+    for (const [pasta, imp] of Object.entries(apostilasImportadas)) {
+      if (estado.excluidas && estado.excluidas[pasta]) continue;
+      const subDir = await dirInterativos.getDirectoryHandle(pasta, { create: true });
+      if (imp.html) {
+        await escreverArquivoNoHandle(subDir, "index.html", imp.html);
+      }
+      let nomeCapaArq = "";
+      if (imp.capaDataUrl && imp.capaDataUrl.startsWith("data:")) {
+        const mime = (imp.capaDataUrl.match(/^data:(image\/[a-z0-9.+-]+);base64,/i) || [])[1] || "image/jpeg";
+        const ext = mime === "image/png" ? ".png" : (mime === "image/webp" ? ".webp" : ".jpg");
+        nomeCapaArq = "capa" + ext;
+        const bytes = dataUrlParaUint8Array(imp.capaDataUrl);
+        if (bytes) await escreverArquivoNoHandle(subDir, nomeCapaArq, bytes);
+      }
+      const ficha = Object.assign({ formato: "estuda-jaider-site", arquivo: "index.html" }, imp.ficha || {});
+      if (nomeCapaArq) ficha.capa = nomeCapaArq;
+      await escreverArquivoNoHandle(subDir, "biblioteca.json", JSON.stringify(ficha, null, 2));
+    }
+
+    // 3. Monta o novo catalogo.json e indice_busca.json completos
+    const metas = listarMetadadosApostilas().map(a => {
+      const imp = apostilasImportadas[a.pasta];
+      let capaUrl = a.capa || "";
+      if (imp && imp.capaDataUrl && imp.capaDataUrl.startsWith("data:")) {
+        const mime = (imp.capaDataUrl.match(/^data:(image\/[a-z0-9.+-]+);base64,/i) || [])[1] || "image/jpeg";
+        const ext = mime === "image/png" ? ".png" : (mime === "image/webp" ? ".webp" : ".jpg");
+        capaUrl = `/interativos/${a.pasta}/capa${ext}`;
+      }
+      return {
+        pasta: a.pasta,
+        titulo: a.titulo,
+        subtitulo: a.subtitulo || "",
+        disciplina: a.disciplina || "",
+        periodo: a.periodo || "",
+        prova: a.prova || "",
+        data_aula: a.data_aula || "",
+        capitulos: a.capitulos || [],
+        contagem: a.contagem || {},
+        url: `/interativos/${a.pasta}/index.html`,
+        capa: capaUrl,
+        modificado: a.modificado || Math.floor(Date.now() / 1000),
+        chave_local: a.chave_local || "",
+        conceitos: a.conceitos || [],
+        testes: a.testes || [],
+      };
+    });
+    metas.sort((a, b) => String(b.data_aula || "").localeCompare(String(a.data_aula || "")));
+
+    const orgLimpa = lerOrganizacaoLimpa();
+    const novoCatalogo = {
+      apostilas: metas,
+      organizacao_padrao: orgLimpa,
+      aparencia_padrao: aparenciaLimpa,
+    };
+
+    const novoIndice = Object.assign({}, indiceBusca);
+    for (const [pasta, imp] of Object.entries(apostilasImportadas)) {
+      if (estado.excluidas && estado.excluidas[pasta]) {
+        delete novoIndice[pasta];
+        continue;
+      }
+      novoIndice[pasta] = {
+        titulo: (imp.ficha && imp.ficha.titulo) || pasta,
+        secoes: imp.secoes || [],
+      };
+    }
+    for (const exc of Object.keys(estado.excluidas || {})) {
+      delete novoIndice[exc];
+    }
+
+    await escreverArquivoNoHandle(dirProjetoHandle, "catalogo.json", JSON.stringify(novoCatalogo, null, 2));
+    await escreverArquivoNoHandle(dirProjetoHandle, "indice_busca.json", JSON.stringify(novoIndice));
+
+    catalogo = novoCatalogo;
+    indiceBusca = novoIndice;
+    salvarEstadoLocal(false);
+    window.dispatchEvent(new CustomEvent("ej-pasta-pc-salva", { detail: { pasta: dirProjetoHandle.name } }));
+    return { ok: true, pasta: dirProjetoHandle.name };
+  }
+
+  async function autoSalvarPastaPCSeConectada() {
+    if (!ehAdmin() || !dirProjetoHandle) return;
+    try {
+      const r = await salvarNaPastaDoPC(false);
+      if (r && r.ok && window.mostrarToast) {
+        window.mostrarToast(`Atualizado na pasta "${r.pasta}" do PC!`);
+      }
+    } catch (e) {
+      console.warn("Auto-save pasta do PC:", e);
+    }
   }
 
   // ------------------------------------------------------------------ Carregamento e persistência local
@@ -187,18 +398,23 @@
       if (indResp) indiceBusca = indResp;
       apostilasImportadas = imp || {};
 
-      // Semeia organização e aparência padrão na primeira vez
-      if (!estado.organizacao || !estado.organizacao.pastas || !Object.keys(estado.organizacao.pastas).length) {
+      // Sempre que não estiver editando como Admin (ou na primeira vez), a organização e aparência seguem o catalogo.json oficial
+      if (!ehAdmin() || !estado.organizacao || !estado.organizacao.pastas || !Object.keys(estado.organizacao.pastas).length) {
         estado.organizacao = JSON.parse(JSON.stringify(catalogo.organizacao_padrao || { pastas: {}, apostilas: {} }));
       }
       if (!estado.aparencia) estado.aparencia = {};
-      for (const [k, v] of Object.entries(catalogo.aparencia_padrao || {})) {
-        if (!(k in estado.aparencia)) {
-          estado.aparencia[k] = JSON.parse(JSON.stringify(v));
+      if (!ehAdmin()) {
+        estado.aparencia = JSON.parse(JSON.stringify(catalogo.aparencia_padrao || {}));
+      } else {
+        for (const [k, v] of Object.entries(catalogo.aparencia_padrao || {})) {
+          if (!(k in estado.aparencia)) {
+            estado.aparencia[k] = JSON.parse(JSON.stringify(v));
+          }
         }
       }
       sincronizarChavesLocaisComEstado();
       salvarEstadoLocal(false);
+      await tentarRestaurarPastaProjeto();
     })();
     return prontoPromise;
   }

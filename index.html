@@ -25,7 +25,7 @@
 <link rel="stylesheet" href="tokens.css?v=2">
 <link rel="stylesheet" href="componentes.css?v=2">
 <link rel="stylesheet" href="animacoes.css?v=2">
-<link rel="stylesheet" href="skin-eleven.css?v=4">
+<link rel="stylesheet" href="skin-eleven.css?v=5">
 <style>
   @font-face { font-family: "Inter"; font-style: normal; font-weight: 400; font-display: swap; src: url("fonts/Inter-Regular.woff2") format("woff2"); }
   @font-face { font-family: "Inter"; font-style: normal; font-weight: 600; font-display: swap; src: url("fonts/Inter-SemiBold.woff2") format("woff2"); }
@@ -101,7 +101,7 @@
     border-radius: 8px;
   }
   .app-marca:hover { background: var(--el-pilula-ativa); box-shadow: var(--el-sombra-pilula); }
-  .app-marca img { height: 15px; width: auto; display: block; object-fit: contain; }
+  .app-marca img { height: 12.75px; width: auto; display: block; object-fit: contain; }
   html[data-tema="escuro"] .app-marca img { filter: invert(1) brightness(1.1); }
 
   /* Busca Global no Topo */
@@ -250,8 +250,11 @@
   main.container {
     max-width: none !important;
     margin: 0 !important;
-    padding: 22px 30px 32px !important;
+    padding: 18px 30px 32px !important;
     box-sizing: border-box !important;
+  }
+  main.container .hero {
+    padding: 4px 0 24px !important;
   }
   main.container.ia-lendo {
     padding: 10px 16px !important;
@@ -366,7 +369,7 @@
   <!-- ================= BARRA SUPERIOR DO APP ================= -->
   <header class="app-shell-header">
     <div class="shell-header-left">
-      <button type="button" class="app-marca" id="btnMarcaInicio" title="Voltar para as apostilas">
+      <button type="button" class="app-marca" id="btnMarcaInicio" title="Voltar à tela de boas-vindas">
         <img src="logo.png?v=4" alt="estuda Jaider">
       </button>
     </div>
@@ -386,7 +389,6 @@
         <img id="contaFoto" src="" alt="" hidden>
         <span id="contaTexto">Entrar com Google</span>
       </button>
-      <button type="button" class="topbar-btn" id="btnTelaInicial" title="Voltar à tela de boas-vindas">Início</button>
       <button type="button" class="tema-botao" id="btnTemaApp" aria-label="Alternar tema claro ou escuro" title="Alternar tema"></button>
     </div>
   </header>
@@ -484,9 +486,9 @@
       }
 
       $("btnEntrarGoogle").onclick = acionarLoginGoogle;
-      $("btnTelaInicial").onclick = mostrarBoasVindas;
       $("btnMarcaInicio").onclick = () => {
         if (window.interativos) window.interativos.fechar();
+        mostrarBoasVindas();
       };
 
       // Atalho Enter na tela de boas-vindas aciona o login com Google
