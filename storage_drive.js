@@ -19,7 +19,7 @@
   const CHAVE_WEBHOOK_VAGAS = "ej_webhook_vagas_url";
   const CLIENT_ID_PADRAO = "363099555044-2v1qfhn1an7j46op8foien17mo139qfl.apps.googleusercontent.com";
   // Cole aqui a URL do seu Google Apps Script (Web App) para controlar as 20 vagas e registrar a planilha de alunos:
-  const URL_CONTROLE_VAGAS_PADRAO = "";
+  const URL_CONTROLE_VAGAS_PADRAO = "https://script.google.com/macros/s/AKfycbzO919V--CjwNYSWd6caoGtdtu6qGmca5RYjkeGwwzKY4nnCQdUTyIhgnHnqQP4-EOj/exec";
   const LIMITE_VAGAS_PADRAO = 20;
   const ARQUIVO_DRIVE = "estuda_jaider_apostilas_v1.json";
   const ESCOPOS_DRIVE = "https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email";

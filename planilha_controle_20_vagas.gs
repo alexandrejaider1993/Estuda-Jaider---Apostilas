@@ -46,11 +46,24 @@ function garantirCabecalho(sheet) {
       "Status",
       "Primeiro Acesso",
       "Último Acesso",
-      "Acessos"
+      "Acessos",
+      "",
+      "LIMITE DE VAGAS:",
+      LIMITE_PADRAO
     ]);
-    sheet.getRange("A1:G1").setFontWeight("bold");
+    sheet.getRange("A1:J1").setFontWeight("bold");
+    sheet.getRange("J1").setBackground("#fff2cc");
     sheet.setFrozenRows(1);
+  } else if (!sheet.getRange("I1").getValue()) {
+    sheet.getRange("I1").setValue("LIMITE DE VAGAS:").setFontWeight("bold");
+    sheet.getRange("J1").setValue(LIMITE_PADRAO).setFontWeight("bold").setBackground("#fff2cc");
   }
+}
+
+function obterLimiteDaPlanilha(sheet, limiteFallback) {
+  const valCelula = Number(sheet.getRange("J1").getValue());
+  if (valCelula > 0) return valCelula;
+  return Number(limiteFallback) > 0 ? Number(limiteFallback) : LIMITE_PADRAO;
 }
 
 function doPost(e) {
@@ -61,8 +74,6 @@ function doPost(e) {
     const dados = JSON.parse((e && e.postData && e.postData.contents) || "{}");
     const email = String(dados.email || "").trim().toLowerCase();
     const nome = String(dados.nome || "Estudante").trim();
-    const limite = Number(dados.limite) > 0 ? Number(dados.limite) : LIMITE_PADRAO;
-
     if (!email) {
       return respostaJSON({ autorizado: false, mensagem: "E-mail não informado." });
     }
@@ -70,6 +81,7 @@ function doPost(e) {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
     const sheet = ss.getSheets()[0];
     garantirCabecalho(sheet);
+    const limite = obterLimiteDaPlanilha(sheet, dados.limite);
 
     const agora = Utilities.formatDate(new Date(), "America/Sao_Paulo", "dd/MM/yyyy HH:mm:ss");
     const ultimaLinha = sheet.getLastRow();
