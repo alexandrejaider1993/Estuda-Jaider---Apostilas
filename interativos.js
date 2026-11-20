@@ -1,4 +1,4 @@
-/*
+﻿/*
   Apostilas interativas (ferramenta #interativos).
 
   Lista as apostilas da pasta Interativos/ (GET /api/interativos) em cartões e abre o site
@@ -182,6 +182,12 @@
   :is(#interativos, .ej-estojo-host) .ia-rot[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--cor-superficie), 0 0 0 4px var(--cor-tinta); }
   :is(#interativos, .ej-estojo-host) .ia-estojo-estado { font-size: 12px; color: var(--cor-suave); white-space: nowrap; }
   :is(#interativos, .ej-estojo-host) .ia-estojo-estado.erro { color: var(--cor-arteria); }
+  @media (pointer: coarse) {
+    :is(#interativos, .ej-estojo-host) .ia-ferr { width: 44px; height: 44px; }
+    :is(#interativos, .ej-estojo-host) .ia-ferr svg { width: 22px; height: 22px; }
+    :is(#interativos, .ej-estojo-host) .ia-cor { width: 34px; height: 34px; }
+    #interativos .ia-palco.com-estojo .ia-quadro { width: calc(100% - 70px); }
+  }
   `;
 
   function montar() {
@@ -902,7 +908,7 @@
     try { doc = q.contentDocument; } catch (e) { return; }
     if (!doc || !doc.head || doc.URL === "about:blank" || q.contentWindow.ejEstojo) return;
     const s = doc.createElement("script");
-    s.src = "/estojo_apostila.js?v=12";
+    s.src = "/estojo_apostila.js?v=13";
     s.onload = () => {
       try {
         q.contentWindow.ejEstojo.iniciar({ pasta: a.pasta, marcaTexto: MT(), aoMudar: e => barraIA.definir(e) });

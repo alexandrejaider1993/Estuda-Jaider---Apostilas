@@ -680,6 +680,79 @@
     return Math.hypot(x - (a[0] + t * dx), y - (a[1] + t * dy));
   }
 
+  // ------------------------------------------------------------ tablet / celular (toque e caneta)
+  // 1) Arrastar o dedo ou a caneta sobre o texto marca na hora (como um marca-texto de verdade).
+  //    Arrasto vertical continua rolando a página (touch-action: pan-y); o arrasto lateral marca.
+  // 2) Seleção pelo toque longo do sistema (alças azuis): quando o aluno solta e a seleção fica parada, marca sozinho.
+  const ferramentaDeTexto = () => ferramenta === "marca" || ferramenta === "sublinhado" || ferramenta === "tachado";
+  function caretEm(x, y) {
+    if (D.caretRangeFromPoint) return D.caretRangeFromPoint(x, y);
+    if (D.caretPositionFromPoint) {
+      const p = D.caretPositionFromPoint(x, y);
+      if (!p) return null;
+      const r = D.createRange(); r.setStart(p.offsetNode, p.offset); r.collapse(true); return r;
+    }
+    return null;
+  }
+  function ligarToqueMarcaTexto() {
+    let toque = null, timerSel = 0, dedosNaTela = 0;
+    D.addEventListener("pointerdown", e => {
+      if (e.pointerType === "mouse") return;
+      dedosNaTela++;
+      if (!ativo() || !ferramentaDeTexto()) return;
+      const art = artigo();
+      if (!art || !art.contains(e.target) || e.target.closest(".ej-ui, mark.ej-m, a, button, input, textarea, select")) return;
+      const c = caretEm(e.clientX, e.clientY);
+      if (!c) return;
+      toque = { id: e.pointerId, x0: e.clientX, y0: e.clientY, ini: c, marcando: false };
+    }, true);
+    D.addEventListener("pointermove", e => {
+      if (!toque || e.pointerId !== toque.id) return;
+      const dx = Math.abs(e.clientX - toque.x0), dy = Math.abs(e.clientY - toque.y0);
+      if (!toque.marcando) {
+        if (dx < 8 && dy < 8) return;
+        if (e.pointerType === "touch" && dy > dx) { toque = null; return; }   // dedo na vertical = rolar
+        toque.marcando = true;
+      }
+      e.preventDefault();
+      const fim = caretEm(e.clientX, e.clientY);
+      if (!fim) return;
+      const r = D.createRange();
+      const antes = toque.ini.compareBoundaryPoints(Range.START_TO_START, fim) <= 0;
+      if (antes) { r.setStart(toque.ini.startContainer, toque.ini.startOffset); r.setEnd(fim.startContainer, fim.startOffset); }
+      else { r.setStart(fim.startContainer, fim.startOffset); r.setEnd(toque.ini.startContainer, toque.ini.startOffset); }
+      const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+    }, { capture: true, passive: false });
+    const soltar = e => {
+      if (e.pointerType !== "mouse") dedosNaTela = Math.max(0, dedosNaTela - 1);
+      if (toque && e.pointerId === toque.id) {
+        const marcou = toque.marcando; toque = null;
+        if (marcou) { setTimeout(marcarSelecao, 0); return; }
+      }
+      agendarMarcarSelecaoToque();
+    };
+    D.addEventListener("pointerup", soltar, true);
+    D.addEventListener("pointercancel", e => { if (toque && e.pointerId === toque.id) toque = null; if (e.pointerType !== "mouse") dedosNaTela = Math.max(0, dedosNaTela - 1); }, true);
+    D.addEventListener("touchend", () => agendarMarcarSelecaoToque(), true);
+    // seleção do sistema (toque longo + alças): espera ficar parada e sem dedo na tela
+    function agendarMarcarSelecaoToque() {
+      if (!ativo() || !ferramentaDeTexto()) return;
+      clearTimeout(timerSel);
+      timerSel = setTimeout(() => {
+        if (dedosNaTela > 0 || toque) return;
+        const s = getSelection();
+        if (s && !s.isCollapsed) marcarSelecao();
+      }, 650);
+    }
+    D.addEventListener("selectionchange", () => {
+      if (!("ontouchstart" in W) && !navigator.maxTouchPoints) return;
+      if (toque && toque.marcando) return;
+      agendarMarcarSelecaoToque();
+    });
+    // impede o menu "Copiar / Pesquisar" do sistema de atrapalhar enquanto o marca-texto está ativo
+    D.addEventListener("contextmenu", e => { if (ativo() && ferramentaDeTexto() && e.pointerType !== "mouse" && artigo()?.contains(e.target)) e.preventDefault(); }, true);
+  }
+
   // ------------------------------------------------------------ API para a barra do app
   function usar(f, opcoes) {
     if (opcoes) { op = { ...op, ...opcoes }; salvarOpcoes(); }
@@ -730,7 +803,8 @@
     camada.addEventListener("pointerup", aoSoltar);
     camada.addEventListener("pointercancel", aoSoltar);
     // marca-texto: ao soltar o mouse com texto selecionado
-    D.addEventListener("pointerup", () => { if (ativo() && (ferramenta === "marca" || ferramenta === "sublinhado" || ferramenta === "tachado")) setTimeout(marcarSelecao, 0); });
+    D.addEventListener("pointerup", e => { if (e.pointerType === "mouse" && ativo() && ferramentaDeTexto()) setTimeout(marcarSelecao, 0); });
+    ligarToqueMarcaTexto();
     // clicar numa marca abre o menu (seta, marca-texto ou sublinhado sem seleção)
     D.addEventListener("click", e => {
       if (!ativo()) return;
@@ -770,6 +844,8 @@
   const CSS = `
   .ej-camada { position: absolute; left: 0; top: 0; z-index: 4; pointer-events: none; }   /* abaixo do cabeçalho do site (z 5, sticky): ao rolar, marcas e adesivos passam por baixo dele */
   .ej-camada.ej-captura { pointer-events: auto; touch-action: none; }
+  html[data-ej-ferramenta="marca"] :is(article.conteudo, .ej-raiz), html[data-ej-ferramenta="sublinhado"] :is(article.conteudo, .ej-raiz), html[data-ej-ferramenta="tachado"] :is(article.conteudo, .ej-raiz) {
+    touch-action: pan-y pinch-zoom; -webkit-touch-callout: none; -webkit-user-select: text; user-select: text; }
   .ej-camada.ej-oculta > :not(.ej-menu) { display: none; }
   .ej-camada.ej-sem-alvo, .ej-camada.ej-sem-alvo * { pointer-events: none !important; }
   .ej-tracos { position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
