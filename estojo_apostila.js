@@ -88,6 +88,14 @@
   let pilhaDesfazer = [], pilhaRefazer = [];
   let camada, svg, observador, quadroAgendado = 0, aplicando = false;
   let tracoAtual = null, arrasto = null, apagando = false;
+  let apagandoId = null, ultimaCanetaEm = 0;
+  const PALMA_MS = 400;
+  const ehCaneta = e => e && e.pointerType === "pen";
+  const palmaRecente = e => e && e.pointerType === "touch" && (agora() - ultimaCanetaEm < PALMA_MS);
+  function marcarCaneta(ativa) {
+    ultimaCanetaEm = agora();
+    if (ativa) D.documentElement.classList.add("ej-pen-ativa");
+  }
 
   // ------------------------------------------------------------ utilidades
   const agora = () => Date.now();
@@ -355,7 +363,7 @@
   }
   function caminhoSvg(p) {
     if (!p.length) return "";
-    if (p.length === 1) return `M${p[0][0]} ${p[0][1]}l0.01 0`;
+    if (p.length === 1) return `M${p[0][0].toFixed(1)} ${p[0][1].toFixed(1)}l0.01 0`;
     let d = `M${p[0][0].toFixed(1)} ${p[0][1].toFixed(1)}`;
     for (let i = 1; i < p.length - 1; i++) {
       const mx = (p[i][0] + p[i + 1][0]) / 2, my = (p[i][1] + p[i + 1][1]) / 2;
@@ -599,14 +607,27 @@
   }
   function aoApertar(e) {
     if (e.button !== 0 || e.target.closest(".ej-nota, .ej-menu, .ej-adesivo, .ej-selo")) return;
+    if (ehCaneta(e)) marcarCaneta(true);
+    else if (palmaRecente(e)) return;
+    // se uma palma/dedo tocou logo antes da caneta encostar, descarta o toque e assume a caneta
+    if (tracoAtual) {
+      if (ehCaneta(e) && tracoAtual.pointerType === "touch" && (agora() - tracoAtual.iniciadoEm < 180) && tracoAtual.pts.length < 6) {
+        tracoAtual.el.remove();
+        tracoAtual = null;
+      } else {
+        return;
+      }
+    }
+    if (apagando && !ehCaneta(e)) return;
     const x = pX(e), y = pY(e);
     fecharMenu();
     if (ferramenta === "caneta" || ferramenta === "marcador") {
       if (!dentroDoArtigo(x, y)) return;
       e.preventDefault();
-      camada.setPointerCapture(e.pointerId);
+      try { camada.setPointerCapture(e.pointerId); } catch (err) {}
       const marcador = ferramenta === "marcador";
       tracoAtual = {
+        pointerId: e.pointerId, pointerType: e.pointerType, iniciadoEm: agora(),
         pts: [[x, y]], cor: marcador ? op.corMarca : op.corCaneta,
         largura: marcador ? 16 : op.largura, opacidade: 1, marcador, ...(marcador ? { intensidade: forca(op) } : {})
       };
@@ -618,7 +639,11 @@
       svg.append(tracoAtual.el);
       return;
     }
-    if (ferramenta === "borracha") { e.preventDefault(); camada.setPointerCapture(e.pointerId); apagando = true; apagarEm(x, y); return; }
+    if (ferramenta === "borracha") {
+      e.preventDefault();
+      try { camada.setPointerCapture(e.pointerId); } catch (err) {}
+      apagando = true; apagandoId = e.pointerId; apagarEm(x, y); return;
+    }
     if (ferramenta === "nota" || ferramenta === "adesivo") {
       if (!dentroDoArtigo(x, y)) return;
       e.preventDefault();
@@ -636,20 +661,40 @@
     }
   }
   function aoMover(e) {
-    if (tracoAtual) {
-      const evs = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
-      for (const ev of evs) tracoAtual.pts.push([pX(ev), pY(ev)]);
+    if (ehCaneta(e)) marcarCaneta(true);
+    if (tracoAtual && e.pointerId === tracoAtual.pointerId) {
+      const co = e.getCoalescedEvents && e.getCoalescedEvents();
+      const evs = (co && co.length) ? co : [e];
+      const o = org();
+      for (const ev of evs) {
+        const x = ev.clientX + o.x, y = ev.clientY + o.y;
+        const u = tracoAtual.pts[tracoAtual.pts.length - 1];
+        if (!u || Math.hypot(x - u[0], y - u[1]) >= 0.25) tracoAtual.pts.push([x, y]);
+      }
       tracoAtual.el.setAttribute("d", caminhoSvg(tracoAtual.pts));
-    } else if (apagando) apagarEm(pX(e), pY(e));
+    } else if (apagando && e.pointerId === apagandoId) {
+      apagarEm(pX(e), pY(e));
+    }
   }
-  function aoSoltar() {
-    apagando = false;
+  function aoSoltar(e) {
+    if (ehCaneta(e)) marcarCaneta(false);
+    if (apagando && (!e || e.pointerId === apagandoId)) { apagando = false; apagandoId = null; }
     if (!tracoAtual) return;
+    if (e && e.pointerId != null && e.pointerId !== tracoAtual.pointerId) return;
     const t = tracoAtual; tracoAtual = null;
-    // simplifica: tira pontos a menos de 1,5 px do anterior
-    const pts = t.pts.filter((p, i, a) => i === 0 || i === a.length - 1 || Math.hypot(p[0] - a[i - 1][0], p[1] - a[i - 1][1]) > 1.5);
-    const an = ancorar(pts[0][0], pts[0][1]);
+    // simplifica comparando com o último ponto mantido (evita colapsar curvas em telas 120-240 Hz)
+    const minDist = t.marcador ? 1.2 : 0.75;
+    const pts = [];
+    for (let i = 0; i < t.pts.length; i++) {
+      const p = t.pts[i];
+      if (i === 0 || i === t.pts.length - 1) { pts.push(p); continue; }
+      const u = pts[pts.length - 1];
+      if (Math.hypot(p[0] - u[0], p[1] - u[1]) >= minDist) pts.push(p);
+    }
+    if (pts.length === 2 && Math.hypot(pts[1][0] - pts[0][0], pts[1][1] - pts[0][1]) < 0.2) pts.pop();
     t.el.remove();
+    if (!pts.length) return;
+    const an = ancorar(pts[0][0], pts[0][1]);
     if (!an) return;
     const r = an.r;
     mudar({
@@ -699,27 +744,39 @@
   }
   function ligarToqueMarcaTexto() {
     let toque = null, timerSel = 0, dedosNaTela = 0;
+    D.addEventListener("pointermove", e => {
+      if (ehCaneta(e)) marcarCaneta(true);
+    }, { capture: true, passive: true });
     D.addEventListener("pointerdown", e => {
       if (e.pointerType === "mouse") return;
+      if (ehCaneta(e)) marcarCaneta(true);
+      else {
+        if (palmaRecente(e) || (toque && toque.tipo === "pen")) return;
+        D.documentElement.classList.remove("ej-pen-ativa");
+      }
       dedosNaTela++;
       if (!ativo() || !ferramentaDeTexto()) return;
       const art = artigo();
       if (!art || !art.contains(e.target) || e.target.closest(".ej-ui, mark.ej-m, a, button, input, textarea, select")) return;
+      if (toque && (!ehCaneta(e) || toque.marcando)) return;
       const c = caretEm(e.clientX, e.clientY);
-      if (!c) return;
-      toque = { id: e.pointerId, x0: e.clientX, y0: e.clientY, ini: c, marcando: false };
+      if (!c && !ehCaneta(e)) return;
+      if (ehCaneta(e)) e.preventDefault();
+      toque = { id: e.pointerId, tipo: e.pointerType, x0: e.clientX, y0: e.clientY, ini: c, marcando: false };
     }, true);
     D.addEventListener("pointermove", e => {
       if (!toque || e.pointerId !== toque.id) return;
       const dx = Math.abs(e.clientX - toque.x0), dy = Math.abs(e.clientY - toque.y0);
+      const lim = toque.tipo === "pen" ? 4 : 8;
       if (!toque.marcando) {
-        if (dx < 8 && dy < 8) return;
+        if (dx < lim && dy < lim) return;
         if (e.pointerType === "touch" && dy > dx) { toque = null; return; }   // dedo na vertical = rolar
         toque.marcando = true;
       }
       e.preventDefault();
       const fim = caretEm(e.clientX, e.clientY);
       if (!fim) return;
+      if (!toque.ini) { toque.ini = fim; return; }
       const r = D.createRange();
       const antes = toque.ini.compareBoundaryPoints(Range.START_TO_START, fim) <= 0;
       if (antes) { r.setStart(toque.ini.startContainer, toque.ini.startOffset); r.setEnd(fim.startContainer, fim.startOffset); }
@@ -728,6 +785,7 @@
     }, { capture: true, passive: false });
     const soltar = e => {
       if (e.pointerType !== "mouse") dedosNaTela = Math.max(0, dedosNaTela - 1);
+      if (ehCaneta(e)) marcarCaneta(false);
       if (toque && e.pointerId === toque.id) {
         const marcou = toque.marcando; toque = null;
         if (marcou) { setTimeout(marcarSelecao, 0); return; }
@@ -735,7 +793,11 @@
       agendarMarcarSelecaoToque();
     };
     D.addEventListener("pointerup", soltar, true);
-    D.addEventListener("pointercancel", e => { if (toque && e.pointerId === toque.id) toque = null; if (e.pointerType !== "mouse") dedosNaTela = Math.max(0, dedosNaTela - 1); }, true);
+    D.addEventListener("pointercancel", e => {
+      if (ehCaneta(e)) marcarCaneta(false);
+      if (toque && e.pointerId === toque.id) toque = null;
+      if (e.pointerType !== "mouse") dedosNaTela = Math.max(0, dedosNaTela - 1);
+    }, true);
     D.addEventListener("touchend", () => agendarMarcarSelecaoToque(), true);
     // seleção do sistema (toque longo + alças): espera ficar parada e sem dedo na tela
     function agendarMarcarSelecaoToque() {
@@ -805,6 +867,13 @@
     camada.addEventListener("pointermove", aoMover);
     camada.addEventListener("pointerup", aoSoltar);
     camada.addEventListener("pointercancel", aoSoltar);
+    const bloquearToqueCaptura = e => {
+      if (!camada.classList.contains("ej-captura")) return;
+      if (e.target.closest(".ej-nota, .ej-menu, .ej-adesivo, .ej-selo")) return;
+      e.preventDefault();
+    };
+    camada.addEventListener("touchstart", bloquearToqueCaptura, { passive: false });
+    camada.addEventListener("touchmove", bloquearToqueCaptura, { passive: false });
     // marca-texto: ao soltar o mouse com texto selecionado
     D.addEventListener("pointerup", e => { if (e.pointerType === "mouse" && ativo() && ferramentaDeTexto()) setTimeout(marcarSelecao, 0); });
     ligarToqueMarcaTexto();
@@ -846,9 +915,11 @@
 
   const CSS = `
   .ej-camada { position: absolute; left: 0; top: 0; z-index: 4; pointer-events: none; }   /* abaixo do cabeçalho do site (z 5, sticky): ao rolar, marcas e adesivos passam por baixo dele */
-  .ej-camada.ej-captura { pointer-events: auto; touch-action: none; }
+  .ej-camada.ej-captura { pointer-events: auto; touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
   html[data-ej-ferramenta="marca"] :is(article.conteudo, .ej-raiz), html[data-ej-ferramenta="sublinhado"] :is(article.conteudo, .ej-raiz), html[data-ej-ferramenta="tachado"] :is(article.conteudo, .ej-raiz) {
     touch-action: pan-y pinch-zoom; -webkit-touch-callout: none; -webkit-user-select: text; user-select: text; }
+  html.ej-pen-ativa[data-ej-ferramenta="marca"] :is(article.conteudo, .ej-raiz), html.ej-pen-ativa[data-ej-ferramenta="sublinhado"] :is(article.conteudo, .ej-raiz), html.ej-pen-ativa[data-ej-ferramenta="tachado"] :is(article.conteudo, .ej-raiz) {
+    touch-action: none; }
   .ej-camada.ej-oculta > :not(.ej-menu) { display: none; }
   .ej-camada.ej-sem-alvo, .ej-camada.ej-sem-alvo * { pointer-events: none !important; }
   .ej-tracos { position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
@@ -870,19 +941,19 @@
   html[data-ej-ferramenta="borracha"] mark.ej-m:hover { outline: 2px dashed #E5342D; }
   .ej-nota, .ej-adesivo, .ej-selo, .ej-menu { pointer-events: auto; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
   .ej-nota { position: absolute; }
-  .ej-nota-icone { width: 26px; height: 26px; padding: 4px; border: 0; border-radius: 6px; cursor: grab; color: #5b4a00;
+  .ej-nota-icone { width: 26px; height: 26px; padding: 4px; border: 0; border-radius: 6px; cursor: grab; touch-action: none; color: #5b4a00;
     background: var(--ej-nota); box-shadow: 0 0 0 .5px rgba(0,0,0,.2), 0 2px 6px rgba(0,0,0,.18); }
   .ej-nota-icone svg { width: 100%; height: 100%; display: block; }
   .ej-nota-cartao { display: none; width: 230px; background: var(--ej-nota); border-radius: 8px; box-shadow: 0 0 0 .5px rgba(0,0,0,.18), 0 8px 24px rgba(0,0,0,.18); overflow: hidden; }
   .ej-nota.aberta .ej-nota-icone { display: none; }
   .ej-nota.aberta .ej-nota-cartao { display: block; }
-  .ej-nota-topo { display: flex; align-items: center; gap: 2px; padding: 4px 4px 0 10px; cursor: grab; user-select: none; -webkit-user-select: none; font-size: 11px; font-weight: 600; color: rgba(0,0,0,.55); letter-spacing: .04em; text-transform: uppercase; }
+  .ej-nota-topo { display: flex; align-items: center; gap: 2px; padding: 4px 4px 0 10px; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; font-size: 11px; font-weight: 600; color: rgba(0,0,0,.55); letter-spacing: .04em; text-transform: uppercase; }
   .ej-nota-topo span { flex: 1; }
   .ej-nota-topo button { width: 24px; height: 22px; border: 0; background: transparent; border-radius: 5px; cursor: pointer; color: rgba(0,0,0,.6); font-size: 16px; line-height: 1; }
   .ej-nota-topo button:hover { background: rgba(0,0,0,.08); }
   .ej-nota textarea { display: block; width: 100%; box-sizing: border-box; min-height: 90px; resize: vertical; border: 0; outline: 0; background: transparent;
     padding: 6px 10px 10px; font: 14px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; color: #1d1d1f; }
-  .ej-adesivo { position: absolute; font-size: 26px; line-height: 1; cursor: grab; user-select: none; filter: drop-shadow(0 1px 1.5px rgba(0,0,0,.25));
+  .ej-adesivo { position: absolute; font-size: 26px; line-height: 1; cursor: grab; touch-action: none; user-select: none; filter: drop-shadow(0 1px 1.5px rgba(0,0,0,.25));
     transform: rotate(var(--ej-giro, 0deg)) scale(var(--ej-escala, 1)); transform-origin: center; }
   .ej-adesivo.ej-seta svg { display: block; width: 48px; height: auto; }
   .ej-adesivo.ej-rotulo { font: 700 11px/1 system-ui, -apple-system, "Segoe UI", sans-serif; letter-spacing: .06em; color: #fff; background: var(--ej-rot);
@@ -905,8 +976,8 @@
   .ej-forca-num input:focus { outline: 2px solid #1d1d1f; outline-offset: 1px; }
   .ej-menu-cores button { width: 22px; height: 22px; border-radius: 50%; border: 0; background: var(--c); cursor: pointer; box-shadow: inset 0 0 0 1px rgba(0,0,0,.15); }
   .ej-menu-cores button.atual { box-shadow: inset 0 0 0 1px rgba(0,0,0,.15), 0 0 0 2px #fff, 0 0 0 4px #1d1d1f; }
-  .ej-menu-acoes { display: flex; gap: 6px; }
-  .ej-menu-acoes button { flex: 1; height: 28px; border: 0; border-radius: 6px; background: #f2f2f4; font: 13px system-ui, -apple-system, "Segoe UI", sans-serif; cursor: pointer; color: #1d1d1f; }
+  .ej-menu-acoes { display: flex; flex-wrap: wrap; gap: 6px; }
+  .ej-menu-acoes button { flex: 1 0 auto; min-height: 28px; padding: 5px 10px; border: 0; border-radius: 6px; background: #f2f2f4; font: 13px/1.2 system-ui, -apple-system, "Segoe UI", sans-serif; cursor: pointer; color: #1d1d1f; white-space: nowrap; }
   .ej-menu-acoes button:hover { background: #e6e6e9; }
   .ej-menu-acoes [data-a="del"] { color: #c4271f; }
   .ej-menu textarea { width: 100%; box-sizing: border-box; border: 0; border-radius: 6px; background: #fff8cc; padding: 6px 8px; resize: vertical;

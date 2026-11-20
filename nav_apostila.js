@@ -113,9 +113,9 @@
     .ej-pn.ej-fixo { box-shadow: none; background: transparent; border-left: 1px solid rgba(0,0,0,.08); border-radius: 0; width: 230px; padding: 4px 0 4px 12px; z-index: 30; top: calc(var(--ej-topo, 64px) + 60px); }
   }
   /* blocos dentro do texto */
-  .ej-liga { margin: 14px 0; padding: 10px 14px; border-radius: 10px; background: #F3F6FA; border: 1px solid #DCE4EF; font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; color: #1F2430; }
-  .ej-liga b { margin-right: 6px; }
-  .ej-liga a { color: #2C4A7A; font-weight: 600; text-decoration: none; margin-right: 10px; white-space: nowrap; }
+  .ej-liga { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; box-sizing: border-box; max-width: 100%; margin: 14px 0; padding: 10px 14px; border-radius: 10px; background: #F3F6FA; border: 1px solid #DCE4EF; font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; color: #1F2430; overflow-wrap: anywhere; }
+  .ej-liga b { white-space: nowrap; }
+  .ej-liga a { color: #2C4A7A; font-weight: 600; text-decoration: none; max-width: 100%; overflow-wrap: anywhere; }
   .ej-liga a:hover { text-decoration: underline; }
   .ej-rever { display: inline-block; margin: 8px 0 0; padding: 6px 10px; border: 1px solid #E5342D; border-radius: 8px; background: #fff; color: #B42318; font: 600 13px/1 system-ui, sans-serif; cursor: pointer; }
   .ej-rever:hover { background: #FEF3F2; }

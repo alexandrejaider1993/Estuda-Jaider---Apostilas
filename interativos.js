@@ -835,7 +835,7 @@
     if (q.contentWindow.ejNav) return;
     const a = aberta, pedido = pedidoAbrir; pedidoAbrir = null;
     const s = doc.createElement("script");
-    s.src = "/nav_apostila.js?v=4";
+    s.src = "/nav_apostila.js?v=5";
     s.onload = async () => {
       if (!a || aberta !== a) return;
       let posicao = a.posicao || null;
@@ -929,7 +929,7 @@
     try { doc = q.contentDocument; } catch (e) { return; }
     if (!doc || !doc.head || doc.URL === "about:blank" || q.contentWindow.ejEstojo) return;
     const s = doc.createElement("script");
-    s.src = "/estojo_apostila.js?v=14";
+    s.src = "/estojo_apostila.js?v=16";
     s.onload = () => {
       try {
         q.contentWindow.ejEstojo.iniciar({ pasta: a.pasta, marcaTexto: MT(), aoMudar: e => barraIA.definir(e) });
