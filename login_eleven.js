@@ -37,7 +37,7 @@
   raiz.className = "bv11 bv11--arte";
   raiz.innerHTML = `
     <header class="bv11__topo">
-      <span class="bv11__marca">estuda Jaider</span>
+      <img class="bv11__marca-img" src="logo.png?v=4" alt="estuda Jaider">
       <span class="bv11__topo-dir" data-slot="tema"></span>
     </header>
 

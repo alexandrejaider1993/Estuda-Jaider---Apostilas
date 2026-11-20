@@ -1191,6 +1191,8 @@
 }
 :root[data-skin="eleven"] .bv11__topo { padding: 22px 32px 0; }
 :root[data-skin="eleven"] .bv11__marca { font: 400 18px/1 var(--fonte-ui); letter-spacing: -0.01em; }
+:root[data-skin="eleven"] .bv11__marca-img { height: 17px; width: auto; display: block; object-fit: contain; }
+:root[data-skin="eleven"][data-tema="escuro"] .bv11__marca-img { filter: invert(1) brightness(1.1); }
 :root[data-skin="eleven"] .bv11 #btnTemaLogin { background: transparent; box-shadow: none; }
 :root[data-skin="eleven"] .bv11__hero { padding-top: clamp(4px, 2vh, 28px); }
 :root[data-skin="eleven"] .bv11__titulo { font-size: clamp(38px, min(5.6vw, 8.4vh), 78px); line-height: 1.04; letter-spacing: -0.02em; }

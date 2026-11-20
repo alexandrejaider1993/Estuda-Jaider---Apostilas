@@ -25,7 +25,7 @@
 <link rel="stylesheet" href="tokens.css?v=2">
 <link rel="stylesheet" href="componentes.css?v=2">
 <link rel="stylesheet" href="animacoes.css?v=2">
-<link rel="stylesheet" href="skin-eleven.css?v=3">
+<link rel="stylesheet" href="skin-eleven.css?v=4">
 <style>
   @font-face { font-family: "Inter"; font-style: normal; font-weight: 400; font-display: swap; src: url("fonts/Inter-Regular.woff2") format("woff2"); }
   @font-face { font-family: "Inter"; font-style: normal; font-weight: 600; font-display: swap; src: url("fonts/Inter-SemiBold.woff2") format("woff2"); }
@@ -93,18 +93,16 @@
   .app-marca {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
     border: 0;
     background: transparent;
     color: var(--cor-tinta);
-    font: 600 16px/1 var(--fonte-ui);
-    letter-spacing: -0.02em;
     cursor: pointer;
-    padding: 6px 8px;
+    padding: 7px 10px;
     border-radius: 8px;
   }
   .app-marca:hover { background: var(--el-pilula-ativa); box-shadow: var(--el-sombra-pilula); }
-  .app-marca img { width: 22px; height: 22px; border-radius: 5px; object-fit: cover; }
+  .app-marca img { height: 15px; width: auto; display: block; object-fit: contain; }
+  html[data-tema="escuro"] .app-marca img { filter: invert(1) brightness(1.1); }
 
   /* Busca Global no Topo */
   .shell-header-center {
@@ -369,8 +367,7 @@
   <header class="app-shell-header">
     <div class="shell-header-left">
       <button type="button" class="app-marca" id="btnMarcaInicio" title="Voltar para as apostilas">
-        <img src="favicon.png?v=3" alt="">
-        <span>estuda Jaider</span>
+        <img src="logo.png?v=4" alt="estuda Jaider">
       </button>
     </div>
 
@@ -406,7 +403,7 @@
   <script src="faixa_preenchida.js?v=2"></script>
   <script src="storage_drive.js?v=2"></script>
   <script src="pasta_visual.js?v=2"></script>
-  <script src="login_eleven.js?v=3"></script>
+  <script src="login_eleven.js?v=4"></script>
   <script src="interativos.js?v=2"></script>
   <script>
     (function () {
