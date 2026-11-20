@@ -1,6 +1,633 @@
 {
   "apostilas": [
     {
+      "pasta": "antimicrobianos-1a",
+      "titulo": "Antimicrobianos · 1A",
+      "subtitulo": "",
+      "disciplina": "",
+      "periodo": "",
+      "prova": "",
+      "data_aula": "",
+      "capitulos": [],
+      "contagem": {},
+      "url": "/interativos/antimicrobianos-1a/index.html",
+      "capa": "",
+      "modificado": 1795198487,
+      "chave_local": "farmaco-antimicrobianos-1a",
+      "conceitos": [
+        {
+          "id": "foco-disciplina",
+          "nome": "O que a Farmacoterapia cobra"
+        },
+        {
+          "id": "espectro-afinidade",
+          "nome": "Espectro e afinidade pelo tecido"
+        },
+        {
+          "id": "agente-provavel",
+          "nome": "Agente etiológico provável"
+        },
+        {
+          "id": "origem-infeccao",
+          "nome": "Comunidade ou hospital"
+        },
+        {
+          "id": "pressao-seletiva",
+          "nome": "Pressão seletiva e CCIH"
+        },
+        {
+          "id": "reavaliar-48h",
+          "nome": "Reavaliar em 48 horas"
+        },
+        {
+          "id": "cim",
+          "nome": "Concentração inibitória mínima"
+        },
+        {
+          "id": "dose-ataque",
+          "nome": "Dose de ataque"
+        },
+        {
+          "id": "receita-retida",
+          "nome": "Receita com retenção"
+        },
+        {
+          "id": "adesao",
+          "nome": "Completar o tratamento"
+        },
+        {
+          "id": "caminho-meio",
+          "nome": "O caminho do meio"
+        },
+        {
+          "id": "poucos-novos",
+          "nome": "Poucos antimicrobianos novos"
+        },
+        {
+          "id": "rodizio",
+          "nome": "Rodízio de antimicrobianos"
+        },
+        {
+          "id": "associacao-resistencia",
+          "nome": "Associação contra resistência"
+        },
+        {
+          "id": "profilaxia-tratamento",
+          "nome": "Profilaxia não é tratamento"
+        },
+        {
+          "id": "termos",
+          "nome": "Antimicrobiano e antibiótico"
+        },
+        {
+          "id": "antissepsia",
+          "nome": "Antissepsia, desinfecção e esterilização"
+        },
+        {
+          "id": "cida-statico",
+          "nome": "Bactericida e bacteriostático"
+        },
+        {
+          "id": "dose-efeito",
+          "nome": "Dose e efeito"
+        },
+        {
+          "id": "imuno-cida",
+          "nome": "Imunodeprimido e bactericida"
+        },
+        {
+          "id": "cim-cbm",
+          "nome": "CIM e CBM no laboratório"
+        },
+        {
+          "id": "historia",
+          "nome": "Linha do tempo das famílias"
+        },
+        {
+          "id": "betalactamico-maior",
+          "nome": "Beta-lactâmicos, a maior família"
+        },
+        {
+          "id": "macrolideo-alternativa",
+          "nome": "Macrolídeo como alternativa"
+        },
+        {
+          "id": "vanco-reserva",
+          "nome": "Vancomicina para resistência"
+        },
+        {
+          "id": "geracoes",
+          "nome": "Gerações: quinolonas e cefalosporinas"
+        },
+        {
+          "id": "classe-quimica",
+          "nome": "Famílias pela estrutura química"
+        },
+        {
+          "id": "assoc-espectro",
+          "nome": "Associar para somar espectro"
+        },
+        {
+          "id": "vanco-teico",
+          "nome": "Vancomicina e teicoplanina"
+        },
+        {
+          "id": "polimixina-ultima",
+          "nome": "Polimixina como último recurso"
+        },
+        {
+          "id": "espectro-class",
+          "nome": "Espectro estreito e amplo"
+        },
+        {
+          "id": "origem-class",
+          "nome": "Origem do fármaco"
+        },
+        {
+          "id": "mec-parede",
+          "nome": "Alvo na parede"
+        },
+        {
+          "id": "mec-proteica",
+          "nome": "Alvo no ribossomo"
+        },
+        {
+          "id": "mec-outros",
+          "nome": "Membrana, ácidos nucleicos e folato"
+        },
+        {
+          "id": "uso-correto",
+          "nome": "Quatro razões para o uso correto"
+        },
+        {
+          "id": "microbioma",
+          "nome": "Microbioma e superinfecção"
+        },
+        {
+          "id": "custo",
+          "nome": "Custo dos antimicrobianos"
+        },
+        {
+          "id": "resist-natural",
+          "nome": "Resistência natural"
+        },
+        {
+          "id": "resist-adquirida",
+          "nome": "Resistência adquirida"
+        },
+        {
+          "id": "mec-raciocinio",
+          "nome": "Um raciocínio para todas as classes"
+        },
+        {
+          "id": "mec-permeab",
+          "nome": "Menos entrada"
+        },
+        {
+          "id": "mec-enzima",
+          "nome": "Enzima que inativa"
+        },
+        {
+          "id": "mec-alvo",
+          "nome": "Alvo alterado ou em excesso"
+        },
+        {
+          "id": "mec-efluxo",
+          "nome": "Bomba de efluxo"
+        },
+        {
+          "id": "escolha-principios",
+          "nome": "Critérios de escolha"
+        },
+        {
+          "id": "interacoes-toxicidade",
+          "nome": "Interações e toxicidade somada"
+        },
+        {
+          "id": "ccih-boletim",
+          "nome": "Sensibilidade da instituição"
+        },
+        {
+          "id": "dose-certa",
+          "nome": "Dose e posologia certas"
+        },
+        {
+          "id": "via-oral",
+          "nome": "Via oral e tratamento em casa"
+        },
+        {
+          "id": "duracao",
+          "nome": "Duração do tratamento"
+        },
+        {
+          "id": "gram-parede",
+          "nome": "Parede de Gram-positivo e Gram-negativo"
+        },
+        {
+          "id": "toxicidade-seletiva",
+          "nome": "Efeito adverso e alvo em comum"
+        },
+        {
+          "id": "agente-doenca",
+          "nome": "Doença e agente provável"
+        }
+      ],
+      "testes": [
+        {
+          "id": "t1",
+          "conceito": "foco-disciplina",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t2",
+          "conceito": "espectro-afinidade",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t3",
+          "conceito": "agente-provavel",
+          "nivel": 3,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t4",
+          "conceito": "origem-infeccao",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t5",
+          "conceito": "pressao-seletiva",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t6",
+          "conceito": "reavaliar-48h",
+          "nivel": 3,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t7",
+          "conceito": "cim",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t8",
+          "conceito": "dose-ataque",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t9",
+          "conceito": "adesao",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t10",
+          "conceito": "receita-retida",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t11",
+          "conceito": "caminho-meio",
+          "nivel": 3,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t12",
+          "conceito": "profilaxia-tratamento",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t13",
+          "conceito": "poucos-novos",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t14",
+          "conceito": "rodizio",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t15",
+          "conceito": "associacao-resistencia",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t16",
+          "conceito": "termos",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t17",
+          "conceito": "antissepsia",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t18",
+          "conceito": "cida-statico",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t19",
+          "conceito": "imuno-cida",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t20",
+          "conceito": "dose-efeito",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t21",
+          "conceito": "cim-cbm",
+          "nivel": 3,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t22",
+          "conceito": "historia",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t23",
+          "conceito": "macrolideo-alternativa",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t24",
+          "conceito": "geracoes",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t25",
+          "conceito": "vanco-reserva",
+          "nivel": 3,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t26",
+          "conceito": "betalactamico-maior",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t27",
+          "conceito": "classe-quimica",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t28",
+          "conceito": "assoc-espectro",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t29",
+          "conceito": "vanco-teico",
+          "nivel": 3,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t30",
+          "conceito": "polimixina-ultima",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t31",
+          "conceito": "mec-outros",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t32",
+          "conceito": "mec-proteica",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t33",
+          "conceito": "origem-class",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t34",
+          "conceito": "espectro-class",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t35",
+          "conceito": "mec-parede",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t36",
+          "conceito": "microbioma",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t37",
+          "conceito": "uso-correto",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t38",
+          "conceito": "custo",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t39",
+          "conceito": "resist-natural",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t40",
+          "conceito": "resist-adquirida",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t41",
+          "conceito": "resist-adquirida",
+          "nivel": 3,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t42",
+          "conceito": "mec-efluxo",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t43",
+          "conceito": "mec-alvo",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t44",
+          "conceito": "mec-enzima",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t45",
+          "conceito": "mec-permeab",
+          "nivel": 3,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t46",
+          "conceito": "mec-raciocinio",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t47",
+          "conceito": "interacoes-toxicidade",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t48",
+          "conceito": "escolha-principios",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t49",
+          "conceito": "ccih-boletim",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t50",
+          "conceito": "duracao",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t51",
+          "conceito": "dose-certa",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t52",
+          "conceito": "via-oral",
+          "nivel": 3,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t53",
+          "conceito": "gram-parede",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t54",
+          "conceito": "toxicidade-seletiva",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t55",
+          "conceito": "agente-doenca",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t56",
+          "conceito": "agente-doenca",
+          "nivel": 3,
+          "correta": 0,
+          "n_alt": 4
+        }
+      ]
+    },
+    {
       "pasta": "patologias-do-utero-2-1a",
       "titulo": "Patologias do Útero 2 · 1A",
       "subtitulo": "",
@@ -813,7 +1440,8 @@
     },
     "apostilas": {
       "patologias-do-utero-2-1a": "5274c0e1be",
-      "patologias-do-utero-2-1b": "5274c0e1be"
+      "patologias-do-utero-2-1b": "5274c0e1be",
+      "antimicrobianos-1a": "a12b7e7a48"
     }
   },
   "aparencia_padrao": {
@@ -841,6 +1469,16 @@
       "capa": "bfe6592028261a6622de.webp",
       "cor": "#eaf0f2",
       "atualizado_em": "2026-11-20T17:42:33"
+    },
+    "doc:patologias-do-utero-2-1a": {
+      "capa": "4d1967fa6365a089c2da.webp",
+      "cor": "#e2afa4",
+      "atualizado_em": "2026-11-20T18:08:10"
+    },
+    "doc:patologias-do-utero-2-1b": {
+      "capa": "4d1967fa6365a089c2da.webp",
+      "cor": "#e2afa4",
+      "atualizado_em": "2026-11-20T18:08:21"
     }
   }
 }

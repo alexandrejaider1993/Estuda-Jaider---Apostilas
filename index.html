@@ -25,7 +25,7 @@
 <link rel="stylesheet" href="tokens.css?v=2">
 <link rel="stylesheet" href="componentes.css?v=2">
 <link rel="stylesheet" href="animacoes.css?v=2">
-<link rel="stylesheet" href="skin-eleven.css?v=5">
+<link rel="stylesheet" href="skin-eleven.css?v=6">
 <style>
   @font-face { font-family: "Inter"; font-style: normal; font-weight: 400; font-display: swap; src: url("fonts/Inter-Regular.woff2") format("woff2"); }
   @font-face { font-family: "Inter"; font-style: normal; font-weight: 600; font-display: swap; src: url("fonts/Inter-SemiBold.woff2") format("woff2"); }
@@ -96,13 +96,14 @@
     border: 0;
     background: transparent;
     color: var(--cor-tinta);
+    font: 400 15.5px/1 var(--fonte-ui);
+    letter-spacing: -0.015em;
     cursor: pointer;
     padding: 7px 10px;
     border-radius: 8px;
+    -webkit-font-smoothing: antialiased;
   }
   .app-marca:hover { background: var(--el-pilula-ativa); box-shadow: var(--el-sombra-pilula); }
-  .app-marca img { height: 12.75px; width: auto; display: block; object-fit: contain; }
-  html[data-tema="escuro"] .app-marca img { filter: invert(1) brightness(1.1); }
 
   /* Busca Global no Topo */
   .shell-header-center {
@@ -396,7 +397,7 @@
   <header class="app-shell-header">
     <div class="shell-header-left">
       <button type="button" class="app-marca" id="btnMarcaInicio" title="Voltar à tela de boas-vindas">
-        <img src="logo.png?v=4" alt="estuda Jaider">
+        <span>estuda Jaider</span>
       </button>
     </div>
 
@@ -431,9 +432,9 @@
   <script src="marca_texto.js?v=2"></script>
   <script src="faixa_preenchida.js?v=2"></script>
   <script src="storage_drive.js?v=6"></script>
-  <script src="pasta_visual.js?v=4"></script>
-  <script src="login_eleven.js?v=4"></script>
-  <script src="interativos.js?v=5"></script>
+  <script src="pasta_visual.js?v=5"></script>
+  <script src="login_eleven.js?v=5"></script>
+  <script src="interativos.js?v=6"></script>
   <script>
     (function () {
       "use strict";
@@ -548,7 +549,7 @@
       window.addEventListener("ej-sync-status", e => desenharStatusConta(e.detail));
       if (window.EJStorageDrive) desenharStatusConta(window.EJStorageDrive.obterStatus());
 
-      // Modal de Conta Google & Backup
+      // Modal de Conta Google
       function abrirModalConta() {
         const st = window.EJStorageDrive.obterStatus();
         const fundo = document.createElement("div");
@@ -556,7 +557,7 @@
         fundo.innerHTML = `
           <div class="conta-modal" role="dialog" aria-modal="true" aria-labelledby="cmTit">
             <h2 id="cmTit">Progresso e Google Drive</h2>
-            <p>Suas respostas, posição de leitura, pastas e marcações do Estojo são salvos automaticamente neste navegador e sincronizados com o seu Google Drive pessoal.</p>
+            <p>Suas respostas, posição de leitura e marcações do Estojo são salvos automaticamente neste navegador e sincronizados com o seu Google Drive pessoal.</p>
             ${st.conectado && st.conta ? `
               <div class="conta-modal__perfil">
                 ${st.conta.foto ? `<img src="${esc(st.conta.foto)}" alt="">` : ""}
@@ -575,25 +576,6 @@
               </div>
             `}
             ${st.erro ? `<p style="color:var(--cor-arteria);margin-top:10px">${esc(st.erro)}</p>` : ""}
-
-            <div class="conta-modal__secao">
-              <b style="font-size:13.5px">Backup em arquivo (.json)</b>
-              <p style="margin:4px 0 8px">Você também pode baixar uma cópia de todo o seu progresso e anotações ou restaurar de um arquivo.</p>
-              <div class="conta-modal__acoes">
-                <button type="button" class="botao botao--secundario" data-acao="exportar">Baixar backup (.json)</button>
-                <button type="button" class="botao botao--secundario" data-acao="importar">Restaurar backup…</button>
-                <input type="file" accept=".json,application/json" hidden data-arq-backup>
-              </div>
-            </div>
-
-            <details>
-              <summary>Configuração avançada (Google Client ID)</summary>
-              <p style="margin:6px 0">Para o login Google funcionar no seu domínio do Vercel, adicione a URL do seu site em <b>Origens JavaScript autorizadas</b> no Google Cloud Console, ou informe seu próprio Client ID abaixo:</p>
-              <input class="campo" type="text" data-client-id value="${esc(window.EJStorageDrive.obterClientId())}" placeholder="seu-id.apps.googleusercontent.com">
-              <div class="conta-modal__acoes" style="margin-top:8px">
-                <button type="button" class="botao botao--secundario" data-acao="salvar-cid">Salvar Client ID</button>
-              </div>
-            </details>
 
             <div class="conta-modal__secao" style="display:flex;justify-content:flex-end">
               <button type="button" class="botao botao--secundario" data-acao="fechar">Fechar</button>
@@ -632,30 +614,6 @@
           window.mostrarToast("Conta Google desconectada.");
           fechar();
           mostrarBoasVindas();
-        };
-
-        fundo.querySelector('[data-acao="exportar"]').onclick = () => {
-          window.EJStorageDrive.exportarBackupJson();
-          window.mostrarToast("Backup baixado!");
-        };
-
-        const inpBackup = fundo.querySelector('[data-arq-backup]');
-        fundo.querySelector('[data-acao="importar"]').onclick = () => inpBackup.click();
-        inpBackup.onchange = async () => {
-          if (!inpBackup.files[0]) return;
-          try {
-            await window.EJStorageDrive.importarBackupJson(inpBackup.files[0]);
-            window.mostrarToast("Backup restaurado com sucesso!");
-            fechar();
-          } catch (e) {
-            window.mostrarToast("Erro ao restaurar backup: " + e.message, "erro", 4500);
-          }
-        };
-
-        fundo.querySelector('[data-acao="salvar-cid"]').onclick = () => {
-          const v = fundo.querySelector('[data-client-id]').value;
-          window.EJStorageDrive.definirClientId(v);
-          window.mostrarToast("Google Client ID atualizado.");
         };
 
         document.body.appendChild(fundo);

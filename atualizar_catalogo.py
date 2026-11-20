@@ -91,14 +91,20 @@ def extrair_secoes(D, html, titulo_padrao):
 
 def ficha_apostila(pasta: Path):
     f = ler_json(pasta / "biblioteca.json")
-    if isinstance(f, dict) and f.get("formato") == FORMATO:
-        return f
+    titulo_html = ""
     if (pasta / "index.html").is_file():
         try:
-            titulo = titulo_do_html((pasta / "index.html").read_text(encoding="utf-8", errors="ignore")[:20000])
+            titulo_html = titulo_do_html((pasta / "index.html").read_text(encoding="utf-8", errors="ignore")[:20000])
         except Exception:
-            titulo = ""
-        return {"formato": FORMATO, "titulo": titulo or pasta.name, "arquivo": "index.html"}
+            titulo_html = ""
+    if isinstance(f, dict) and f.get("formato") == FORMATO:
+        # Se biblioteca.json foi copiado de outra pasta (id != pasta.name), corrige id e titulo automaticamente
+        if f.get("id") and f.get("id") != pasta.name and titulo_html:
+            f["id"] = pasta.name
+            f["titulo"] = titulo_html
+        return f
+    if (pasta / "index.html").is_file():
+        return {"formato": FORMATO, "titulo": titulo_html or pasta.name, "arquivo": "index.html"}
     return None
 
 

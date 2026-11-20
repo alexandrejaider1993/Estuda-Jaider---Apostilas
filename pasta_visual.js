@@ -159,12 +159,11 @@
     const img = (ap && (ap.previa || (ap.capa ? urlCapa(ap.capa) : ""))) || (doc && !(ap && ap.sem_capa) ? (capaPadrao || "") : "");
     const gifAttr = ehGifUrl(img) ? ` data-gif-src="${esc(img)}"` : "";
     if (doc) {
-      return `<svg viewBox="0 0 120 200" aria-hidden="true" focusable="false">
-        <defs><clipPath id="${id}"><rect x="0" y="0" width="120" height="200" rx="8"/></clipPath></defs>
-        <rect x="0" y="0" width="120" height="200" rx="8" style="fill: ${cor}"/>
+      return `<svg viewBox="0 0 120 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+        <rect x="0" y="0" width="120" height="200" style="fill: ${cor}"/>
         ${img
-          ? `<image href="${esc(img)}"${gifAttr} x="0" y="0" width="120" height="200" preserveAspectRatio="xMidYMid slice" clip-path="url(#${id})"/>`
-          : `<g clip-path="url(#${id})">
+          ? `<image href="${esc(img)}"${gifAttr} x="0" y="0" width="120" height="200" preserveAspectRatio="xMidYMid slice"/>`
+          : `<g>
               <rect x="0" y="0" width="11" height="200" style="fill: color-mix(in srgb, ${cor} 76%, #000)" opacity=".55"/>
               <line x1="11" y1="0" x2="11" y2="200" stroke="rgba(0,0,0,.1)" stroke-width="1"/>
               <rect x="24" y="34" width="64" height="5" rx="2.5" fill="currentColor" opacity=".2"/>
@@ -174,7 +173,6 @@
               <line x1="24" y1="102" x2="98" y2="102" stroke="currentColor" stroke-opacity=".11" stroke-width="1.5" stroke-linecap="round"/>
               <line x1="24" y1="116" x2="76" y2="116" stroke="currentColor" stroke-opacity=".11" stroke-width="1.5" stroke-linecap="round"/>
             </g>`}
-        <rect x="0.6" y="0.6" width="118.8" height="198.8" rx="7.6" fill="none" stroke="rgba(0,0,0,.08)" stroke-width="1.2"/>
       </svg>`;
     }
     return `<svg viewBox="0 0 120 92" aria-hidden="true" focusable="false">

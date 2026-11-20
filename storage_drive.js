@@ -278,6 +278,55 @@
         testes: a.testes || [],
       };
     });
+
+    // Descobre automaticamente novas pastas adicionadas manualmente em interativos/<pasta>/ no PC
+    try {
+      const pastasConhecidas = new Set(metas.map(m => m.pasta));
+      for await (const [nomeEntrada, entryHandle] of dirInterativos.entries()) {
+        if (entryHandle.kind !== "directory" || nomeEntrada.startsWith(".") || nomeEntrada.startsWith("_")) continue;
+        if (pastasConhecidas.has(nomeEntrada)) continue;
+        if (estado.excluidas && estado.excluidas[nomeEntrada]) continue;
+        let htmlTexto = "";
+        try {
+          const fhHtml = await entryHandle.getFileHandle("index.html");
+          htmlTexto = await (await fhHtml.getFile()).text();
+        } catch (e) { continue; }
+        let ficha = null;
+        try {
+          const fhBib = await entryHandle.getFileHandle("biblioteca.json");
+          ficha = JSON.parse(await (await fhBib.getFile()).text());
+        } catch (e) {}
+        const mTit = /<title[^>]*>([\s\S]*?)<\/title>/i.exec(htmlTexto.slice(0, 20000));
+        const titHtml = mTit ? mTit[1].replace(/\s+/g, " ").trim() : nomeEntrada;
+        // Se biblioteca.json foi copiado de outra apostila com id diferente da pasta, usa o título do HTML
+        const tituloFinal = (ficha && ficha.titulo && (!ficha.id || ficha.id === nomeEntrada)) ? ficha.titulo : (titHtml || (ficha && ficha.titulo) || nomeEntrada);
+        const extra = extrairDadosDeHtmlImportado(htmlTexto, tituloFinal);
+        metas.push({
+          pasta: nomeEntrada,
+          titulo: tituloFinal,
+          subtitulo: (ficha && ficha.subtitulo) || "",
+          disciplina: (ficha && ficha.disciplina) || "",
+          periodo: (ficha && ficha.periodo) || "",
+          prova: (ficha && ficha.prova) || "",
+          data_aula: (ficha && ficha.data_aula) || "",
+          capitulos: (ficha && ficha.capitulos) || [],
+          contagem: (ficha && ficha.contagem) || {},
+          url: `/interativos/${nomeEntrada}/index.html`,
+          capa: (ficha && ficha.capa) ? `/interativos/${nomeEntrada}/${ficha.capa}` : "",
+          modificado: Math.floor(Date.now() / 1000),
+          chave_local: extra.chave_local || "",
+          conceitos: extra.conceitos || [],
+          testes: extra.testes || [],
+        });
+        indiceBusca[nomeEntrada] = {
+          titulo: tituloFinal,
+          secoes: extra.secoes || [],
+        };
+      }
+    } catch (e) {
+      console.warn("Varredura de interativos/ no PC:", e);
+    }
+
     metas.sort((a, b) => String(b.data_aula || "").localeCompare(String(a.data_aula || "")));
 
     const orgLimpa = lerOrganizacaoLimpa();
@@ -399,12 +448,27 @@
       if (indResp) indiceBusca = indResp;
       apostilasImportadas = imp || {};
 
-      // Sempre que não estiver editando como Admin (ou na primeira vez), a organização e aparência seguem o catalogo.json oficial
-      if (!ehAdmin() || !estado.organizacao || !estado.organizacao.pastas || !Object.keys(estado.organizacao.pastas).length) {
+      // Se o Admin já fez edições locais neste navegador (org_em > 0), preserva; caso contrário usa o catalogo.json oficial
+      const temEdicaoAdminSalva = (Number(estado.org_em) || 0) > 0 && estado.organizacao && estado.organizacao.pastas && Object.keys(estado.organizacao.pastas).length > 0;
+      if (!temEdicaoAdminSalva) {
         estado.organizacao = JSON.parse(JSON.stringify(catalogo.organizacao_padrao || { pastas: {}, apostilas: {} }));
+      } else {
+        // Mescla pastas e vínculos de apostilas novos que vieram do catalogo.json
+        const orgCat = catalogo.organizacao_padrao || { pastas: {}, apostilas: {} };
+        for (const [pid, p] of Object.entries(orgCat.pastas || {})) {
+          if (!(pid in estado.organizacao.pastas)) {
+            estado.organizacao.pastas[pid] = JSON.parse(JSON.stringify(p));
+          }
+        }
+        if (!estado.organizacao.apostilas) estado.organizacao.apostilas = {};
+        for (const [ap, pid] of Object.entries(orgCat.apostilas || {})) {
+          if (!(ap in estado.organizacao.apostilas) && (pid in estado.organizacao.pastas)) {
+            estado.organizacao.apostilas[ap] = pid;
+          }
+        }
       }
       if (!estado.aparencia) estado.aparencia = {};
-      if (!ehAdmin()) {
+      if (!temEdicaoAdminSalva && !ehAdmin()) {
         estado.aparencia = JSON.parse(JSON.stringify(catalogo.aparencia_padrao || {}));
       } else {
         for (const [k, v] of Object.entries(catalogo.aparencia_padrao || {})) {

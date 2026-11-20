@@ -20,23 +20,23 @@
   const ehAdmin = () => !!(window.EJStorageDrive && window.EJStorageDrive.ehAdmin && window.EJStorageDrive.ehAdmin());
 
   const CSS = `
-  #interativos .ia-barra { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin: 0 0 16px; }
-  #interativos .ia-barra p { margin: 0; color: var(--cor-suave); font-size: 14px; }
-  #interativos .ia-grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(195px, 1fr)); gap: 16px; }
+  #interativos .ia-barra { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin: 0 0 14px; }
+  #interativos .ia-barra p { margin: 0; color: var(--cor-suave); font-size: 13.5px; }
+  #interativos .ia-grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(176px, 210px)); gap: 16px; }
   #interativos .ia-card { display: flex; flex-direction: column; text-align: left; padding: 0; overflow: hidden; cursor: pointer;
-    background: var(--cor-superficie); border: 1px solid var(--cor-borda); border-radius: var(--raio-card); box-shadow: var(--sombra-card);
-    color: var(--cor-texto); font: inherit; transition: box-shadow var(--duracao) var(--curva), transform var(--duracao) var(--curva); }
+    aspect-ratio: 6 / 10; background: var(--cor-superficie); border: 1px solid var(--cor-borda, var(--cor-fio)); border-radius: 14px; box-shadow: var(--sombra-card);
+    color: var(--cor-texto, var(--cor-tinta)); font: inherit; transition: box-shadow var(--duracao) var(--curva), transform var(--duracao) var(--curva); }
   #interativos .ia-card:hover { box-shadow: var(--sombra-card-hover); transform: translateY(-2px); }
   #interativos .ia-card:focus-visible { outline: 2px solid var(--cor-acento); outline-offset: 2px; }
-  #interativos .ia-capa { aspect-ratio: 6 / 10; background: var(--cor-superficie-2); display: flex; align-items: stretch; justify-content: center; color: var(--cor-suave); overflow: hidden; }
-  #interativos .ia-capa .pv-arte { width: 100%; height: 100%; aspect-ratio: 6 / 10; }
+  #interativos .ia-capa { flex: 1 1 0; min-height: 0; background: var(--cor-superficie-2); display: flex; align-items: stretch; justify-content: center; color: var(--cor-suave); overflow: hidden; }
+  #interativos .ia-capa .pv-arte { width: 100%; height: 100%; aspect-ratio: auto; }
   #interativos .ia-capa .pv-arte svg { width: 100%; height: 100%; display: block; }
   #interativos .ia-capa img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  #interativos .ia-corpo { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
-  #interativos .ia-meta { font-size: 11.5px; font-weight: 600; color: var(--cor-suave); text-transform: uppercase; letter-spacing: .04em; }
-  #interativos .ia-titulo { font-size: 15.5px; font-weight: 600; margin: 0; line-height: 1.3; }
-  #interativos .ia-sub { font-size: 13px; color: var(--cor-suave); margin: 0; }
-  #interativos .ia-rodape { margin-top: auto; padding-top: 6px; display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 12.5px; color: var(--cor-suave); }
+  #interativos .ia-corpo { flex: none; padding: 10px 12px 11px; display: flex; flex-direction: column; gap: 3px; background: var(--cor-superficie); border-top: 1px solid var(--cor-fio); }
+  #interativos .ia-meta { font-size: 10.5px; font-weight: 600; color: var(--cor-suave); text-transform: uppercase; letter-spacing: .04em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #interativos .ia-titulo { font-size: 14px; font-weight: 600; margin: 0; line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  #interativos .ia-sub { font-size: 12px; color: var(--cor-suave); margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #interativos .ia-rodape { margin-top: 2px; padding-top: 4px; display: flex; justify-content: space-between; align-items: center; gap: 6px; font-size: 11.5px; color: var(--cor-suave); }
   #interativos .ia-acao { color: var(--cor-acento); font-weight: 600; }
   #interativos .ia-vazio { padding: 32px; text-align: center; color: var(--cor-suave); border: 1px dashed var(--cor-borda-forte); border-radius: var(--raio-card); }
   #interativos .ia-vazio b { color: var(--cor-texto); font-weight: 600; }
@@ -243,6 +243,7 @@
         if (res && res.ok) {
           txt.textContent = `Salvo em "${res.pasta}"`;
           toast(`Arquivos atualizados na pasta "${res.pasta}" do PC! Agora é só rodar o atualizar.bat.`);
+          carregar();
         }
       } catch (e) {
         if (e && e.name !== "AbortError") toast(e.message || "Não foi possível salvar na pasta do PC.", "erro", 4500);
