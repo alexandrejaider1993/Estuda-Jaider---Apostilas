@@ -795,30 +795,10 @@
         "pai": null,
         "criada": 1795013450
       },
-      "f98b6f7cb3": {
-        "nome": "(11.11.2026) - Patologias do Útero 2",
-        "pai": "5274c0e1be",
-        "criada": 1795014562
-      },
       "5274c0e1be": {
         "nome": "P4",
         "pai": "288183cf92",
         "criada": 1795014580
-      },
-      "4075e54670": {
-        "nome": "P3",
-        "pai": "288183cf92",
-        "criada": 1795014584
-      },
-      "b727fe9015": {
-        "nome": "P2",
-        "pai": "288183cf92",
-        "criada": 1795014587
-      },
-      "5daec07c5f": {
-        "nome": "P1",
-        "pai": "288183cf92",
-        "criada": 1795014590
       },
       "dbac5377cb": {
         "nome": "Anatomia Topográfica",
@@ -829,16 +809,11 @@
         "nome": "Farmacoterapia",
         "pai": null,
         "criada": 1795049136
-      },
-      "451b56ce15": {
-        "nome": "Anatomia Patológica II",
-        "pai": "f98b6f7cb3",
-        "criada": 1795102937
       }
     },
     "apostilas": {
-      "patologias-do-utero-2-1a": "451b56ce15",
-      "patologias-do-utero-2-1b": "451b56ce15"
+      "patologias-do-utero-2-1a": "5274c0e1be",
+      "patologias-do-utero-2-1b": "5274c0e1be"
     }
   },
   "aparencia_padrao": {
@@ -861,6 +836,11 @@
       "capa": "5cf183b596d9ac008f49.gif",
       "cor": "#F2C14E",
       "atualizado_em": "2026-11-19T12:42:53"
+    },
+    "apost:5274c0e1be": {
+      "capa": "bfe6592028261a6622de.webp",
+      "cor": "#eaf0f2",
+      "atualizado_em": "2026-11-20T17:42:33"
     }
   }
 }
