@@ -775,8 +775,10 @@
 
     // 3. POST /api/interativos/importar
     if (path === "/api/interativos/importar" && metodo === "POST") {
+      if (!ehAdmin()) return respostaJson({ detail: "Apenas o administrador pode adicionar apostilas." }, 403);
       try {
         const res = await importarArquivosLocal(init.body);
+        autoSalvarPastaPCSeConectada();
         return respostaJson(res);
       } catch (e) {
         return respostaJson({ detail: e.message || "Erro ao importar apostila." }, 400);
@@ -785,6 +787,7 @@
 
     // 4. Pastas de organização (/api/interativos-org/...)
     if (path === "/api/interativos-org/pastas" && metodo === "POST") {
+      if (!ehAdmin()) return respostaJson({ detail: "Apenas o administrador pode criar pastas." }, 403);
       const b = await lerBodyJson();
       const nome = String(b.nome || "").replace(/\s+/g, " ").trim().slice(0, 80);
       if (!nome) return respostaJson({ detail: "Dê um nome para a pasta." }, 400);
@@ -798,11 +801,13 @@
       org.pastas[pid] = { nome, pai, criada: Math.floor(Date.now() / 1000) };
       estado.org_em = Date.now() / 1000;
       salvarEstadoLocal();
+      autoSalvarPastaPCSeConectada();
       return respostaJson({ id: pid, ...org.pastas[pid] });
     }
 
     const mRen = /^\/api\/interativos-org\/pastas\/([^/]+)\/renomear$/.exec(path);
     if (mRen && metodo === "POST") {
+      if (!ehAdmin()) return respostaJson({ detail: "Apenas o administrador pode renomear pastas." }, 403);
       const pid = decodeURIComponent(mRen[1]);
       const b = await lerBodyJson();
       const nome = String(b.nome || "").replace(/\s+/g, " ").trim().slice(0, 80);
@@ -812,11 +817,13 @@
       org.pastas[pid].nome = nome;
       estado.org_em = Date.now() / 1000;
       salvarEstadoLocal();
+      autoSalvarPastaPCSeConectada();
       return respostaJson(org);
     }
 
     const mExcPasta = /^\/api\/interativos-org\/pastas\/([^/]+)\/excluir$/.exec(path);
     if (mExcPasta && metodo === "POST") {
+      if (!ehAdmin()) return respostaJson({ detail: "Apenas o administrador pode excluir pastas." }, 403);
       const pid = decodeURIComponent(mExcPasta[1]);
       const org = lerOrganizacaoLimpa();
       const p = org.pastas[pid];
@@ -835,10 +842,12 @@
       delete estado.aparencia["apost:" + pid];
       estado.org_em = Date.now() / 1000;
       salvarEstadoLocal();
+      autoSalvarPastaPCSeConectada();
       return respostaJson(org);
     }
 
     if (path === "/api/interativos-org/mover" && metodo === "POST") {
+      if (!ehAdmin()) return respostaJson({ detail: "Apenas o administrador pode mover itens." }, 403);
       const b = await lerBodyJson();
       const org = lerOrganizacaoLimpa();
       const destino = b.destino || null;
@@ -866,6 +875,7 @@
       }
       estado.org_em = Date.now() / 1000;
       salvarEstadoLocal();
+      autoSalvarPastaPCSeConectada();
       return respostaJson(org);
     }
 
@@ -960,6 +970,7 @@
       }
 
       if (acao === "excluir" && metodo === "POST") {
+        if (!ehAdmin()) return respostaJson({ detail: "Apenas o administrador pode excluir apostilas." }, 403);
         delete estado.progresso[pasta];
         delete estado.posicao[pasta];
         delete estado.anotacoes[pasta];
@@ -977,6 +988,7 @@
           try { localStorage.removeItem(meta.chave_local); } catch (e) {}
         }
         salvarEstadoLocal();
+        autoSalvarPastaPCSeConectada();
         return respostaJson({ ok: true, pasta, registros_apagados: 1 });
       }
     }
@@ -987,6 +999,7 @@
     }
 
     if (path === "/api/pastas-aparencia" && metodo === "POST") {
+      if (!ehAdmin()) return respostaJson({ detail: "Apenas o administrador pode personalizar pastas." }, 403);
       const b = await lerBodyJson();
       const chave = String(b.chave || "").trim();
       if (!chave) return respostaJson({ detail: "Pasta inválida." }, 400);
@@ -1000,10 +1013,12 @@
         estado.aparencia[chave] = a;
       }
       salvarEstadoLocal();
+      autoSalvarPastaPCSeConectada();
       return respostaJson({ chave, aparencia: estado.aparencia[chave] || {} });
     }
 
     if (path === "/api/pastas-aparencia/capa" && metodo === "POST") {
+      if (!ehAdmin()) return respostaJson({ detail: "Apenas o administrador pode personalizar pastas." }, 403);
       const fd = init.body;
       const chave = String(fd.get("chave") || "").trim();
       const cor = String(fd.get("cor") || "").trim();
@@ -1025,6 +1040,7 @@
       a.atualizado_em = new Date().toISOString().slice(0, 19);
       estado.aparencia[chave] = a;
       salvarEstadoLocal();
+      autoSalvarPastaPCSeConectada();
       return respostaJson({ chave, aparencia: a });
     }
 
@@ -1351,30 +1367,30 @@
     if (!remoto || typeof remoto !== "object") return false;
     let mudouLocal = false;
 
-    // 1. Organização de pastas (vale a mais recente por org_em)
-    if ((Number(remoto.org_em) || 0) > (Number(local.org_em) || 0) && remoto.organizacao) {
-      local.organizacao = JSON.parse(JSON.stringify(remoto.organizacao));
-      local.org_em = Number(remoto.org_em);
-      mudouLocal = true;
-    }
-
-    // 2. Aparência das pastas e capas customizadas
-    if (remoto.capas_custom && typeof remoto.capas_custom === "object") {
-      if (!local.capas_custom) local.capas_custom = {};
-      for (const [k, v] of Object.entries(remoto.capas_custom)) {
-        if (!local.capas_custom[k]) {
-          local.capas_custom[k] = v;
-          mudouLocal = true;
+    // 1. Organização e aparência de pastas: apenas no Modo Admin mescla alterações locais; para o aluno vale sempre o catalogo.json oficial
+    if (ehAdmin()) {
+      if ((Number(remoto.org_em) || 0) > (Number(local.org_em) || 0) && remoto.organizacao) {
+        local.organizacao = JSON.parse(JSON.stringify(remoto.organizacao));
+        local.org_em = Number(remoto.org_em);
+        mudouLocal = true;
+      }
+      if (remoto.capas_custom && typeof remoto.capas_custom === "object") {
+        if (!local.capas_custom) local.capas_custom = {};
+        for (const [k, v] of Object.entries(remoto.capas_custom)) {
+          if (!local.capas_custom[k]) {
+            local.capas_custom[k] = v;
+            mudouLocal = true;
+          }
         }
       }
-    }
-    if (remoto.aparencia && typeof remoto.aparencia === "object") {
-      if (!local.aparencia) local.aparencia = {};
-      for (const [chave, apRem] of Object.entries(remoto.aparencia)) {
-        const apLoc = local.aparencia[chave];
-        if (!apLoc || String(apRem.atualizado_em || "") > String(apLoc.atualizado_em || "")) {
-          local.aparencia[chave] = JSON.parse(JSON.stringify(apRem));
-          mudouLocal = true;
+      if (remoto.aparencia && typeof remoto.aparencia === "object") {
+        if (!local.aparencia) local.aparencia = {};
+        for (const [chave, apRem] of Object.entries(remoto.aparencia)) {
+          const apLoc = local.aparencia[chave];
+          if (!apLoc || String(apRem.atualizado_em || "") > String(apLoc.atualizado_em || "")) {
+            local.aparencia[chave] = JSON.parse(JSON.stringify(apRem));
+            mudouLocal = true;
+          }
         }
       }
     }
@@ -1603,6 +1619,12 @@
     definirUrlControleVagas,
     exportarBackupJson,
     importarBackupJson,
+    ehAdmin,
+    entrarModoAdmin,
+    sairModoAdmin,
+    salvarNaPastaDoPC,
+    temPastaPCConectada: () => !!dirProjetoHandle,
+    nomePastaPCConectada: () => (dirProjetoHandle ? dirProjetoHandle.name : ""),
     obterStatus: () => ({
       status: statusSync,
       erro: msgErroSync,

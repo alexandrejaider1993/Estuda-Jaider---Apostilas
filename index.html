@@ -206,6 +206,32 @@
     color: var(--cor-tinta);
     box-shadow: var(--el-sombra-pilula);
   }
+  .admin-botao {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 34px;
+    padding: 0 10px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--cor-suave);
+    font: 500 12.5px/1 var(--fonte-ui);
+    cursor: pointer;
+    transition: all 160ms var(--ease-out);
+  }
+  .admin-botao svg { width: 15px; height: 15px; flex: none; }
+  .admin-botao:hover {
+    background: var(--el-pilula-ativa);
+    color: var(--cor-tinta);
+    box-shadow: var(--el-sombra-pilula);
+  }
+  .admin-botao[data-ativo="1"] {
+    border-color: var(--cor-nervo, #d29922);
+    background: rgba(210, 153, 34, 0.14);
+    color: var(--cor-tinta);
+    font-weight: 600;
+  }
 
   .conta-pilula {
     display: inline-flex;
@@ -390,6 +416,7 @@
         <span id="contaTexto">Entrar com Google</span>
       </button>
       <button type="button" class="tema-botao" id="btnTemaApp" aria-label="Alternar tema claro ou escuro" title="Alternar tema"></button>
+      <button type="button" class="admin-botao" id="btnModoAdmin" aria-label="Modo Administrador" title="Entrar como Administrador"></button>
     </div>
   </header>
 
@@ -403,10 +430,10 @@
   <!-- Scripts do Sistema -->
   <script src="marca_texto.js?v=2"></script>
   <script src="faixa_preenchida.js?v=2"></script>
-  <script src="storage_drive.js?v=2"></script>
+  <script src="storage_drive.js?v=3"></script>
   <script src="pasta_visual.js?v=2"></script>
   <script src="login_eleven.js?v=4"></script>
-  <script src="interativos.js?v=2"></script>
+  <script src="interativos.js?v=3"></script>
   <script>
     (function () {
       "use strict";
@@ -634,6 +661,113 @@
         document.body.appendChild(fundo);
       }
       $("btnContaGoogle").onclick = abrirModalConta;
+
+      // ================= MODO ADMINISTRADOR (CANTO SUPERIOR DIREITO) =================
+      const IC_CADEADO_FECHADO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
+      const IC_CADEADO_ABERTO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>';
+
+      function atualizarBotaoAdmin() {
+        const b = $("btnModoAdmin");
+        if (!b) return;
+        const ativo = !!(window.EJStorageDrive && window.EJStorageDrive.ehAdmin());
+        b.dataset.ativo = ativo ? "1" : "0";
+        b.innerHTML = ativo ? `${IC_CADEADO_ABERTO}<span>Admin</span>` : IC_CADEADO_FECHADO;
+        b.title = ativo ? "Modo Admin ativo (clique para configurar ou sair para Visão do Aluno)" : "Entrar como Administrador";
+      }
+
+      function abrirModalAdmin() {
+        const ativo = !!(window.EJStorageDrive && window.EJStorageDrive.ehAdmin());
+        const nomePastaPC = window.EJStorageDrive?.nomePastaPCConectada ? window.EJStorageDrive.nomePastaPCConectada() : "";
+        const fundo = document.createElement("div");
+        fundo.className = "conta-modal-fundo";
+        if (!ativo) {
+          fundo.innerHTML = `
+            <div class="conta-modal" role="dialog" aria-modal="true" aria-labelledby="admTit">
+              <h2 id="admTit">Acesso do Administrador</h2>
+              <p>Digite a senha de administrador para liberar a criação de pastas, personalização de capas e adição de apostilas.</p>
+              <input class="campo" type="password" data-senha-adm placeholder="Senha de administrador" autocomplete="current-password">
+              <p data-erro-adm style="color:var(--cor-arteria);margin:8px 0 0;font-size:13px" hidden>Senha incorreta.</p>
+              <div class="conta-modal__acoes" style="justify-content:flex-end;margin-top:16px">
+                <button type="button" class="botao botao--secundario" data-acao="fechar">Cancelar</button>
+                <button type="button" class="botao botao--primario" data-acao="entrar-adm">Entrar como Admin</button>
+              </div>
+            </div>`;
+        } else {
+          fundo.innerHTML = `
+            <div class="conta-modal" role="dialog" aria-modal="true" aria-labelledby="admTit">
+              <h2 id="admTit">Painel do Administrador</h2>
+              <p>O modo de edição está <b>ativo</b>. Você pode criar, renomear, mover e personalizar pastas ou adicionar novas apostilas.</p>
+              <div class="conta-modal__secao">
+                <b style="font-size:13.5px">Sincronizar com a pasta do seu PC (GitHub / Vercel)</b>
+                <p style="margin:4px 0 10px">Salva todas as pastas, cores, GIFs e apostilas direto em <code>catalogo.json</code> dentro da sua pasta <b>Apostilas-Vercel</b> no computador. Depois é só rodar o <code>atualizar.bat</code>.</p>
+                <div class="conta-modal__acoes">
+                  <button type="button" class="botao botao--primario" data-acao="salvar-pc">${nomePastaPC ? `Atualizar pasta "${esc(nomePastaPC)}" agora` : "Vincular e salvar na pasta do PC"}</button>
+                </div>
+              </div>
+              <div class="conta-modal__secao" style="display:flex;justify-content:space-between;align-items:center">
+                <button type="button" class="botao botao--secundario" data-acao="sair-adm">Voltar para Visão do Aluno</button>
+                <button type="button" class="botao botao--secundario" data-acao="fechar">Fechar</button>
+              </div>
+            </div>`;
+        }
+
+        const fechar = () => fundo.remove();
+        fundo.addEventListener("mousedown", e => { if (e.target === fundo) fechar(); });
+        fundo.querySelector('[data-acao="fechar"]').onclick = fechar;
+
+        const inpSenha = fundo.querySelector("[data-senha-adm]");
+        const erroEl = fundo.querySelector("[data-erro-adm]");
+        const btnEntrarAdm = fundo.querySelector('[data-acao="entrar-adm"]');
+        if (btnEntrarAdm && inpSenha) {
+          const tentar = () => {
+            if (window.EJStorageDrive.entrarModoAdmin(inpSenha.value)) {
+              window.mostrarToast("Modo Administrador ativado!");
+              fechar();
+            } else {
+              erroEl.hidden = false;
+              inpSenha.select();
+            }
+          };
+          btnEntrarAdm.onclick = tentar;
+          inpSenha.addEventListener("keydown", e => {
+            if (e.key === "Enter") { e.preventDefault(); tentar(); }
+            else if (e.key === "Escape") { e.preventDefault(); fechar(); }
+          });
+          setTimeout(() => inpSenha.focus(), 30);
+        }
+
+        const btnSalvarPC = fundo.querySelector('[data-acao="salvar-pc"]');
+        if (btnSalvarPC) {
+          btnSalvarPC.onclick = async () => {
+            btnSalvarPC.disabled = true;
+            try {
+              const r = await window.EJStorageDrive.salvarNaPastaDoPC(true);
+              if (r && r.ok) {
+                window.mostrarToast(`Salvo na pasta "${r.pasta}" do PC!`);
+                fechar();
+              }
+            } catch (e) {
+              if (e && e.name !== "AbortError") window.mostrarToast(e.message || "Erro ao salvar na pasta.", "erro", 4500);
+              btnSalvarPC.disabled = false;
+            }
+          };
+        }
+
+        const btnSairAdm = fundo.querySelector('[data-acao="sair-adm"]');
+        if (btnSairAdm) {
+          btnSairAdm.onclick = () => {
+            window.EJStorageDrive.sairModoAdmin();
+            window.mostrarToast("Visão do Aluno ativada.");
+            fechar();
+          };
+        }
+
+        document.body.appendChild(fundo);
+      }
+
+      $("btnModoAdmin").onclick = abrirModalAdmin;
+      window.addEventListener("ej-admin-mudou", atualizarBotaoAdmin);
+      atualizarBotaoAdmin();
 
       // ================= BUSCA GLOBAL EM TODAS AS APOSTILAS =================
       const campoBusca = $("campoBuscaGlobal"), listaBusca = $("listaBuscaGlobal");

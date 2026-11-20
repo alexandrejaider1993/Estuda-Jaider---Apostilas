@@ -16,6 +16,8 @@
   const toast = (m, t = "sucesso", d = 3000) => (window.mostrarToast ? window.mostrarToast(m, t, d) : console.log(m));
   let lista = [], aberta = null, montado = false;
   const ICP_NOVA = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 10v6"/><path d="M9 13h6"/><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>';
+  const ICP_SALVAR_PC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>';
+  const ehAdmin = () => !!(window.EJStorageDrive && window.EJStorageDrive.ehAdmin && window.EJStorageDrive.ehAdmin());
 
   const CSS = `
   #interativos .ia-barra { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin: 0 0 16px; }
@@ -195,9 +197,9 @@
         <section class="secao">
           <div class="ia-barra">
             <div class="ia-onde"><nav class="ia-trilha" id="iaTrilha" aria-label="Pastas"></nav><p id="iaResumo">Carregando...</p></div>
-            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <div id="iaBarraAdmin" style="display:flex; gap:8px; flex-wrap:wrap;" hidden>
               <button type="button" class="botao botao--secundario ia-nova" id="iaNovaPasta">${ICP_NOVA}Nova pasta</button>
-              <button type="button" class="botao botao--secundario" id="iaAtualizar">Atualizar</button>
+              <button type="button" class="botao botao--secundario ia-nova" id="iaSalvarPC" title="Grava pastas, capas e apostilas direto na pasta do seu PC">${ICP_SALVAR_PC}<span id="iaSalvarPCTxt">Salvar na pasta do PC</span></button>
               <button type="button" class="botao" id="iaAdicionar">Adicionar apostila</button>
             </div>
             <input type="file" id="iaArquivos" multiple accept=".html,.htm,.json,.jpg,.jpeg,.png,.webp,.zip" hidden>
@@ -229,10 +231,30 @@
           </div>
         </div>
       </div>`;
-    $("iaAtualizar").onclick = carregar;
     $("iaNovaPasta").onclick = novaPasta;
+    $("iaSalvarPC").onclick = async () => {
+      if (!window.EJStorageDrive?.salvarNaPastaDoPC) return;
+      const btn = $("iaSalvarPC"), txt = $("iaSalvarPCTxt");
+      btn.disabled = true;
+      try {
+        const res = await window.EJStorageDrive.salvarNaPastaDoPC(true);
+        if (res && res.ok) {
+          txt.textContent = `Salvo em "${res.pasta}"`;
+          toast(`Arquivos atualizados na pasta "${res.pasta}" do PC! Agora é só rodar o atualizar.bat.`);
+        }
+      } catch (e) {
+        if (e && e.name !== "AbortError") toast(e.message || "Não foi possível salvar na pasta do PC.", "erro", 4500);
+      } finally {
+        btn.disabled = false;
+      }
+    };
     $("iaAdicionar").onclick = () => $("iaArquivos").click();
     $("iaArquivos").onchange = e => importar(e.target.files);
+    window.addEventListener("ej-admin-mudou", () => desenhar());
+    window.addEventListener("ej-pasta-pc-salva", e => {
+      const txt = $("iaSalvarPCTxt");
+      if (txt && e.detail?.pasta) txt.textContent = `Pasta PC: ${e.detail.pasta}`;
+    });
     $("iaVoltar").onclick = fechar;
     $("iaProxima").onclick = () => { const p = proximaApostila(); if (p) abrir(p); };
     $("iaMax").onclick = alternarMax;
@@ -257,8 +279,8 @@
     desenharBotaoMax();
     document.addEventListener("fullscreenchange", () => { if (!document.fullscreenElement && maximizado()) sairMax(); });
     document.addEventListener("keydown", e => { if (e.key === "Escape" && maximizado()) sairMax(); });
-    main.addEventListener("dragover", e => { if (!main.classList.contains("ia-lendo")) e.preventDefault(); });
-    main.addEventListener("drop", e => { if (main.classList.contains("ia-lendo")) return; e.preventDefault(); importar(e.dataTransfer.files); });
+    main.addEventListener("dragover", e => { if (ehAdmin() && !main.classList.contains("ia-lendo")) e.preventDefault(); });
+    main.addEventListener("drop", e => { if (!ehAdmin() || main.classList.contains("ia-lendo")) return; e.preventDefault(); importar(e.dataTransfer.files); });
     window.addEventListener("resize", ajustarAltura);
     new ResizeObserver(ajustarAltura).observe(main);
   }
@@ -467,6 +489,16 @@
   function desenhar() {
     const g = $("iaGrade");
     if (!g) return;
+    const modoAdmin = ehAdmin();
+    const barraAdmin = $("iaBarraAdmin");
+    if (barraAdmin) {
+      barraAdmin.hidden = !modoAdmin;
+      const txtPC = $("iaSalvarPCTxt");
+      if (txtPC && window.EJStorageDrive?.nomePastaPCConectada) {
+        const np = window.EJStorageDrive.nomePastaPCConectada();
+        if (np) txtPC.textContent = `Pasta PC: ${np}`;
+      }
+    }
     if (pastaAtual && !org.pastas[pastaAtual]) pastaAtual = null;
     // trilha
     const trilha = $("iaTrilha");
@@ -480,29 +512,31 @@
     trilha.querySelectorAll("[data-dest]").forEach(b => {
       const dest = b.dataset.dest || null;
       if (b.tagName === "BUTTON") b.onclick = () => irPara(dest);
-      soltavel(b, dest);
+      if (modoAdmin) soltavel(b, dest);
     });
     const pastas = filhasDe(pastaAtual), aqui = apostilasDe(pastaAtual);
     $("iaResumo").textContent = lista.length
       ? (pastaAtual ? `${aqui.length} ${aqui.length === 1 ? "apostila" : "apostilas"} nesta pasta, ${lista.length} no total.` : `${lista.length} ${lista.length === 1 ? "apostila" : "apostilas"}. O progresso fica salvo no seu navegador e sincroniza com o seu Google Drive.`)
       : "Nenhuma apostila ainda.";
     if (!lista.length && !pastas.length) {
-      g.innerHTML = `<div class="ia-vazio" style="grid-column:1/-1">Clique em <b>Adicionar apostila</b> e escolha os arquivos do pacote
-        (<b>index.html</b>, <b>biblioteca.json</b> e <b>capa.jpg</b>), um <b>.zip</b> com eles ou só o <b>.html</b> do site.
-        Também dá para arrastar os arquivos para cá.</div>`;
+      g.innerHTML = modoAdmin
+        ? `<div class="ia-vazio" style="grid-column:1/-1">Clique em <b>Adicionar apostila</b> e escolha os arquivos do pacote
+          (<b>index.html</b>, <b>biblioteca.json</b> e <b>capa.jpg</b>), um <b>.zip</b> com eles ou só o <b>.html</b> do site.
+          Também dá para arrastar os arquivos para cá.</div>`
+        : `<div class="ia-vazio" style="grid-column:1/-1">Nenhuma apostila publicada ainda.</div>`;
       return;
     }
     const cartPasta = pastas.map(([id, p]) => {
       const sub = filhasDe(id).length, n = totalDentro(id);
       const det = [n ? `${n} ${n === 1 ? "apostila" : "apostilas"}` : "vazia", sub ? `${sub} ${sub === 1 ? "pasta" : "pastas"}` : ""].filter(Boolean).join(" · ");
-      return `<div class="ia-item ia-item--pasta" draggable="true" data-pasta="${esc(id)}">
-        <button type="button" class="ia-pasta" data-abrir="${esc(id)}"><span class="ia-pasta-ic" data-pv="${esc("apost:" + id)}">${ICP.pasta}</span><span class="ia-pasta-txt"><b>${esc(p.nome)}</b><small>${det}</small></span></button>
-        <button type="button" class="ia-mais" aria-label="Opções da pasta ${esc(p.nome)}" aria-haspopup="menu">${ICP.mais}</button></div>`;
+      return `<div class="ia-item ia-item--pasta"${modoAdmin ? ' draggable="true"' : ''} data-pasta="${esc(id)}">
+        <button type="button" class="ia-pasta" data-abrir="${esc(id)}"><span class="ia-pasta-ic" data-pv="${esc("apost:" + id)}">${ICP.pasta}</span><span class="ia-pasta-txt"${modoAdmin ? '' : ' style="padding-right:0"'}><b>${esc(p.nome)}</b><small>${det}</small></span></button>
+        ${modoAdmin ? `<button type="button" class="ia-mais" aria-label="Opções da pasta ${esc(p.nome)}" aria-haspopup="menu">${ICP.mais}</button>` : ""}</div>`;
     }).join("");
     const cartApost = aqui.map(a => {
       const i = lista.indexOf(a);
       const meta = [a.disciplina, a.prova, dataBr(a.data_aula)].filter(Boolean).join(" · ");
-      return `<div class="ia-item" draggable="true" data-apostila="${esc(a.pasta)}">
+      return `<div class="ia-item"${modoAdmin ? ' draggable="true"' : ''} data-apostila="${esc(a.pasta)}">
         <button type="button" class="ia-card" data-i="${i}">
         <div class="ia-capa">${a.capa ? `<img src="${esc(a.capa)}" alt="" loading="lazy" draggable="false">` : "Apostila"}</div>
         <div class="ia-corpo">
@@ -514,30 +548,41 @@
         <button type="button" class="ia-mais ia-mais--card" aria-label="Opções de ${esc(a.titulo)}" aria-haspopup="menu">${ICP.mais}</button></div>`;
     }).join("");
     g.innerHTML = (cartPasta ? `<div class="ia-pastas" style="grid-column:1/-1">${cartPasta}</div>` : "") + cartApost +
-      (!aqui.length && pastaAtual ? `<div class="ia-vazio" style="grid-column:1/-1">Pasta vazia. Arraste apostilas para cá, use <b>Mover para…</b> no menu de uma apostila ou adicione uma nova estando aqui.</div>` : "");
+      (!aqui.length && pastaAtual ? `<div class="ia-vazio" style="grid-column:1/-1">${modoAdmin ? 'Pasta vazia. Arraste apostilas para cá, use <b>Mover para…</b> no menu de uma apostila ou adicione uma nova estando aqui.' : 'Esta pasta ainda não tem apostilas.'}</div>` : "");
     g.querySelectorAll(".ia-card").forEach(b => (b.onclick = () => abrir(lista[+b.dataset.i])));
     g.querySelectorAll("[data-abrir]").forEach(b => (b.onclick = () => irPara(b.dataset.abrir)));
     g.querySelectorAll(".ia-item").forEach(it => {
       const oQue = it.dataset.pasta ? { pasta: it.dataset.pasta } : { apostila: it.dataset.apostila };
-      it.addEventListener("dragstart", e => { e.dataTransfer.setData(TIPO_DND, JSON.stringify(oQue)); e.dataTransfer.effectAllowed = "move"; it.classList.add("ia-arrastando"); });
-      it.addEventListener("dragend", () => it.classList.remove("ia-arrastando"));
-      if (oQue.pasta) soltavel(it, oQue.pasta);
-      it.querySelector(".ia-mais").onclick = e => {
+      if (modoAdmin) {
+        it.addEventListener("dragstart", e => { e.dataTransfer.setData(TIPO_DND, JSON.stringify(oQue)); e.dataTransfer.effectAllowed = "move"; it.classList.add("ia-arrastando"); });
+        it.addEventListener("dragend", () => it.classList.remove("ia-arrastando"));
+        if (oQue.pasta) soltavel(it, oQue.pasta);
+      }
+      const btnMais = it.querySelector(".ia-mais");
+      if (!btnMais) return;
+      btnMais.onclick = e => {
         e.stopPropagation();
         const b = e.currentTarget;
-        if (oQue.pasta) menu(b, [
+        if (oQue.pasta && modoAdmin) menu(b, [
           { t: "Abrir", f: () => irPara(oQue.pasta) },
           { t: "Renomear", f: () => renomear(oQue.pasta) },
           { t: "Personalizar (cor e capa)", f: () => window.PastaVisual && PastaVisual.editar("apost:" + oQue.pasta, (org.pastas[oQue.pasta] || {}).nome) },
           { t: "Mover para…", f: () => menu(b, destinos(oQue)) },
           { t: "Excluir pasta", perigo: true, f: () => excluir(oQue.pasta) },
         ]);
-        else menu(b, [
-          { t: "Domínio por conceito", f: () => verDominio(lista.find(x => x.pasta === oQue.apostila)) },
-          { t: "Recomeçar do zero", perigo: true, f: () => recomecar(lista.find(x => x.pasta === oQue.apostila)) },
-          { t: "Mover para…", f: () => menu(b, destinos(oQue)) },
-          { t: "Excluir apostila", perigo: true, f: () => excluirApostila(oQue.apostila) },
-        ]);
+        else if (oQue.apostila) {
+          const opcoesApostila = [
+            { t: "Domínio por conceito", f: () => verDominio(lista.find(x => x.pasta === oQue.apostila)) },
+            { t: "Recomeçar do zero", perigo: true, f: () => recomecar(lista.find(x => x.pasta === oQue.apostila)) },
+          ];
+          if (modoAdmin) {
+            opcoesApostila.push(
+              { t: "Mover para…", f: () => menu(b, destinos(oQue)) },
+              { t: "Excluir apostila", perigo: true, f: () => excluirApostila(oQue.apostila) }
+            );
+          }
+          menu(b, opcoesApostila);
+        }
       };
     });
   }
