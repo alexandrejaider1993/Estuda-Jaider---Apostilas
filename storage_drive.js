@@ -1009,7 +1009,10 @@
       } else {
         const a = estado.aparencia[chave] || {};
         a.cor = b.cor || "";
-        if (b.remover_capa) delete a.capa;
+        if (b.remover_capa) {
+          delete a.capa;
+          a.sem_capa = true;
+        }
         a.atualizado_em = new Date().toISOString().slice(0, 19);
         estado.aparencia[chave] = a;
       }
@@ -1037,6 +1040,7 @@
       estado.capas_custom[hash] = dataUrl;
       const a = estado.aparencia[chave] || {};
       a.capa = dataUrl; // guarda direto ou via nome
+      delete a.sem_capa;
       if (cor) a.cor = cor;
       a.atualizado_em = new Date().toISOString().slice(0, 19);
       estado.aparencia[chave] = a;

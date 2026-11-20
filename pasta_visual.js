@@ -15,6 +15,7 @@
   const css = document.createElement("style");
   css.textContent = `
   .pv-arte { display: block; width: 100%; aspect-ratio: 120 / 92; }
+  .pv-arte--doc { aspect-ratio: 6 / 10; }
   .pv-arte svg { display: block; width: 100%; height: 100%; overflow: visible; }
   .pv-dlg { width: min(520px, calc(100vw - 32px)); padding: 0; border: 1px solid var(--cor-fio); border-radius: 12px; background: var(--cor-fundo); color: var(--cor-tinta);
     box-shadow: 0 24px 60px rgba(0,0,0,.28); font: 400 14px var(--fonte-ui); }
@@ -23,6 +24,7 @@
   .pv-dlg h2 { grid-column: 1 / -1; margin: 0; font: 600 17px var(--fonte-ui); }
   .pv-dlg h2 small { display: block; margin-top: 2px; font: 400 13px var(--fonte-ui); color: var(--cor-suave); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .pv-dlg__previa { align-self: start; position: relative; border-radius: 10px; }
+  .pv-dlg__previa--doc { max-width: 144px; justify-self: center; width: 100%; }
   .pv-dlg__previa.pv-solta { outline: 2px dashed var(--cor-tinta); outline-offset: 6px; }
   .pv-dlg__rot { margin: 0 0 8px; font: 600 13px var(--fonte-ui); }
   .pv-cores { display: grid; grid-template-columns: repeat(8, 26px); gap: 8px; margin-bottom: 8px; }
@@ -146,12 +148,35 @@
     }
   }
 
-  // desenho: aba atrás (tom escuro da cor) + frente arredondada com a cor ou a imagem
-  function svg(ap) {
+  const ehDoc = chave => String(chave || "").startsWith("doc:");
+
+  // desenho: pasta (aba atrás + frente arredondada) ou apostila (folha A4 vertical 6:10 com capa ou linhas de caderno)
+  function svg(ap, chave, capaPadrao) {
     const id = "pvc" + (++seq);
-    const cor = ap && ap.cor ? ap.cor : PADRAO;
-    const img = ap && (ap.previa || (ap.capa ? urlCapa(ap.capa) : ""));
+    const doc = ehDoc(chave);
+    const temCor = !!(ap && ap.cor);
+    const cor = temCor ? ap.cor : (doc ? "#F4F2ED" : PADRAO);
+    const img = (ap && (ap.previa || (ap.capa ? urlCapa(ap.capa) : ""))) || (doc && !(ap && ap.sem_capa) ? (capaPadrao || "") : "");
     const gifAttr = ehGifUrl(img) ? ` data-gif-src="${esc(img)}"` : "";
+    if (doc) {
+      return `<svg viewBox="0 0 120 200" aria-hidden="true" focusable="false">
+        <defs><clipPath id="${id}"><rect x="0" y="0" width="120" height="200" rx="8"/></clipPath></defs>
+        <rect x="0" y="0" width="120" height="200" rx="8" style="fill: ${cor}"/>
+        ${img
+          ? `<image href="${esc(img)}"${gifAttr} x="0" y="0" width="120" height="200" preserveAspectRatio="xMidYMid slice" clip-path="url(#${id})"/>`
+          : `<g clip-path="url(#${id})">
+              <rect x="0" y="0" width="11" height="200" style="fill: color-mix(in srgb, ${cor} 76%, #000)" opacity=".55"/>
+              <line x1="11" y1="0" x2="11" y2="200" stroke="rgba(0,0,0,.1)" stroke-width="1"/>
+              <rect x="24" y="34" width="64" height="5" rx="2.5" fill="currentColor" opacity=".2"/>
+              <rect x="24" y="46" width="44" height="4" rx="2" fill="currentColor" opacity=".13"/>
+              <line x1="24" y1="74" x2="98" y2="74" stroke="currentColor" stroke-opacity=".11" stroke-width="1.5" stroke-linecap="round"/>
+              <line x1="24" y1="88" x2="98" y2="88" stroke="currentColor" stroke-opacity=".11" stroke-width="1.5" stroke-linecap="round"/>
+              <line x1="24" y1="102" x2="98" y2="102" stroke="currentColor" stroke-opacity=".11" stroke-width="1.5" stroke-linecap="round"/>
+              <line x1="24" y1="116" x2="76" y2="116" stroke="currentColor" stroke-opacity=".11" stroke-width="1.5" stroke-linecap="round"/>
+            </g>`}
+        <rect x="0.6" y="0.6" width="118.8" height="198.8" rx="7.6" fill="none" stroke="rgba(0,0,0,.08)" stroke-width="1.2"/>
+      </svg>`;
+    }
     return `<svg viewBox="0 0 120 92" aria-hidden="true" focusable="false">
       <defs><clipPath id="${id}"><rect x="0" y="13" width="120" height="79" rx="8"/></clipPath></defs>
       <path d="M7 1h27c3 0 4.6 1 6.6 3.2L46 10h67a7 7 0 0 1 7 7v20H0V8a7 7 0 0 1 7-7Z" style="fill: color-mix(in srgb, ${cor} 70%, #000)"/>
@@ -160,17 +185,21 @@
       <rect x="0.6" y="13.6" width="118.8" height="77.8" rx="7.6" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="1.2"/>
     </svg>`;
   }
-  function arte(chave, ap) {
-    const d = document.createElement("span"); d.className = "pv-arte"; d.innerHTML = svg(ap !== undefined ? ap : mapa[chave]);
+  function arte(chave, ap, capaPadrao) {
+    const d = document.createElement("span");
+    d.className = "pv-arte" + (ehDoc(chave) ? " pv-arte--doc" : "");
+    d.innerHTML = svg(ap !== undefined ? ap : mapa[chave], chave, capaPadrao);
     return d;
   }
   function preencher(raiz) {
     (raiz || document).querySelectorAll("[data-pv]").forEach(el => {
-      const ap = mapa[el.dataset.pv];
-      const assin = JSON.stringify(ap || null);
+      const chave = el.dataset.pv;
+      const capaPadrao = el.dataset.pvCapaPadrao || "";
+      const ap = mapa[chave];
+      const assin = JSON.stringify({ ap: ap || null, capaPadrao });
       if (el.dataset.pvAssin === assin && el.firstChild) return;
       el.dataset.pvAssin = assin;
-      el.replaceChildren(arte(el.dataset.pv, ap));
+      el.replaceChildren(arte(chave, ap, capaPadrao));
     });
     sincronizarSequenciaGifs();
   }
@@ -226,23 +255,25 @@
     });
   }
 
-  function editar(chave, nome) {
+  function editar(chave, nome, capaPadrao) {
+    const doc = ehDoc(chave);
+    const rotTipo = doc ? "apostila" : "pasta";
     const atual = mapa[chave] || {};
-    const e = { cor: atual.cor || "", capa: atual.capa || "", nova: null, removerCapa: false, corEscolhida: !!atual.cor };
+    const e = { cor: atual.cor || "", capa: atual.capa || "", nova: null, removerCapa: !!atual.sem_capa, corEscolhida: !!atual.cor };
     const dlg = document.createElement("dialog"); dlg.className = "pv-dlg"; dlg.setAttribute("aria-labelledby", "pvTit");
     dlg.innerHTML = `<div class="pv-dlg__corpo">
-        <h2 id="pvTit">Personalizar pasta<small>${esc(nome || "")}</small></h2>
-        <div class="pv-dlg__previa" title="Solte uma imagem aqui"></div>
+        <h2 id="pvTit">Personalizar ${rotTipo}<small>${esc(nome || "")}</small></h2>
+        <div class="pv-dlg__previa${doc ? " pv-dlg__previa--doc" : ""}" title="Solte uma imagem aqui"></div>
         <div>
           <p class="pv-dlg__rot">Cor</p>
-          <div class="pv-cores" role="group" aria-label="Cor da pasta">${CORES.map(c => `<button type="button" class="pv-cor" style="--c:${c}" data-cor="${c}" aria-label="Cor ${c}"></button>`).join("")}</div>
-          <label class="pv-livre"><input type="color" value="${e.cor || PADRAO}" aria-label="Outra cor"> Outra cor</label>
+          <div class="pv-cores" role="group" aria-label="Cor da ${rotTipo}">${CORES.map(c => `<button type="button" class="pv-cor" style="--c:${c}" data-cor="${c}" aria-label="Cor ${c}"></button>`).join("")}</div>
+          <label class="pv-livre"><input type="color" value="${e.cor || (doc ? "#F4F2ED" : PADRAO)}" aria-label="Outra cor"> Outra cor</label>
           <p class="pv-dlg__rot">Capa</p>
           <div class="pv-capa-acoes">
             <button type="button" class="pv-bt" data-acao="imagem">Escolher imagem…</button>
             <button type="button" class="pv-bt pv-bt--sutil" data-acao="sem-imagem">Remover imagem</button>
           </div>
-          <p class="pv-dica">Imagem ou GIF animado. Também dá para arrastar até a pasta ou colar (Ctrl+V).</p>
+          <p class="pv-dica">Imagem ou GIF animado. Também dá para arrastar até a ${rotTipo} ou colar (Ctrl+V).</p>
           <p class="pv-erro" hidden></p>
           <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
         </div>
@@ -253,10 +284,10 @@
     const $ = s => dlg.querySelector(s), previa = $(".pv-dlg__previa"), erro = $(".pv-erro"), file = $("input[type=file]"), livre = $("input[type=color]");
     const mostrarErro = m => { erro.hidden = !m; erro.textContent = m || ""; };
     function desenhar() {
-      const ap = { cor: e.cor, capa: e.removerCapa ? "" : e.capa, previa: e.nova ? e.nova.previa : "" };
-      previa.replaceChildren(arte(chave, ap));
+      const ap = { cor: e.cor, capa: e.removerCapa ? "" : e.capa, previa: e.nova ? e.nova.previa : "", sem_capa: e.removerCapa };
+      previa.replaceChildren(arte(chave, ap, capaPadrao));
       dlg.querySelectorAll(".pv-cor").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.cor.toLowerCase() === (e.cor || "").toLowerCase())));
-      $('[data-acao="sem-imagem"]').hidden = !(e.nova || (e.capa && !e.removerCapa));
+      $('[data-acao="sem-imagem"]').hidden = !(e.nova || ((e.capa || capaPadrao) && !e.removerCapa));
     }
     async function usarArquivo(f) {
       if (!f) return;

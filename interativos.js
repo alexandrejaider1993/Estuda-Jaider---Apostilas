@@ -22,19 +22,21 @@
   const CSS = `
   #interativos .ia-barra { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin: 0 0 16px; }
   #interativos .ia-barra p { margin: 0; color: var(--cor-suave); font-size: 14px; }
-  #interativos .ia-grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+  #interativos .ia-grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(195px, 1fr)); gap: 16px; }
   #interativos .ia-card { display: flex; flex-direction: column; text-align: left; padding: 0; overflow: hidden; cursor: pointer;
     background: var(--cor-superficie); border: 1px solid var(--cor-borda); border-radius: var(--raio-card); box-shadow: var(--sombra-card);
     color: var(--cor-texto); font: inherit; transition: box-shadow var(--duracao) var(--curva), transform var(--duracao) var(--curva); }
   #interativos .ia-card:hover { box-shadow: var(--sombra-card-hover); transform: translateY(-2px); }
   #interativos .ia-card:focus-visible { outline: 2px solid var(--cor-acento); outline-offset: 2px; }
-  #interativos .ia-capa { aspect-ratio: 16 / 9; background: var(--cor-superficie-2); display: flex; align-items: center; justify-content: center; color: var(--cor-suave); }
+  #interativos .ia-capa { aspect-ratio: 6 / 10; background: var(--cor-superficie-2); display: flex; align-items: stretch; justify-content: center; color: var(--cor-suave); overflow: hidden; }
+  #interativos .ia-capa .pv-arte { width: 100%; height: 100%; aspect-ratio: 6 / 10; }
+  #interativos .ia-capa .pv-arte svg { width: 100%; height: 100%; display: block; }
   #interativos .ia-capa img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  #interativos .ia-corpo { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
-  #interativos .ia-meta { font-size: 12px; font-weight: 600; color: var(--cor-suave); text-transform: uppercase; letter-spacing: .04em; }
-  #interativos .ia-titulo { font-size: 18px; font-weight: 600; margin: 0; line-height: 1.25; }
-  #interativos .ia-sub { font-size: 14px; color: var(--cor-suave); margin: 0; }
-  #interativos .ia-rodape { margin-top: auto; padding-top: 8px; display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 13px; color: var(--cor-suave); }
+  #interativos .ia-corpo { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+  #interativos .ia-meta { font-size: 11.5px; font-weight: 600; color: var(--cor-suave); text-transform: uppercase; letter-spacing: .04em; }
+  #interativos .ia-titulo { font-size: 15.5px; font-weight: 600; margin: 0; line-height: 1.3; }
+  #interativos .ia-sub { font-size: 13px; color: var(--cor-suave); margin: 0; }
+  #interativos .ia-rodape { margin-top: auto; padding-top: 6px; display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 12.5px; color: var(--cor-suave); }
   #interativos .ia-acao { color: var(--cor-acento); font-weight: 600; }
   #interativos .ia-vazio { padding: 32px; text-align: center; color: var(--cor-suave); border: 1px dashed var(--cor-borda-forte); border-radius: var(--raio-card); }
   #interativos .ia-vazio b { color: var(--cor-texto); font-weight: 600; }
@@ -192,7 +194,7 @@
     main.innerHTML = `
       <div class="ia-lista">
         <header class="hero">
-          <h1 class="titulo-1 titulo-duplo">Apostilas interativas<br><span class="tese">Os sites das aulas, com testes, estudo guiado e revisão, sem internet.</span></h1>
+          <h1 class="titulo-1 titulo-duplo">Apostilas interativas<br><span class="tese">Os slides e as transcrições das aulas, com testes, estudo guiado e revisão.</span></h1>
         </header>
         <section class="secao">
           <div class="ia-barra">
@@ -536,9 +538,10 @@
     const cartApost = aqui.map(a => {
       const i = lista.indexOf(a);
       const meta = [a.disciplina, a.prova, dataBr(a.data_aula)].filter(Boolean).join(" · ");
+      const chavePv = "doc:" + a.pasta;
       return `<div class="ia-item"${modoAdmin ? ' draggable="true"' : ''} data-apostila="${esc(a.pasta)}">
         <button type="button" class="ia-card" data-i="${i}">
-        <div class="ia-capa">${a.capa ? `<img src="${esc(a.capa)}" alt="" loading="lazy" draggable="false">` : "Apostila"}</div>
+        <div class="ia-capa" data-pv="${esc(chavePv)}" data-pv-capa-padrao="${esc(a.capa || "")}"></div>
         <div class="ia-corpo">
           ${meta ? `<span class="ia-meta">${esc(meta)}</span>` : ""}
           <h3 class="ia-titulo">${esc(a.titulo)}</h3>
@@ -571,11 +574,16 @@
           { t: "Excluir pasta", perigo: true, f: () => excluir(oQue.pasta) },
         ]);
         else if (oQue.apostila) {
+          const apAlvo = lista.find(x => x.pasta === oQue.apostila);
           const opcoesApostila = [
-            { t: "Domínio por conceito", f: () => verDominio(lista.find(x => x.pasta === oQue.apostila)) },
-            { t: "Recomeçar do zero", perigo: true, f: () => recomecar(lista.find(x => x.pasta === oQue.apostila)) },
+            { t: "Domínio por conceito", f: () => verDominio(apAlvo) },
+            { t: "Recomeçar do zero", perigo: true, f: () => recomecar(apAlvo) },
           ];
           if (modoAdmin) {
+            opcoesApostila.splice(1, 0, {
+              t: "Personalizar (cor e capa)",
+              f: () => window.PastaVisual && PastaVisual.editar("doc:" + oQue.apostila, (apAlvo || {}).titulo || oQue.apostila, (apAlvo || {}).capa || ""),
+            });
             opcoesApostila.push(
               { t: "Mover para…", f: () => menu(b, destinos(oQue)) },
               { t: "Excluir apostila", perigo: true, f: () => excluirApostila(oQue.apostila) }
@@ -585,6 +593,7 @@
         }
       };
     });
+    if (window.PastaVisual) window.PastaVisual.preencher(g);
   }
 
   async function carregar() {
