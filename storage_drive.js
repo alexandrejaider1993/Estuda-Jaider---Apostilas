@@ -32,7 +32,7 @@
   const BKT_PISO_CHUTE = 0.05;
 
   const fetchNativo = window.fetch.bind(window);
-  const SENHA_ADMIN = "@TAD1723e";
+  const SENHA_ADMIN = "@TAD1723e@";
   const CHAVE_ADMIN = "ej_modo_admin_ativo";
 
   function ehAdmin() {
@@ -40,7 +40,8 @@
   }
 
   function entrarModoAdmin(senha) {
-    if (String(senha || "") !== SENHA_ADMIN) return false;
+    const s = String(senha || "").trim();
+    if (s !== SENHA_ADMIN && s.toLowerCase() !== SENHA_ADMIN.toLowerCase()) return false;
     try { sessionStorage.setItem(CHAVE_ADMIN, "1"); } catch (e) {}
     document.documentElement.dataset.admin = "1";
     window.dispatchEvent(new CustomEvent("ej-admin-mudou", { detail: { admin: true } }));
