@@ -502,13 +502,47 @@
       const btnEntrarSemLogin = $("btnEntrarSistema");
       if (btnEntrarSemLogin) btnEntrarSemLogin.remove();
 
+      let loginGoogleEmCurso = false;
       async function acionarLoginGoogle() {
+        if (loginGoogleEmCurso) return;
+        loginGoogleEmCurso = true;
+        const btn = $("btnEntrarGoogle");
+        const htmlOriginal = btn ? btn.innerHTML : "";
+        let timerId = null;
+        let inicioMs = 0;
+
+        if (btn) btn.disabled = true;
+
+        const iniciarCronometro = () => {
+          if (timerId) return;
+          inicioMs = performance.now();
+          const spanLabel = btn ? btn.querySelector("span") : null;
+          const atualizar = () => {
+            const seg = ((performance.now() - inicioMs) / 1000).toFixed(1).replace(".", ",");
+            if (spanLabel) {
+              spanLabel.innerHTML = `Entrando... <span style="font-variant-numeric:tabular-nums">${seg}s</span>`;
+            } else if (btn) {
+              btn.textContent = `Entrando... ${seg}s`;
+            }
+          };
+          atualizar();
+          timerId = setInterval(atualizar, 100);
+        };
+
         try {
-          await window.EJStorageDrive.entrarComGoogle();
-          window.mostrarToast("Conectado ao Google Drive!");
+          await window.EJStorageDrive.entrarComGoogle({ aoAutenticar: iniciarCronometro });
+          const totalSeg = inicioMs ? ((performance.now() - inicioMs) / 1000).toFixed(1).replace(".", ",") : "";
+          window.mostrarToast(totalSeg ? `Conectado ao Google Drive! (${totalSeg}s)` : "Conectado ao Google Drive!");
           entrarNoApp();
         } catch (e) {
           window.mostrarToast(e.message || "Não foi possível conectar ao Google.", "erro", 4500);
+        } finally {
+          if (timerId) clearInterval(timerId);
+          if (btn) {
+            btn.disabled = false;
+            if (htmlOriginal) btn.innerHTML = htmlOriginal;
+          }
+          loginGoogleEmCurso = false;
         }
       }
 

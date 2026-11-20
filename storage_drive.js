@@ -1362,6 +1362,9 @@
               }
               return reject(new Error(resp.error_description || resp.error));
             }
+            if (typeof opcoes.aoAutenticar === "function") {
+              try { opcoes.aoAutenticar(); } catch (e) {}
+            }
             tokenAcesso = resp.access_token;
             const expiraEm = Date.now() + (Number(resp.expires_in || 3599) * 1000);
             let perfil = contaGoogle || {};
