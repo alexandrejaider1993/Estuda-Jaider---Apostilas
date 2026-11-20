@@ -880,10 +880,9 @@
   font: 600 14px/1 var(--fonte-ui); letter-spacing: -0.005em; cursor: pointer;
   transition: background-color var(--duracao) var(--curva), border-color var(--duracao) var(--curva), transform var(--duracao) var(--curva);
 }
-:root[data-skin="eleven"] .bv11 .tela-boasvindas__btn svg { width: 16px; height: 16px; transition: transform var(--duracao) var(--curva); }
+:root[data-skin="eleven"] .bv11 .tela-boasvindas__btn svg { width: 18px; height: 18px; flex: none; transition: transform var(--duracao) var(--curva); }
 :root[data-skin="eleven"] .bv11 .tela-boasvindas__btn--primario { background: var(--cor-veia); color: var(--cor-sobre-veia); box-shadow: 0 1px 2px rgba(0, 0, 0, .12); }
 :root[data-skin="eleven"] .bv11 .tela-boasvindas__btn--primario:hover { background: var(--el-acao-hover); }
-:root[data-skin="eleven"] .bv11 .tela-boasvindas__btn--primario:hover svg { transform: translateX(2px); }
 :root[data-skin="eleven"] .bv11 .tela-boasvindas__btn--secundario { background: var(--cor-superficie); color: var(--cor-tinta); border: 1px solid var(--cor-fio); box-shadow: var(--el-sombra-xs); }
 :root[data-skin="eleven"] .bv11 .tela-boasvindas__btn--secundario:hover { background: var(--el-hover); border-color: var(--el-borda-forte); }
 :root[data-skin="eleven"] .bv11 .tela-boasvindas__btn:active { transform: scale(.98); }
