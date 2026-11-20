@@ -396,7 +396,7 @@
   <!-- ================= BARRA SUPERIOR DO APP ================= -->
   <header class="app-shell-header">
     <div class="shell-header-left">
-      <button type="button" class="app-marca" id="btnMarcaInicio" title="Voltar à tela de boas-vindas">
+      <button type="button" class="app-marca" id="btnMarcaInicio" title="Voltar ao início">
         <span>estuda Jaider</span>
       </button>
     </div>
@@ -516,7 +516,13 @@
       $("btnEntrarGoogle").onclick = acionarLoginGoogle;
       $("btnMarcaInicio").onclick = () => {
         if (window.interativos) window.interativos.fechar();
-        mostrarBoasVindas();
+        if (temSessaoGoogleAtiva()) {
+          telaBV.hidden = true;
+          try { sessionStorage.setItem("ej_bv_entrou", "1"); } catch (e) {}
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        } else {
+          mostrarBoasVindas();
+        }
       };
 
       // Atalho Enter na tela de boas-vindas aciona o login com Google
