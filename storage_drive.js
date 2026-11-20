@@ -1052,6 +1052,7 @@
         if (meta && meta.chave_local) {
           try { localStorage.removeItem(meta.chave_local); } catch (e) {}
         }
+        estado.org_em = Date.now() / 1000;
         salvarEstadoLocal();
         autoSalvarPastaPCSeConectada();
         return respostaJson({ ok: true, pasta, registros_apagados: 1 });
@@ -1080,6 +1081,7 @@
         a.atualizado_em = new Date().toISOString().slice(0, 19);
         estado.aparencia[chave] = a;
       }
+      estado.org_em = Date.now() / 1000;
       salvarEstadoLocal();
       autoSalvarPastaPCSeConectada();
       return respostaJson({ chave, aparencia: estado.aparencia[chave] || {} });
@@ -1108,6 +1110,7 @@
       if (cor) a.cor = cor;
       a.atualizado_em = new Date().toISOString().slice(0, 19);
       estado.aparencia[chave] = a;
+      estado.org_em = Date.now() / 1000;
       salvarEstadoLocal();
       autoSalvarPastaPCSeConectada();
       return respostaJson({ chave, aparencia: a });
