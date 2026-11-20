@@ -772,7 +772,7 @@
     if (!q.contentWindow.__ejRegras) { const rg = doc.createElement("script"); rg.src = "/regras_apostila.js?v=2"; doc.head.append(rg); }
     injetarNav(q, doc);
     const s = doc.createElement("script");
-    s.src = "/trilho_apostila.js?v=7";
+    s.src = "/trilho_apostila.js?v=8";
     s.onload = () => {
       try { q.contentWindow.ejTrilho.iniciar({ aoMudar: e => { indiceAberto = e.aberto; marcarBotoesIndice(); } }); } catch (e) { console.warn("trilho:", e); }
       indiceAberto = q.contentWindow.ejTrilho ? q.contentWindow.ejTrilho.aberto() : indiceAberto;
@@ -929,7 +929,7 @@
     try { doc = q.contentDocument; } catch (e) { return; }
     if (!doc || !doc.head || doc.URL === "about:blank" || q.contentWindow.ejEstojo) return;
     const s = doc.createElement("script");
-    s.src = "/estojo_apostila.js?v=13";
+    s.src = "/estojo_apostila.js?v=14";
     s.onload = () => {
       try {
         q.contentWindow.ejEstojo.iniciar({ pasta: a.pasta, marcaTexto: MT(), aoMudar: e => barraIA.definir(e) });

@@ -42,8 +42,18 @@
   html.ej-app-max .topo { flex-wrap: nowrap; }
   html.ej-app-max .topo .marca { margin-left: 8px; }
   @media (min-width: 941px) {
-    html.ej-aberto .site { grid-template-columns: var(--ej-larg, 260px) minmax(0, 1fr) !important; }
-    html.ej-aberto .site > :not(.side) { margin-inline: 0 auto; }
+    html.ej-aberto .site { grid-template-columns: minmax(0, 1fr) !important; gap: 0 !important; padding-left: calc(var(--ej-larg, 260px) + 28px) !important; }
+    html.ej-aberto .site > :not(.side) { margin-inline: auto; }
+    html.ej-aberto .side {
+      position: fixed !important; left: 0; top: var(--ej-topo, 64px); bottom: 0;
+      width: var(--ej-larg, 260px); max-height: none !important;
+      overflow-y: auto; overflow-x: hidden; z-index: 35;
+      padding: 14px 12px 24px 16px; box-sizing: border-box;
+      border-right: 1px solid rgba(0,0,0,.08);
+      background: var(--bg, #FDFDFC);
+    }
+    html.ej-aberto .side > summary { cursor: default; list-style: none; }
+    html.ej-aberto .side > summary::-webkit-details-marker { display: none; }
   }
   @media (max-width: 940px) { .ej-recolher, .ej-borda { display: none !important; } html.ej-aberto .ej-fonte { top: calc(var(--ej-topo, 64px) + 62px); } }
   @media (min-width: 641px) {
@@ -84,11 +94,11 @@
     .ej-voo a i.ok { background: #2C4A7A; } .ej-voo a i.mei { background: #9DB3D3; } .ej-voo a i.pend { background: #E8A33D; }
     .ej-voo .ej-voo-ti { padding: 10px 10px 2px; font-size: 12px; font-weight: 600; color: #6B7280; }
     /* índice aberto: borda arrastável e botão para recolher */
-    .ej-borda { position: absolute; top: 0; right: -14px; width: 10px; height: 100%; cursor: col-resize; z-index: 3; }
-    .ej-borda::after { content: ""; position: absolute; left: 4px; top: 40%; width: 2px; height: 40px; border-radius: 1px; background: rgba(0,0,0,.18); }
+    .ej-borda { position: fixed; top: var(--ej-topo, 64px); left: calc(var(--ej-larg, 260px) - 5px); width: 10px; bottom: 0; cursor: col-resize; z-index: 36; }
+    html:not(.ej-aberto) .ej-borda { display: none; }
+    .ej-borda::after { content: ""; position: absolute; left: 4px; top: 50%; transform: translateY(-50%); width: 2px; height: 40px; border-radius: 1px; background: rgba(0,0,0,.18); }
     .ej-recolher { float: right; width: 26px; height: 24px; margin: 0 0 4px 6px; border: 1px solid rgba(0,0,0,.12); border-radius: 6px; background: #fff; color: #2C4A7A; cursor: pointer;
       font: 600 13px/1 system-ui, sans-serif; position: relative; z-index: 2; }
-    .side { position: sticky; }
     /* A− / A+ */
     .ej-fonte { position: fixed; top: calc(var(--ej-topo, 64px) + 10px); right: 18px; z-index: 34; display: flex; align-items: center; border: 1px solid rgba(0,0,0,.12);
       border-radius: 9px; background: rgba(255,255,255,.95); overflow: hidden; font: 600 13px/1 system-ui, sans-serif; color: #2C4A7A; }
@@ -130,7 +140,7 @@
     h.classList.toggle("ej-trilho", !aberto);
     h.style.setProperty("--ej-larg", largura + "px");
     h.style.setProperty("--ej-fonte", String(fonte / 100));
-    const topo = D.querySelector(".topo, header");
+    const topo = D.querySelector("header, .topo");
     h.style.setProperty("--ej-topo", (topo ? Math.round(topo.getBoundingClientRect().bottom) : 64) + "px");
     const sd = side();
     if (sd && aberto && !sd.open && innerWidth > 940) sd.open = true;          // aberto = índice visível por inteiro
@@ -249,7 +259,15 @@
     rec.type = "button"; rec.className = "ej-recolher"; rec.textContent = "«";
     rec.title = "Recolher o índice em números"; rec.setAttribute("aria-label", "Recolher o índice");
     rec.addEventListener("click", ev => { ev.preventDefault(); ev.stopPropagation(); definir(false); });
-    if (sum) sum.prepend(rec);
+    if (sum) {
+      sum.prepend(rec);
+      if (!sum.dataset.ejFixo) {
+        sum.dataset.ejFixo = "1";
+        sum.addEventListener("click", ev => {
+          if (aberto && innerWidth > 940 && !ev.target.closest(".ej-recolher")) ev.preventDefault();
+        });
+      }
+    }
     const borda = D.createElement("div");
     borda.className = "ej-borda"; borda.title = "Arraste para mudar a largura do índice";
     borda.addEventListener("pointerdown", e => arrastar(e, false));

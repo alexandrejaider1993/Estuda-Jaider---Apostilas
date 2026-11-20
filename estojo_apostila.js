@@ -344,7 +344,10 @@
       no.style.left = (r.right + o.x + 1) + "px"; no.style.top = (r.top + o.y - 8) + "px";
       vivos.add(it.id + "-n");
     }
-    camada.querySelectorAll("[data-item]").forEach(n => { if (!vivos.has(n.dataset.item) && !n.contains(D.activeElement)) n.remove(); });
+    camada.querySelectorAll("[data-item]").forEach(n => {
+      const it = itens[n.dataset.item];
+      if (!vivos.has(n.dataset.item) && (!n.contains(D.activeElement) || !it || it.apagado)) n.remove();
+    });
     const alvoObs = cfgG.observar ? cfgG.observar() : D.getElementById("app");
     if (observador && alvoObs) observador.observe(alvoObs, { childList: true, subtree: true, characterData: true });
     observador && observador.takeRecords();
@@ -377,7 +380,7 @@
         const ta = no.querySelector("textarea");
         ta.addEventListener("input", () => { const i = itens[it.id]; if (i) { i.texto = ta.value; mudar(i, false); } });
         no.querySelector(".ej-nota-icone").onclick = () => { const i = itens[it.id]; if (i && ferramenta !== "borracha") { i.aberta = true; mudar(i, false); setTimeout(() => no.querySelector("textarea").focus(), 30); } };
-        no.querySelector('[data-a="min"]').onclick = () => { const i = itens[it.id]; if (i) { i.aberta = false; mudar(i, false); } };
+        no.querySelector('[data-a="min"]').onclick = () => { const i = itens[it.id]; if (i && !i.apagado) { i.aberta = false; no.classList.remove("aberta"); mudar(i, false); } };
         no.querySelector('[data-a="del"]').onclick = () => apagar(it.id);
         ligarArrasto(no, it.id, ".ej-nota-topo, .ej-nota-icone");
         camada.append(no);
@@ -873,7 +876,7 @@
   .ej-nota-cartao { display: none; width: 230px; background: var(--ej-nota); border-radius: 8px; box-shadow: 0 0 0 .5px rgba(0,0,0,.18), 0 8px 24px rgba(0,0,0,.18); overflow: hidden; }
   .ej-nota.aberta .ej-nota-icone { display: none; }
   .ej-nota.aberta .ej-nota-cartao { display: block; }
-  .ej-nota-topo { display: flex; align-items: center; gap: 2px; padding: 4px 4px 0 10px; cursor: grab; font-size: 11px; font-weight: 600; color: rgba(0,0,0,.55); letter-spacing: .04em; text-transform: uppercase; }
+  .ej-nota-topo { display: flex; align-items: center; gap: 2px; padding: 4px 4px 0 10px; cursor: grab; user-select: none; -webkit-user-select: none; font-size: 11px; font-weight: 600; color: rgba(0,0,0,.55); letter-spacing: .04em; text-transform: uppercase; }
   .ej-nota-topo span { flex: 1; }
   .ej-nota-topo button { width: 24px; height: 22px; border: 0; background: transparent; border-radius: 5px; cursor: pointer; color: rgba(0,0,0,.6); font-size: 16px; line-height: 1; }
   .ej-nota-topo button:hover { background: rgba(0,0,0,.08); }
