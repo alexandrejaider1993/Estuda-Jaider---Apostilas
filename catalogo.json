@@ -792,13 +792,8 @@
     "pastas": {
       "288183cf92": {
         "nome": "Anatomia Patológica II",
-        "pai": "c8bd51b3c2",
-        "criada": 1795013450
-      },
-      "c8bd51b3c2": {
-        "nome": "4º período",
         "pai": null,
-        "criada": 1795013469
+        "criada": 1795013450
       },
       "f98b6f7cb3": {
         "nome": "(11.11.2026) - Patologias do Útero 2",
@@ -827,23 +822,13 @@
       },
       "dbac5377cb": {
         "nome": "Anatomia Topográfica",
-        "pai": "c8bd51b3c2",
-        "criada": 1795034638
-      },
-      "c87518b6b5": {
-        "nome": "3º Período",
         "pai": null,
-        "criada": 1795034755
+        "criada": 1795034638
       },
       "a12b7e7a48": {
         "nome": "Farmacoterapia",
-        "pai": "c8bd51b3c2",
+        "pai": null,
         "criada": 1795049136
-      },
-      "2118a72482": {
-        "nome": "Anatomia Patológica I",
-        "pai": "c87518b6b5",
-        "criada": 1795049498
       },
       "451b56ce15": {
         "nome": "Anatomia Patológica II",

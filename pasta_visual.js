@@ -47,17 +47,116 @@
 
   const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const urlCapa = nome => `${API}/capa/${encodeURIComponent(nome)}`;
+  const ehGifUrl = u => /\.gif(?:$|\?)/i.test(u || "") || /^data:image\/gif/i.test(u || "");
+
+  // Quadro estático e duração dos GIFs (para rodar apenas 1 GIF por vez, em sequência)
+  const cacheQuadros = new Map();
+  const cacheDuracao = new Map();
+  let timerGifSeq = 0, indiceGifAtivo = 0;
+
+  function lerDuracaoGif(buf) {
+    try {
+      const b = new Uint8Array(buf);
+      if (b.length < 13 || b[0] !== 0x47 || b[1] !== 0x49 || b[2] !== 0x46) return 3000;
+      let p = 13;
+      if (b[10] & 0x80) p += 3 * (1 << ((b[10] & 7) + 1));
+      let ms = 0;
+      while (p < b.length) {
+        const bloco = b[p++];
+        if (bloco === 0x3B) break;
+        if (bloco === 0x21) {
+          const rot = b[p++];
+          if (rot === 0xF9 && b[p] === 4) {
+            const atraso = b[p + 2] | (b[p + 3] << 8);
+            ms += (atraso > 1 ? atraso : 10) * 10;
+          }
+          while (p < b.length) { const n = b[p++]; if (!n) break; p += n; }
+        } else if (bloco === 0x2C) {
+          p += 8;
+          const fl = b[p++];
+          if (fl & 0x80) p += 3 * (1 << ((fl & 7) + 1));
+          p++;
+          while (p < b.length) { const n = b[p++]; if (!n) break; p += n; }
+        } else break;
+      }
+      return Math.min(Math.max(ms, 1800), 10000);
+    } catch (e) { return 3000; }
+  }
+
+  function obterInfoGif(url) {
+    if (cacheQuadros.has(url)) return Promise.resolve({ estatico: cacheQuadros.get(url), duracao: cacheDuracao.get(url) || 3000 });
+    return new Promise(resolve => {
+      const pDur = fetch(url).then(r => r.arrayBuffer()).then(lerDuracaoGif).catch(() => 3000);
+      const im = new Image();
+      im.crossOrigin = "anonymous";
+      im.onload = async () => {
+        let estatico = url;
+        try {
+          const cv = document.createElement("canvas");
+          cv.width = im.naturalWidth || 240;
+          cv.height = im.naturalHeight || 158;
+          cv.getContext("2d").drawImage(im, 0, 0);
+          estatico = cv.toDataURL("image/webp", 0.88);
+        } catch (e) {}
+        const duracao = await pDur;
+        cacheQuadros.set(url, estatico);
+        cacheDuracao.set(url, duracao);
+        resolve({ estatico, duracao });
+      };
+      im.onerror = () => resolve({ estatico: url, duracao: 3000 });
+      im.src = url;
+    });
+  }
+
+  function definirHrefImg(elImg, href) {
+    if (!elImg || elImg.getAttribute("href") === href) return;
+    elImg.setAttribute("href", href);
+  }
+
+  async function sincronizarSequenciaGifs() {
+    clearTimeout(timerGifSeq);
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      const todos = [...document.querySelectorAll("[data-pv] image[data-gif-src]")];
+      for (const im of todos) {
+        const { estatico } = await obterInfoGif(im.dataset.gifSrc);
+        definirHrefImg(im, estatico);
+      }
+      return;
+    }
+    const itens = [...document.querySelectorAll("[data-pv] image[data-gif-src]")]
+      .filter(im => !im.closest("dialog") && im.closest("[data-pv]")?.offsetParent !== null);
+    if (!itens.length) return;
+    await Promise.all(itens.map(im => obterInfoGif(im.dataset.gifSrc)));
+    if (indiceGifAtivo >= itens.length) indiceGifAtivo = 0;
+    let duracaoAtiva = 3000;
+    itens.forEach((im, idx) => {
+      const src = im.dataset.gifSrc;
+      if (idx === indiceGifAtivo) {
+        definirHrefImg(im, src);
+        duracaoAtiva = cacheDuracao.get(src) || 3000;
+      } else {
+        definirHrefImg(im, cacheQuadros.get(src) || src);
+      }
+    });
+    if (itens.length > 1) {
+      timerGifSeq = setTimeout(() => {
+        indiceGifAtivo = (indiceGifAtivo + 1) % itens.length;
+        sincronizarSequenciaGifs();
+      }, duracaoAtiva);
+    }
+  }
 
   // desenho: aba atrás (tom escuro da cor) + frente arredondada com a cor ou a imagem
   function svg(ap) {
     const id = "pvc" + (++seq);
     const cor = ap && ap.cor ? ap.cor : PADRAO;
     const img = ap && (ap.previa || (ap.capa ? urlCapa(ap.capa) : ""));
+    const gifAttr = ehGifUrl(img) ? ` data-gif-src="${esc(img)}"` : "";
     return `<svg viewBox="0 0 120 92" aria-hidden="true" focusable="false">
       <defs><clipPath id="${id}"><rect x="0" y="13" width="120" height="79" rx="8"/></clipPath></defs>
       <path d="M7 1h27c3 0 4.6 1 6.6 3.2L46 10h67a7 7 0 0 1 7 7v20H0V8a7 7 0 0 1 7-7Z" style="fill: color-mix(in srgb, ${cor} 70%, #000)"/>
       <rect x="0" y="13" width="120" height="79" rx="8" style="fill: ${cor}"/>
-      ${img ? `<image href="${esc(img)}" x="0" y="13" width="120" height="79" preserveAspectRatio="xMidYMid slice" clip-path="url(#${id})"/>` : ""}
+      ${img ? `<image href="${esc(img)}"${gifAttr} x="0" y="13" width="120" height="79" preserveAspectRatio="xMidYMid slice" clip-path="url(#${id})"/>` : ""}
       <rect x="0.6" y="13.6" width="118.8" height="77.8" rx="7.6" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="1.2"/>
     </svg>`;
   }
@@ -73,6 +172,7 @@
       el.dataset.pvAssin = assin;
       el.replaceChildren(arte(el.dataset.pv, ap));
     });
+    sincronizarSequenciaGifs();
   }
   async function carregar(forcar) {
     if (carregado && !forcar) return carregado;
