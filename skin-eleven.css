@@ -1252,3 +1252,8 @@
 /* a largura da ilustração vinha presa à da linha Constância (240 px) e ela ficava achatada; agora segue a proporção */
 :root[data-skin="eleven"] .bv11__cena { padding-bottom: clamp(10px, 2.5vh, 32px); }
 @media (max-height: 640px) { :root[data-skin="eleven"] .bv11__constancia span { font-size: 18px; } :root[data-skin="eleven"] .bv11__dica { display: none; } }
+html[data-dispositivo="celular"]:root[data-skin="eleven"] .bv11__topo { padding: calc(14px + env(safe-area-inset-top)) 16px 0; }
+html[data-dispositivo="celular"]:root[data-skin="eleven"] .bv11__hero { padding: 12px 16px 0; }
+html[data-dispositivo="celular"]:root[data-skin="eleven"] .bv11__sub { font-size: 15px; line-height: 22px; padding: 0 8px; }
+html[data-dispositivo="celular"]:root[data-skin="eleven"] .bv11__acoes { flex-direction: column; width: 100%; max-width: 280px; margin: 0 auto; }
+html[data-dispositivo="celular"]:root[data-skin="eleven"] .bv11 .tela-boasvindas__btn { width: 100%; min-height: 44px; }

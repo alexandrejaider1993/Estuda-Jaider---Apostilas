@@ -16,6 +16,20 @@
     document.documentElement.dataset.tema = t === "escuro" ? "escuro" : "claro";
     document.documentElement.dataset.skin = "eleven";
   } catch (e) {}
+  (function () {
+    const detectarCelular = () => {
+      const uaMovel = /Android|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent || "");
+      const toque = !!(window.matchMedia && window.matchMedia("(pointer: coarse)").matches);
+      const telaPequena = window.innerWidth <= 768;
+      return (uaMovel && telaPequena) || (toque && window.innerWidth <= 640);
+    };
+    const aplicarDispositivo = () => {
+      document.documentElement.dataset.dispositivo = detectarCelular() ? "celular" : "desktop";
+    };
+    aplicarDispositivo();
+    window.addEventListener("resize", aplicarDispositivo, { passive: true });
+    window.addEventListener("orientationchange", aplicarDispositivo, { passive: true });
+  })();
 </script>
 <link rel="preload" href="fonts/Inter-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/Inter-SemiBold.woff2" as="font" type="font/woff2" crossorigin>
@@ -289,6 +303,104 @@
     main.container { padding: 16px !important; }
     .shell-header-center { max-width: 200px; }
     .conta-pilula span.conta-sub { display: none; }
+  }
+
+  /* Otimizações automáticas quando o sistema detecta celular */
+  html[data-dispositivo="celular"],
+  html[data-dispositivo="celular"] body {
+    overscroll-behavior-y: contain;
+    -webkit-tap-highlight-color: transparent;
+  }
+  html[data-dispositivo="celular"] button,
+  html[data-dispositivo="celular"] a {
+    touch-action: manipulation;
+  }
+  html[data-dispositivo="celular"] .app-shell-header {
+    padding: 0 10px !important;
+    padding-top: env(safe-area-inset-top) !important;
+    height: calc(var(--header-altura) + env(safe-area-inset-top)) !important;
+    gap: 8px;
+  }
+  html[data-dispositivo="celular"] .app-marca {
+    padding: 6px 8px;
+    font-size: 14.5px;
+    white-space: nowrap;
+  }
+  html[data-dispositivo="celular"] .shell-header-center {
+    max-width: none;
+    min-width: 0;
+  }
+  html[data-dispositivo="celular"] .busca {
+    height: 38px;
+    padding: 0 10px;
+  }
+  html[data-dispositivo="celular"] .busca input {
+    font-size: 16px; /* evita zoom automático no iOS Safari */
+  }
+  html[data-dispositivo="celular"] .busca kbd {
+    display: none;
+  }
+  html[data-dispositivo="celular"] .busca-lista {
+    position: fixed;
+    top: calc(var(--header-altura) + env(safe-area-inset-top) + 4px);
+    left: 10px;
+    right: 10px;
+    max-height: 65dvh;
+  }
+  html[data-dispositivo="celular"] .shell-header-right {
+    gap: 4px;
+    flex: none;
+  }
+  html[data-dispositivo="celular"] .tema-botao,
+  html[data-dispositivo="celular"] .admin-botao,
+  html[data-dispositivo="celular"] .conta-pilula {
+    min-height: 38px;
+    padding: 0 9px;
+  }
+  html[data-dispositivo="celular"] .conta-pilula #contaTexto {
+    max-width: 72px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  html[data-dispositivo="celular"] .app-workspace-shell {
+    top: calc(var(--header-altura) + env(safe-area-inset-top)) !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: calc(100vh - var(--header-altura) - env(safe-area-inset-top)) !important;
+    height: calc(100dvh - var(--header-altura) - env(safe-area-inset-top)) !important;
+    border-radius: 14px 14px 0 0 !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
+    border-bottom: 0 !important;
+    -webkit-overflow-scrolling: touch;
+  }
+  html[data-dispositivo="celular"] main.container {
+    padding: 12px 14px calc(24px + env(safe-area-inset-bottom)) !important;
+  }
+  html[data-dispositivo="celular"] main.container.ia-lendo {
+    padding: 6px 8px calc(8px + env(safe-area-inset-bottom)) !important;
+  }
+  html[data-dispositivo="celular"] .campo {
+    font-size: 16px;
+    min-height: 42px;
+  }
+  html[data-dispositivo="celular"] .conta-modal {
+    max-height: 88dvh;
+    overflow-y: auto;
+    padding: 18px;
+  }
+  html[data-dispositivo="celular"] #toastCaixa {
+    left: 12px;
+    right: 12px;
+    bottom: calc(14px + env(safe-area-inset-bottom));
+    align-items: center;
+  }
+  html[data-dispositivo="celular"] .ej-toast {
+    max-width: 100%;
+    text-align: center;
   }
 
   /* Campo genérico usado pelas caixas de diálogo */

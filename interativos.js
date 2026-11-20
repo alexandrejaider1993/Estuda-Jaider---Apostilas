@@ -188,6 +188,24 @@
     :is(#interativos, .ej-estojo-host) .ia-cor { width: 34px; height: 34px; }
     #interativos .ia-palco.com-estojo .ia-quadro { width: calc(100% - 70px); }
   }
+  html[data-dispositivo="celular"] #interativos .ia-grade { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  html[data-dispositivo="celular"] #interativos .ia-pastas { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  html[data-dispositivo="celular"] #interativos .ia-card:hover { transform: none; }
+  html[data-dispositivo="celular"] #interativos .ia-mais { width: 38px; height: 38px; }
+  html[data-dispositivo="celular"] #interativos .ia-leitor-topo { flex-wrap: wrap; gap: 6px; }
+  html[data-dispositivo="celular"] #interativos .ia-leitor-topo button { min-height: 38px; }
+  html[data-dispositivo="celular"] #interativos .ia-palco.com-estojo .ia-quadro { width: 100%; }
+  html[data-dispositivo="celular"] :is(#interativos, .ej-estojo-host) .ia-estojo {
+    top: auto; bottom: 8px; right: auto; left: 50%; transform: translateX(-50%);
+    flex-direction: column-reverse; align-items: center; max-width: calc(100% - 16px);
+  }
+  html[data-dispositivo="celular"] :is(#interativos, .ej-estojo-host) .ia-estojo-barra {
+    flex-direction: row; overflow-x: auto; max-width: 100%; -webkit-overflow-scrolling: touch;
+  }
+  html[data-dispositivo="celular"] :is(#interativos, .ej-estojo-host) .ia-estojo-barra hr {
+    width: 1px; height: 22px; margin: auto 4px; flex: none; border-top: 0; border-left: 1px solid var(--cor-fio);
+  }
+  html[data-dispositivo="celular"] .ia-dlg { max-height: 88dvh; overflow-y: auto; }
   `;
 
   function montar() {
@@ -641,7 +659,8 @@
     const q = $("iaQuadro");
     if (!q || !aberta) return;
     const topo = q.getBoundingClientRect().top;
-    q.style.height = Math.max(320, Math.floor(window.innerHeight - topo - (maximizado() ? 8 : 12))) + "px";
+    const altJanela = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+    q.style.height = Math.max(320, Math.floor(altJanela - topo - (maximizado() ? 8 : 12))) + "px";
   }
 
   // Tela cheia: a apostila ocupa a tela inteira (Fullscreen do navegador/Electron); se o pedido
