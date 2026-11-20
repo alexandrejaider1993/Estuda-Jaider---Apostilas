@@ -1,0 +1,54 @@
+/* Animações dos cartões (14/11/2026).
+   0) O movimento só acontece com o mouse (ou o foco do teclado) em cima do cartão; em repouso os desenhos ficam parados.
+   1) Estilo Clássico: as figurinhas coloridas ganham vida (manchas que flutuam, barras de som que dançam, círculos que pulsam).
+   2) Interruptor em Configurações > Tema e Aparência Visual > Animações dos cartões: html[data-anim="off"] desliga tudo isto,
+      o movimento dos desenhos de aramado (skin-eleven.css) e a animação do botão "Abrir".
+   Quem desativa animações no Windows também não vê movimento. */
+
+/* ---------- figurinhas coloridas (estilo Clássico) ---------- */
+.apple-card .card-image > svg:not(.arte-fio) * { transform-box: fill-box; transform-origin: center; }
+.apple-card .card-image > svg:not(.arte-fio) polygon { animation: ctBolha 7s ease-in-out infinite alternate; }
+.apple-card .card-image > svg:not(.arte-fio) polygon:nth-of-type(2) { animation-duration: 8.5s; animation-delay: -2s; animation-direction: alternate-reverse; }
+.apple-card .card-image > svg:not(.arte-fio) polygon:nth-of-type(3) { animation-duration: 6.5s; animation-delay: -3.5s; }
+.apple-card .card-image > svg:not(.arte-fio) polygon:nth-of-type(4) { animation-duration: 9s; animation-delay: -1s; animation-direction: alternate-reverse; }
+/* barras de som (as pequenas, de ponta arredondada) dançam em tempos diferentes */
+.apple-card .card-image > svg:not(.arte-fio) rect[rx="2.5"],
+.apple-card .card-image > svg:not(.arte-fio) rect[rx="3"][width="7"],
+.apple-card .card-image > svg:not(.arte-fio) rect[rx="3"][width="5"] { animation: ctBarra 1.7s ease-in-out infinite; }
+.apple-card .card-image > svg:not(.arte-fio) rect[rx="2.5"]:nth-of-type(3n+1) { animation-delay: -.35s; }
+.apple-card .card-image > svg:not(.arte-fio) rect[rx="2.5"]:nth-of-type(3n+2) { animation-delay: -.7s; animation-duration: 1.3s; }
+.apple-card .card-image > svg:not(.arte-fio) rect[rx="2.5"]:nth-of-type(3n) { animation-delay: -1.05s; animation-duration: 2s; }
+.apple-card .card-image > svg:not(.arte-fio) circle { animation: ctPulsa 3.8s ease-in-out infinite; }
+.apple-card .card-image > svg:not(.arte-fio) circle:nth-of-type(2n) { animation-delay: -1.4s; }
+.apple-card .card-image > svg:not(.arte-fio) path[stroke-linecap="round"] { animation: ctTrem 4.2s ease-in-out infinite alternate; }
+.apple-card .card-image > svg:not(.arte-fio) { transition: transform .5s var(--curva); }
+.apple-card:hover .card-image > svg:not(.arte-fio) { transform: translateY(-3px) scale(1.04); }
+.apple-card:hover .card-image > svg:not(.arte-fio) polygon { animation-duration: 3.2s; }
+.apple-card:hover .card-image > svg:not(.arte-fio) rect[rx="2.5"] { animation-duration: .9s; }
+.apple-card:hover .card-image > svg:not(.arte-fio) circle { animation-duration: 1.8s; }
+@keyframes ctBolha { from { transform: translate(-2px, 2px) rotate(-1.5deg) scale(.985); } to { transform: translate(3px, -3px) rotate(2deg) scale(1.025); } }
+@keyframes ctBarra { 0%, 100% { transform: scaleY(.55); } 50% { transform: scaleY(1.25); } }
+@keyframes ctPulsa { 50% { transform: scale(1.08); } }
+@keyframes ctTrem { from { transform: translateY(-1.5px); } to { transform: translateY(1.5px); } }
+
+/* ---------- interruptor: tudo parado ---------- */
+:root[data-anim="off"] .apple-card .card-image *,
+:root[data-anim="off"] .apple-card .card-image > svg,
+:root[data-anim="off"] .arte-fio .f,
+:root[data-anim="off"] .arte-fio { animation: none !important; transition: none !important; }
+:root[data-anim="off"] .apple-card:hover .card-image > svg,
+:root[data-anim="off"] .apple-card:hover .card-image .arte-fio { transform: none !important; }
+:root[data-anim="off"] .apple-card .card-button,
+:root[data-anim="off"] .apple-card .card-button::before,
+:root[data-anim="off"] .apple-card .card-button::after { transition: none !important; animation: none !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  .apple-card .card-image > svg:not(.arte-fio),
+  .apple-card .card-image > svg:not(.arte-fio) * { animation: none !important; transition: none !important; }
+}
+
+/* ---------- só mexe quando o mouse está em cima do cartão ---------- */
+.apple-card .card-image svg,
+.apple-card .card-image svg * { animation-play-state: paused !important; }
+.apple-card:is(:hover, :focus-visible, :focus-within, .cb-hover) .card-image svg,
+.apple-card:is(:hover, :focus-visible, :focus-within, .cb-hover) .card-image svg * { animation-play-state: running !important; }

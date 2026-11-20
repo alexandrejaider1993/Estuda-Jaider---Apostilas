@@ -1,0 +1,881 @@
+{
+  "apostilas": [
+    {
+      "pasta": "patologias-do-utero-2-1a",
+      "titulo": "Patologias do Útero 2 · 1A",
+      "subtitulo": "",
+      "disciplina": "",
+      "periodo": "",
+      "prova": "",
+      "data_aula": "",
+      "capitulos": [],
+      "contagem": {},
+      "url": "/interativos/patologias-do-utero-2-1a/index.html",
+      "capa": "",
+      "modificado": 1795101587,
+      "chave_local": "utero2-1a-v6",
+      "conceitos": [
+        {
+          "id": "corpo-uterino",
+          "nome": "Corpo uterino e suas camadas"
+        },
+        {
+          "id": "basal-funcional",
+          "nome": "Camadas basal e funcional"
+        },
+        {
+          "id": "ciclo-fases",
+          "nome": "Fases do ciclo endometrial"
+        },
+        {
+          "id": "exposicao-estrogenica",
+          "nome": "Exposição estrogênica"
+        },
+        {
+          "id": "biopsia-fase",
+          "nome": "Biópsia de endométrio"
+        },
+        {
+          "id": "termos-gineco",
+          "nome": "Termos da história ginecológica"
+        },
+        {
+          "id": "atrofia",
+          "nome": "Endométrio na pós-menopausa"
+        },
+        {
+          "id": "malformacoes",
+          "nome": "Malformações uterinas"
+        },
+        {
+          "id": "def",
+          "nome": "Distúrbio endometrial funcional"
+        },
+        {
+          "id": "anovulacao",
+          "nome": "Ciclo anovulatório"
+        },
+        {
+          "id": "endometrite",
+          "nome": "Endometrite"
+        },
+        {
+          "id": "endometriose",
+          "nome": "Endometriose"
+        },
+        {
+          "id": "teorias",
+          "nome": "Teorias da endometriose"
+        },
+        {
+          "id": "locais",
+          "nome": "Locais de endometriose"
+        },
+        {
+          "id": "seis-d",
+          "nome": "Os seis Ds"
+        },
+        {
+          "id": "trat-endometriose",
+          "nome": "Tratamento da endometriose"
+        },
+        {
+          "id": "adenomiose",
+          "nome": "Adenomiose"
+        },
+        {
+          "id": "hiperplasia",
+          "nome": "Hiperplasia endometrial"
+        },
+        {
+          "id": "causas-hiper",
+          "nome": "Causas de hiperestrogenismo"
+        },
+        {
+          "id": "pten",
+          "nome": "PTEN"
+        },
+        {
+          "id": "tipica-atipica",
+          "nome": "Hiperplasia típica e atípica"
+        },
+        {
+          "id": "back-to-back",
+          "nome": "Padrão back to back"
+        },
+        {
+          "id": "risco-atipica",
+          "nome": "Risco e conduta na hiperplasia atípica"
+        },
+        {
+          "id": "adenoca",
+          "nome": "Adenocarcinoma de endométrio"
+        },
+        {
+          "id": "tipo1",
+          "nome": "Tipo I, endometrioide"
+        },
+        {
+          "id": "tipo2",
+          "nome": "Tipo II, seroso"
+        },
+        {
+          "id": "tamoxifeno",
+          "nome": "Tamoxifeno e endométrio"
+        },
+        {
+          "id": "morfo-ca",
+          "nome": "Morfologia do carcinoma"
+        },
+        {
+          "id": "fr-endometrio",
+          "nome": "Fatores de risco do carcinoma de endométrio"
+        },
+        {
+          "id": "fr-x-malignidade",
+          "nome": "Fator de risco não é característica da lesão"
+        },
+        {
+          "id": "disseminacao",
+          "nome": "Diagnóstico e disseminação"
+        },
+        {
+          "id": "nomenclatura",
+          "nome": "Nomenclatura do músculo e dos tumores"
+        },
+        {
+          "id": "leiomioma",
+          "nome": "Leiomioma"
+        },
+        {
+          "id": "morfo-mioma",
+          "nome": "Morfologia do leiomioma"
+        },
+        {
+          "id": "conduta-mioma",
+          "nome": "Conduta no leiomioma"
+        }
+      ],
+      "testes": [
+        {
+          "id": "t1a",
+          "conceito": "basal-funcional",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t1b",
+          "conceito": "basal-funcional",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t1c",
+          "conceito": "corpo-uterino",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t2a",
+          "conceito": "ciclo-fases",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t2b",
+          "conceito": "ciclo-fases",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t2c",
+          "conceito": "exposicao-estrogenica",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t3a",
+          "conceito": "biopsia-fase",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t3b",
+          "conceito": "termos-gineco",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t3c",
+          "conceito": "termos-gineco",
+          "nivel": 3,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t4a",
+          "conceito": "atrofia",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t4b",
+          "conceito": "malformacoes",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t4c",
+          "conceito": "malformacoes",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t5a",
+          "conceito": "anovulacao",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t5b",
+          "conceito": "def",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t5c",
+          "conceito": "def",
+          "nivel": 3,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t6a",
+          "conceito": "endometrite",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t6b",
+          "conceito": "endometrite",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t6c",
+          "conceito": "endometrite",
+          "nivel": 3,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t7a",
+          "conceito": "endometriose",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t7b",
+          "conceito": "teorias",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t7c",
+          "conceito": "teorias",
+          "nivel": 3,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t8a",
+          "conceito": "locais",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t8b",
+          "conceito": "seis-d",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t8c",
+          "conceito": "trat-endometriose",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t9a",
+          "conceito": "adenomiose",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t9b",
+          "conceito": "adenomiose",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t10a",
+          "conceito": "hiperplasia",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t10b",
+          "conceito": "causas-hiper",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t10c",
+          "conceito": "hiperplasia",
+          "nivel": 3,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t11a",
+          "conceito": "back-to-back",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t11b",
+          "conceito": "tipica-atipica",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t11c",
+          "conceito": "pten",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t11d",
+          "conceito": "risco-atipica",
+          "nivel": 3,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t12a",
+          "conceito": "adenoca",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t12b",
+          "conceito": "tipo1",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t12c",
+          "conceito": "tamoxifeno",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t12d",
+          "conceito": "tipo2",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t13a",
+          "conceito": "fr-endometrio",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t13b",
+          "conceito": "fr-x-malignidade",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t13c",
+          "conceito": "morfo-ca",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t13d",
+          "conceito": "disseminacao",
+          "nivel": 3,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t14a",
+          "conceito": "nomenclatura",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t14b",
+          "conceito": "leiomioma",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t14c",
+          "conceito": "leiomioma",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t15a",
+          "conceito": "morfo-mioma",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t15b",
+          "conceito": "morfo-mioma",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t15c",
+          "conceito": "conduta-mioma",
+          "nivel": 3,
+          "correta": 0,
+          "n_alt": 4
+        }
+      ]
+    },
+    {
+      "pasta": "patologias-do-utero-2-1b",
+      "titulo": "Patologias do Útero 2 · 1B",
+      "subtitulo": "",
+      "disciplina": "",
+      "periodo": "",
+      "prova": "",
+      "data_aula": "",
+      "capitulos": [],
+      "contagem": {},
+      "url": "/interativos/patologias-do-utero-2-1b/index.html",
+      "capa": "",
+      "modificado": 1795101588,
+      "chave_local": "utero2-1b-v6",
+      "conceitos": [
+        {
+          "id": "ovario-estrutura",
+          "nome": "Estrutura do ovário"
+        },
+        {
+          "id": "cisto-tumor",
+          "nome": "Cisto, tumor e torção anexial"
+        },
+        {
+          "id": "foliculo-graaf",
+          "nome": "Maturação do folículo"
+        },
+        {
+          "id": "teca-granulosa",
+          "nome": "Teca e granulosa"
+        },
+        {
+          "id": "cistos-funcionais",
+          "nome": "Cistos funcionais"
+        },
+        {
+          "id": "biopsia-ovario",
+          "nome": "Diagnóstico sem biópsia"
+        },
+        {
+          "id": "dop",
+          "nome": "Doença do ovário policístico"
+        },
+        {
+          "id": "rotterdam",
+          "nome": "Critério de Rotterdam"
+        },
+        {
+          "id": "trat-dop",
+          "nome": "Tratamento da doença do ovário policístico"
+        },
+        {
+          "id": "oms-origem",
+          "nome": "Classificação pela origem"
+        },
+        {
+          "id": "borderline",
+          "nome": "Tumor borderline"
+        },
+        {
+          "id": "iota",
+          "nome": "Leitura da imagem (IOTA)"
+        },
+        {
+          "id": "clinica-tumor",
+          "nome": "Clínica dos tumores ovarianos"
+        },
+        {
+          "id": "seroso",
+          "nome": "Tumor seroso"
+        },
+        {
+          "id": "mucinoso",
+          "nome": "Tumor mucinoso"
+        },
+        {
+          "id": "marcadores",
+          "nome": "Marcadores tumorais"
+        },
+        {
+          "id": "teratoma-maduro",
+          "nome": "Teratoma maduro"
+        },
+        {
+          "id": "teratoma-imaturo",
+          "nome": "Teratoma imaturo"
+        },
+        {
+          "id": "struma",
+          "nome": "Teratoma monodérmico"
+        },
+        {
+          "id": "cordoes",
+          "nome": "Tumores dos cordões sexuais"
+        },
+        {
+          "id": "prognostico-ovario",
+          "nome": "Prognóstico do câncer de ovário"
+        }
+      ],
+      "testes": [
+        {
+          "id": "t1a",
+          "conceito": "ovario-estrutura",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t1b",
+          "conceito": "ovario-estrutura",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t1c",
+          "conceito": "cisto-tumor",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t2a",
+          "conceito": "foliculo-graaf",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t2b",
+          "conceito": "teca-granulosa",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t2c",
+          "conceito": "teca-granulosa",
+          "nivel": 3,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t3a",
+          "conceito": "cistos-funcionais",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t3b",
+          "conceito": "cistos-funcionais",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t3c",
+          "conceito": "biopsia-ovario",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t4a",
+          "conceito": "dop",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t4b",
+          "conceito": "rotterdam",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t4c",
+          "conceito": "dop",
+          "nivel": 3,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t4d",
+          "conceito": "trat-dop",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t5a",
+          "conceito": "oms-origem",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t5b",
+          "conceito": "borderline",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t5c",
+          "conceito": "iota",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t5d",
+          "conceito": "clinica-tumor",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t6a",
+          "conceito": "seroso",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t6b",
+          "conceito": "mucinoso",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t6c",
+          "conceito": "marcadores",
+          "nivel": 3,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t6d",
+          "conceito": "marcadores",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t7a",
+          "conceito": "teratoma-maduro",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t7b",
+          "conceito": "teratoma-maduro",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t7c",
+          "conceito": "teratoma-imaturo",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t7d",
+          "conceito": "struma",
+          "nivel": 3,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t8a",
+          "conceito": "cordoes",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t8b",
+          "conceito": "prognostico-ovario",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t8c",
+          "conceito": "prognostico-ovario",
+          "nivel": 3,
+          "correta": 0,
+          "n_alt": 4
+        }
+      ]
+    }
+  ],
+  "organizacao_padrao": {
+    "pastas": {
+      "288183cf92": {
+        "nome": "Anatomia Patológica II",
+        "pai": "c8bd51b3c2",
+        "criada": 1795013450
+      },
+      "c8bd51b3c2": {
+        "nome": "4º período",
+        "pai": null,
+        "criada": 1795013469
+      },
+      "f98b6f7cb3": {
+        "nome": "(11.11.2026) - Patologias do Útero 2",
+        "pai": "5274c0e1be",
+        "criada": 1795014562
+      },
+      "5274c0e1be": {
+        "nome": "P4",
+        "pai": "288183cf92",
+        "criada": 1795014580
+      },
+      "4075e54670": {
+        "nome": "P3",
+        "pai": "288183cf92",
+        "criada": 1795014584
+      },
+      "b727fe9015": {
+        "nome": "P2",
+        "pai": "288183cf92",
+        "criada": 1795014587
+      },
+      "5daec07c5f": {
+        "nome": "P1",
+        "pai": "288183cf92",
+        "criada": 1795014590
+      },
+      "dbac5377cb": {
+        "nome": "Anatomia Topográfica",
+        "pai": "c8bd51b3c2",
+        "criada": 1795034638
+      },
+      "c87518b6b5": {
+        "nome": "3º Período",
+        "pai": null,
+        "criada": 1795034755
+      },
+      "a12b7e7a48": {
+        "nome": "Farmacoterapia",
+        "pai": "c8bd51b3c2",
+        "criada": 1795049136
+      },
+      "2118a72482": {
+        "nome": "Anatomia Patológica I",
+        "pai": "c87518b6b5",
+        "criada": 1795049498
+      },
+      "451b56ce15": {
+        "nome": "Anatomia Patológica II",
+        "pai": "f98b6f7cb3",
+        "criada": 1795102937
+      }
+    },
+    "apostilas": {
+      "patologias-do-utero-2-1a": "451b56ce15",
+      "patologias-do-utero-2-1b": "451b56ce15"
+    }
+  },
+  "aparencia_padrao": {
+    "apost:288183cf92": {
+      "capa": "5cf183b596d9ac008f49.gif",
+      "cor": "#fcb62d",
+      "atualizado_em": "2026-11-18T19:18:21"
+    },
+    "apost:dbac5377cb": {
+      "capa": "4241f7c951cd8bb1e472.gif",
+      "cor": "#ac4372",
+      "atualizado_em": "2026-11-18T19:18:37"
+    },
+    "apost:a12b7e7a48": {
+      "capa": "27db23d40cecd24f21e8.gif",
+      "cor": "#f2efe8",
+      "atualizado_em": "2026-11-18T21:50:56"
+    },
+    "apost:451b56ce15": {
+      "capa": "5cf183b596d9ac008f49.gif",
+      "cor": "#F2C14E",
+      "atualizado_em": "2026-11-19T12:42:53"
+    }
+  }
+}

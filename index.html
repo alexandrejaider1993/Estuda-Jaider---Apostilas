@@ -1,0 +1,694 @@
+<!doctype html>
+<html lang="pt-BR" data-skin="eleven">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Estuda Jaider">
+<link rel="icon" href="logo.png">
+<link rel="apple-touch-icon" href="logo.png">
+<title>Estuda Jaider · Apostilas Interativas</title>
+<script>
+  try {
+    const t = localStorage.getItem("ej_tema");
+    const h = new Date().getHours();
+    document.documentElement.dataset.tema = t || (h >= 6 && h < 18 ? "claro" : "escuro");
+    document.documentElement.dataset.skin = "eleven";
+  } catch (e) {}
+</script>
+<link rel="preload" href="fonts/Inter-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/Inter-SemiBold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/SourceSerif4-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/SourceSerif4-Italic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="tokens.css?v=2">
+<link rel="stylesheet" href="componentes.css?v=2">
+<link rel="stylesheet" href="animacoes.css?v=2">
+<link rel="stylesheet" href="skin-eleven.css?v=2">
+<style>
+  @font-face { font-family: "Inter"; font-style: normal; font-weight: 400; font-display: swap; src: url("fonts/Inter-Regular.woff2") format("woff2"); }
+  @font-face { font-family: "Inter"; font-style: normal; font-weight: 600; font-display: swap; src: url("fonts/Inter-SemiBold.woff2") format("woff2"); }
+  @font-face { font-family: "Inter Display"; font-style: normal; font-weight: 400; font-display: swap; src: url("fonts/InterDisplay-Regular.woff2") format("woff2"); }
+  @font-face { font-family: "Inter Display"; font-style: normal; font-weight: 600; font-display: swap; src: url("fonts/InterDisplay-SemiBold.woff2") format("woff2"); }
+  @font-face { font-family: "Source Serif 4"; font-style: normal; font-weight: 400; font-display: swap; src: url("fonts/SourceSerif4-Regular.woff2") format("woff2"); }
+  @font-face { font-family: "Source Serif 4"; font-style: italic; font-weight: 400; font-display: swap; src: url("fonts/SourceSerif4-Italic.woff2") format("woff2"); }
+
+  :root {
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+    --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+    --curva: var(--ease-out);
+    --duracao: 200ms;
+    --t-toque: 160ms;
+    --t-entrada: 240ms;
+    --header-altura: 52px;
+    --largura-lateral: 10px;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: var(--fonte-ui);
+    color: var(--cor-tinta);
+    background: var(--el-moldura, var(--cor-fundo));
+  }
+
+  [hidden] { display: none !important; }
+
+  /* Tela de Boas-Vindas (ocupa a tela toda quando ativa) */
+  .tela-boasvindas {
+    position: fixed;
+    inset: 0;
+    z-index: 9000;
+    display: flex;
+    flex-direction: column;
+    background: var(--cor-fundo);
+    color: var(--cor-tinta);
+  }
+
+  /* Moldura Superior do App */
+  .app-shell-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--header-altura);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 0 18px;
+    box-sizing: border-box;
+  }
+
+  .shell-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+  }
+
+  .app-marca {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    border: 0;
+    background: transparent;
+    color: var(--cor-tinta);
+    font: 600 16px/1 var(--fonte-ui);
+    letter-spacing: -0.02em;
+    cursor: pointer;
+    padding: 6px 8px;
+    border-radius: 8px;
+  }
+  .app-marca:hover { background: var(--el-pilula-ativa); box-shadow: var(--el-sombra-pilula); }
+  .app-marca img { width: 22px; height: 22px; border-radius: 5px; object-fit: cover; }
+
+  /* Busca Global no Topo */
+  .shell-header-center {
+    flex: 1;
+    max-width: 480px;
+    position: relative;
+  }
+  .busca {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 34px;
+    padding: 0 12px;
+    border-radius: 8px;
+    background: var(--el-pilula-ativa, var(--cor-superficie));
+    box-shadow: var(--el-sombra-pilula);
+  }
+  .busca svg { width: 15px; height: 15px; color: var(--cor-suave); flex: none; }
+  .busca input {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: var(--cor-tinta);
+    font: 400 13.5px var(--fonte-ui);
+  }
+  .busca input::placeholder { color: var(--cor-suave); }
+  .busca kbd {
+    font: 500 11px/1 var(--fonte-ui);
+    color: var(--cor-suave);
+    padding: 3px 5px;
+    border-radius: 5px;
+    border: 1px solid var(--cor-fio);
+    background: var(--cor-superficie-2);
+  }
+
+  .busca-lista {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    background: var(--cor-superficie);
+    border-radius: 12px;
+    box-shadow: 0 14px 38px rgba(0,0,0,.18), 0 0 0 1px var(--cor-fio);
+    list-style: none;
+    margin: 0;
+    padding: 6px;
+    max-height: 400px;
+    overflow-y: auto;
+    z-index: 1200;
+  }
+  .busca-grupo-tit {
+    padding: 8px 10px 4px;
+    font: 600 11px/1.2 var(--fonte-ui);
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--cor-suave);
+  }
+  .busca-item {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: var(--cor-tinta);
+    font-size: 13.5px;
+  }
+  .busca-item:hover, .busca-item[aria-selected="true"] {
+    background: var(--cor-superficie-2);
+  }
+  .busca-item__secao { font-weight: 600; font-size: 13.5px; display: flex; justify-content: space-between; gap: 8px; }
+  .busca-item__secao small { font-weight: 400; color: var(--cor-suave); font-size: 11.5px; }
+  .busca-item__trecho { font-size: 12.5px; color: var(--cor-suave); line-height: 1.35; }
+  .busca-item__trecho mark { background: rgba(212, 178, 122, .32); color: var(--cor-tinta); border-radius: 3px; padding: 0 2px; }
+  .busca-vazio { padding: 14px; text-align: center; color: var(--cor-suave); font-size: 13.5px; }
+
+  /* Botões à Direita no Topo */
+  .shell-header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .topbar-btn, .tema-botao {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    height: 34px;
+    padding: 0 11px;
+    border-radius: 8px;
+    border: 0;
+    background: transparent;
+    color: var(--cor-suave);
+    font: 500 13px/1 var(--fonte-ui);
+    cursor: pointer;
+  }
+  .topbar-btn svg, .tema-botao svg { width: 16px; height: 16px; flex: none; }
+  .topbar-btn:hover, .tema-botao:hover {
+    background: var(--el-pilula-ativa);
+    color: var(--cor-tinta);
+    box-shadow: var(--el-sombra-pilula);
+  }
+
+  .conta-pilula {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 34px;
+    padding: 0 12px;
+    border-radius: 8px;
+    border: 1px solid var(--cor-fio);
+    background: var(--el-pilula-ativa, var(--cor-superficie));
+    color: var(--cor-tinta);
+    font: 500 13px/1 var(--fonte-ui);
+    box-shadow: var(--el-sombra-pilula);
+    cursor: pointer;
+  }
+  .conta-pilula:hover { border-color: var(--el-borda-forte, var(--cor-tinta)); }
+  .conta-pilula img { width: 20px; height: 20px; border-radius: 50%; object-fit: cover; }
+  .conta-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--cor-suave); flex: none; }
+  .conta-dot[data-st="salvo"], .conta-dot[data-st="conectado"] { background: var(--cor-linfa, #2ea043); }
+  .conta-dot[data-st="sincronizando"] { background: var(--cor-nervo, #d29922); animation: pulsoSync 1s infinite alternate; }
+  .conta-dot[data-st="erro"] { background: var(--cor-arteria, #cf222e); }
+  @keyframes pulsoSync { from { opacity: .4; } to { opacity: 1; } }
+
+  /* Área de trabalho principal (Cartão arredondado do skin-eleven) */
+  .app-workspace-shell {
+    position: fixed;
+    top: var(--header-altura) !important;
+    left: 10px !important;
+    right: 10px !important;
+    bottom: 10px !important;
+    width: calc(100vw - 20px) !important;
+    height: calc(100vh - var(--header-altura) - 10px) !important;
+    border-radius: 16px !important;
+    border: 1px solid var(--cor-fio) !important;
+    background: var(--cor-superficie) !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .04), 0 8px 24px rgba(0, 0, 0, .04) !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box;
+  }
+
+  main.container {
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 22px 30px 32px !important;
+    box-sizing: border-box !important;
+  }
+  main.container.ia-lendo {
+    padding: 10px 16px !important;
+  }
+  @media (max-width: 640px) {
+    main.container { padding: 16px !important; }
+    .shell-header-center { max-width: 200px; }
+    .conta-pilula span.conta-sub { display: none; }
+  }
+
+  /* Campo genérico usado pelas caixas de diálogo */
+  .campo {
+    display: block;
+    width: 100%;
+    min-height: 38px;
+    padding: 8px 12px;
+    border: 1px solid var(--cor-fio);
+    border-radius: 8px;
+    background: var(--cor-superficie);
+    color: var(--cor-tinta);
+    font: 400 14px/1.4 var(--fonte-ui);
+    box-sizing: border-box;
+  }
+  .campo:focus { outline: 2px solid var(--cor-tinta); outline-offset: 1px; }
+
+  /* Toast de avisos */
+  #toastCaixa {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 20000;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+  }
+  .ej-toast {
+    pointer-events: auto;
+    padding: 10px 16px;
+    border-radius: 10px;
+    background: var(--cor-tinta);
+    color: var(--cor-fundo);
+    font: 500 13.5px/1.35 var(--fonte-ui);
+    box-shadow: 0 10px 28px rgba(0,0,0,.22);
+    animation: toastEntra .2s var(--ease-out);
+  }
+  .ej-toast--erro { background: var(--cor-arteria, #c93b2b); color: #fff; }
+  @keyframes toastEntra { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  /* Modal da Conta Google & Backup */
+  .conta-modal-fundo {
+    position: fixed;
+    inset: 0;
+    z-index: 10500;
+    background: rgba(0,0,0,.36);
+    display: grid;
+    place-items: center;
+    padding: 16px;
+  }
+  .conta-modal {
+    width: min(460px, 100%);
+    padding: 22px;
+    border-radius: 14px;
+    border: 1px solid var(--cor-fio);
+    background: var(--cor-superficie);
+    color: var(--cor-tinta);
+    box-shadow: 0 20px 50px rgba(0,0,0,.28);
+    font: 400 14px/1.45 var(--fonte-ui);
+  }
+  .conta-modal h2 { margin: 0 0 6px; font: 600 18px/1.25 var(--fonte-ui); }
+  .conta-modal p { margin: 0 0 14px; color: var(--cor-suave); font-size: 13.5px; }
+  .conta-modal__perfil {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 10px;
+    background: var(--cor-superficie-2);
+    margin-bottom: 14px;
+  }
+  .conta-modal__perfil img { width: 40px; height: 40px; border-radius: 50%; }
+  .conta-modal__perfil b { display: block; font-size: 14.5px; }
+  .conta-modal__perfil small { color: var(--cor-suave); font-size: 12.5px; }
+  .conta-modal__secao {
+    padding-top: 14px;
+    margin-top: 14px;
+    border-top: 1px solid var(--cor-fio);
+  }
+  .conta-modal__acoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .conta-modal details { margin-top: 12px; font-size: 12.5px; color: var(--cor-suave); }
+  .conta-modal summary { cursor: pointer; font-weight: 600; color: var(--cor-tinta); }
+</style>
+</head>
+<body>
+
+  <!-- ================= TELA DE BOAS-VINDAS (LOGIN ELEVEN) ================= -->
+  <div id="telaBoasVindas" class="tela-boasvindas">
+    <div class="tela-boasvindas__layout" hidden>
+      <span id="boasVindasSaudacao">Olá!</span>
+      <button type="button" id="btnTemaLogin" aria-label="Alternar tema claro ou escuro" title="Alternar tema"></button>
+      <button type="button" id="btnEntrarGoogle" class="tela-boasvindas__btn tela-boasvindas__btn--primario">Entrar com Google</button>
+      <button type="button" id="btnEntrarSistema" class="tela-boasvindas__btn tela-boasvindas__btn--secundario">Entrar</button>
+      <span class="tela-boasvindas__atalho-dica">ou pressione <kbd class="tela-boasvindas__tecla-enter">↵ Enter</kbd></span>
+    </div>
+  </div>
+
+  <!-- ================= BARRA SUPERIOR DO APP ================= -->
+  <header class="app-shell-header">
+    <div class="shell-header-left">
+      <button type="button" class="app-marca" id="btnMarcaInicio" title="Voltar para as apostilas">
+        <img src="logo.png" alt="">
+        <span>estuda Jaider</span>
+      </button>
+    </div>
+
+    <div class="shell-header-center">
+      <div class="busca" role="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="search" id="campoBuscaGlobal" placeholder="Buscar em todas as apostilas..." autocomplete="off" aria-label="Buscar em todas as apostilas">
+        <kbd>/</kbd>
+      </div>
+      <ul class="busca-lista" id="listaBuscaGlobal" hidden></ul>
+    </div>
+
+    <div class="shell-header-right">
+      <button type="button" class="conta-pilula" id="btnContaGoogle" title="Sincronização com Google Drive e Backup">
+        <span class="conta-dot" id="contaDot" data-st="local"></span>
+        <img id="contaFoto" src="" alt="" hidden>
+        <span id="contaTexto">Entrar com Google</span>
+      </button>
+      <button type="button" class="topbar-btn" id="btnTelaInicial" title="Voltar à tela de boas-vindas">Início</button>
+      <button type="button" class="tema-botao" id="btnTemaApp" aria-label="Alternar tema claro ou escuro" title="Alternar tema"></button>
+    </div>
+  </header>
+
+  <!-- ================= ÁREA DE TRABALHO (APOSTILAS INTERATIVAS) ================= -->
+  <div class="app-workspace-shell">
+    <main id="interativos" data-pagina class="container"></main>
+  </div>
+
+  <div id="toastCaixa" aria-live="polite"></div>
+
+  <!-- Scripts do Sistema -->
+  <script src="marca_texto.js?v=2"></script>
+  <script src="faixa_preenchida.js?v=2"></script>
+  <script src="storage_drive.js?v=2"></script>
+  <script src="pasta_visual.js?v=2"></script>
+  <script src="login_eleven.js?v=2"></script>
+  <script src="interativos.js?v=2"></script>
+  <script>
+    (function () {
+      "use strict";
+      const $ = id => document.getElementById(id);
+      const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+      // Toast global usado por interativos.js
+      window.mostrarToast = function (msg, tipo = "sucesso", duracao = 3200) {
+        const cx = $("toastCaixa");
+        if (!cx) return;
+        const el = document.createElement("div");
+        el.className = "ej-toast" + (tipo === "erro" ? " ej-toast--erro" : "");
+        el.textContent = msg;
+        cx.appendChild(el);
+        setTimeout(() => { el.remove(); }, duracao);
+      };
+
+      // Tema Claro / Escuro
+      const IC_SOL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>';
+      const IC_LUA = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>';
+
+      function atualizarIconesTema() {
+        const escuro = document.documentElement.dataset.tema === "escuro";
+        ["btnTemaLogin", "btnTemaApp"].forEach(id => {
+          const b = $(id);
+          if (b) b.innerHTML = escuro ? IC_SOL : IC_LUA;
+        });
+      }
+      function alternarTema() {
+        const novo = document.documentElement.dataset.tema === "escuro" ? "claro" : "escuro";
+        document.documentElement.dataset.tema = novo;
+        try { localStorage.setItem("ej_tema", novo); } catch (e) {}
+        atualizarIconesTema();
+      }
+      $("btnTemaLogin").onclick = alternarTema;
+      $("btnTemaApp").onclick = alternarTema;
+      atualizarIconesTema();
+
+      // Controle da Tela de Boas-Vindas
+      const telaBV = $("telaBoasVindas");
+      function entrarNoApp() {
+        telaBV.hidden = true;
+        try { sessionStorage.setItem("ej_bv_entrou", "1"); } catch (e) {}
+        if (window.interativos) window.interativos.carregar();
+      }
+      function mostrarBoasVindas() {
+        telaBV.hidden = false;
+        try { sessionStorage.removeItem("ej_bv_entrou"); } catch (e) {}
+      }
+
+      if (sessionStorage.getItem("ej_bv_entrou") === "1") {
+        telaBV.hidden = true;
+      }
+
+      $("btnEntrarSistema").onclick = entrarNoApp;
+      $("btnEntrarGoogle").onclick = async () => {
+        try {
+          await window.EJStorageDrive.entrarComGoogle();
+          window.mostrarToast("Conectado ao Google Drive!");
+          entrarNoApp();
+        } catch (e) {
+          window.mostrarToast(e.message || "Não foi possível conectar ao Google.", "erro", 4500);
+        }
+      };
+      $("btnTelaInicial").onclick = mostrarBoasVindas;
+      $("btnMarcaInicio").onclick = () => {
+        if (window.interativos) window.interativos.fechar();
+      };
+
+      // Atalho Enter na tela de boas-vindas para entrar direto
+      document.addEventListener("keydown", e => {
+        if (!telaBV.hidden && e.key === "Enter" && !e.ctrlKey && !e.altKey && !e.metaKey) {
+          if (document.activeElement && document.activeElement.tagName === "BUTTON") return;
+          e.preventDefault();
+          entrarNoApp();
+        }
+      });
+
+      // Status do Google Drive na Barra Superior
+      function desenharStatusConta(det) {
+        const dot = $("contaDot"), foto = $("contaFoto"), txt = $("contaTexto");
+        if (!dot || !txt) return;
+        dot.dataset.st = det.status || "local";
+        if (det.conectado && det.conta) {
+          if (det.conta.foto) { foto.src = det.conta.foto; foto.hidden = false; }
+          else foto.hidden = true;
+          const primeiroNome = String(det.conta.nome || "Google Drive").split(" ")[0];
+          const estadoTxt = det.status === "sincronizando" ? "Sincronizando..."
+            : det.status === "erro" ? "Erro no Drive"
+            : "Salvo no Drive";
+          txt.innerHTML = `<b>${esc(primeiroNome)}</b> <span class="conta-sub" style="color:var(--cor-suave)">· ${esc(estadoTxt)}</span>`;
+        } else {
+          foto.hidden = true;
+          txt.textContent = "Entrar com Google";
+        }
+      }
+      window.addEventListener("ej-sync-status", e => desenharStatusConta(e.detail));
+      if (window.EJStorageDrive) desenharStatusConta(window.EJStorageDrive.obterStatus());
+
+      // Modal de Conta Google & Backup
+      function abrirModalConta() {
+        const st = window.EJStorageDrive.obterStatus();
+        const fundo = document.createElement("div");
+        fundo.className = "conta-modal-fundo";
+        fundo.innerHTML = `
+          <div class="conta-modal" role="dialog" aria-modal="true" aria-labelledby="cmTit">
+            <h2 id="cmTit">Progresso e Google Drive</h2>
+            <p>Suas respostas, posição de leitura, pastas e marcações do Estojo são salvos automaticamente neste navegador e sincronizados com o seu Google Drive pessoal.</p>
+            ${st.conectado && st.conta ? `
+              <div class="conta-modal__perfil">
+                ${st.conta.foto ? `<img src="${esc(st.conta.foto)}" alt="">` : ""}
+                <div style="flex:1;min-width:0">
+                  <b>${esc(st.conta.nome || "Conta Google")}</b>
+                  <small>${esc(st.conta.email || "")}</small>
+                </div>
+              </div>
+              <div class="conta-modal__acoes">
+                <button type="button" class="botao botao--primario" data-acao="sync">Sincronizar agora</button>
+                <button type="button" class="botao botao--secundario" data-acao="sair">Desconectar conta</button>
+              </div>
+            ` : `
+              <div class="conta-modal__acoes">
+                <button type="button" class="botao botao--primario" data-acao="entrar">Conectar com Google Drive</button>
+              </div>
+            `}
+            ${st.erro ? `<p style="color:var(--cor-arteria);margin-top:10px">${esc(st.erro)}</p>` : ""}
+
+            <div class="conta-modal__secao">
+              <b style="font-size:13.5px">Backup em arquivo (.json)</b>
+              <p style="margin:4px 0 8px">Você também pode baixar uma cópia de todo o seu progresso e anotações ou restaurar de um arquivo.</p>
+              <div class="conta-modal__acoes">
+                <button type="button" class="botao botao--secundario" data-acao="exportar">Baixar backup (.json)</button>
+                <button type="button" class="botao botao--secundario" data-acao="importar">Restaurar backup…</button>
+                <input type="file" accept=".json,application/json" hidden data-arq-backup>
+              </div>
+            </div>
+
+            <details>
+              <summary>Configuração avançada (Google Client ID)</summary>
+              <p style="margin:6px 0">Para o login Google funcionar no seu domínio do Vercel, adicione a URL do seu site em <b>Origens JavaScript autorizadas</b> no Google Cloud Console, ou informe seu próprio Client ID abaixo:</p>
+              <input class="campo" type="text" data-client-id value="${esc(window.EJStorageDrive.obterClientId())}" placeholder="seu-id.apps.googleusercontent.com">
+              <div class="conta-modal__acoes" style="margin-top:8px">
+                <button type="button" class="botao botao--secundario" data-acao="salvar-cid">Salvar Client ID</button>
+              </div>
+            </details>
+
+            <div class="conta-modal__secao" style="display:flex;justify-content:flex-end">
+              <button type="button" class="botao botao--secundario" data-acao="fechar">Fechar</button>
+            </div>
+          </div>`;
+
+        const fechar = () => fundo.remove();
+        fundo.addEventListener("mousedown", e => { if (e.target === fundo) fechar(); });
+        fundo.querySelector('[data-acao="fechar"]').onclick = fechar;
+
+        const btnEntrar = fundo.querySelector('[data-acao="entrar"]');
+        if (btnEntrar) btnEntrar.onclick = async () => {
+          btnEntrar.disabled = true;
+          try {
+            await window.EJStorageDrive.entrarComGoogle();
+            window.mostrarToast("Conectado ao Google Drive!");
+            fechar();
+          } catch (e) {
+            window.mostrarToast(e.message, "erro", 4500);
+            btnEntrar.disabled = false;
+          }
+        };
+
+        const btnSync = fundo.querySelector('[data-acao="sync"]');
+        if (btnSync) btnSync.onclick = async () => {
+          btnSync.disabled = true;
+          btnSync.textContent = "Sincronizando...";
+          const ok = await window.EJStorageDrive.sincronizarComDriveAgora();
+          window.mostrarToast(ok ? "Sincronizado com o Google Drive!" : "Não foi possível sincronizar agora.", ok ? "sucesso" : "erro");
+          fechar();
+        };
+
+        const btnSair = fundo.querySelector('[data-acao="sair"]');
+        if (btnSair) btnSair.onclick = () => {
+          window.EJStorageDrive.sairDoGoogle();
+          window.mostrarToast("Conta Google desconectada. Seus dados continuam salvos neste navegador.");
+          fechar();
+        };
+
+        fundo.querySelector('[data-acao="exportar"]').onclick = () => {
+          window.EJStorageDrive.exportarBackupJson();
+          window.mostrarToast("Backup baixado!");
+        };
+
+        const inpBackup = fundo.querySelector('[data-arq-backup]');
+        fundo.querySelector('[data-acao="importar"]').onclick = () => inpBackup.click();
+        inpBackup.onchange = async () => {
+          if (!inpBackup.files[0]) return;
+          try {
+            await window.EJStorageDrive.importarBackupJson(inpBackup.files[0]);
+            window.mostrarToast("Backup restaurado com sucesso!");
+            fechar();
+          } catch (e) {
+            window.mostrarToast("Erro ao restaurar backup: " + e.message, "erro", 4500);
+          }
+        };
+
+        fundo.querySelector('[data-acao="salvar-cid"]').onclick = () => {
+          const v = fundo.querySelector('[data-client-id]').value;
+          window.EJStorageDrive.definirClientId(v);
+          window.mostrarToast("Google Client ID atualizado.");
+        };
+
+        document.body.appendChild(fundo);
+      }
+      $("btnContaGoogle").onclick = abrirModalConta;
+
+      // ================= BUSCA GLOBAL EM TODAS AS APOSTILAS =================
+      const campoBusca = $("campoBuscaGlobal"), listaBusca = $("listaBuscaGlobal");
+      let timerBusca = 0;
+
+      function destacarTrecho(trecho, inicio, tamanho) {
+        if (typeof inicio !== "number" || !tamanho || inicio < 0 || inicio >= trecho.length) return esc(trecho);
+        return esc(trecho.slice(0, inicio)) + "<mark>" + esc(trecho.slice(inicio, inicio + tamanho)) + "</mark>" + esc(trecho.slice(inicio + tamanho));
+      }
+
+      async function executarBuscaGlobal(termo) {
+        const q = (termo || "").trim();
+        if (q.length < 2) {
+          listaBusca.hidden = true;
+          listaBusca.innerHTML = "";
+          return;
+        }
+        try {
+          const r = await fetch(`/api/interativos-buscar?q=${encodeURIComponent(q)}`);
+          const d = await r.json();
+          const res = d.resultados || [];
+          if (!res.length) {
+            listaBusca.innerHTML = `<li class="busca-vazio">Nenhum resultado para "<b>${esc(q)}</b>" nas apostilas.</li>`;
+            listaBusca.hidden = false;
+            return;
+          }
+          let html = "";
+          for (const ap of res) {
+            html += `<li class="busca-grupo-tit">${esc(ap.titulo)} (${ap.total} ${ap.total === 1 ? "ocorrência" : "ocorrências"})</li>`;
+            for (const tr of (ap.trechos || [])) {
+              html += `<li class="busca-item" data-pasta="${esc(ap.pasta)}" data-hash="${esc(tr.hash || "")}" data-termo="${esc(q)}">
+                <span class="busca-item__secao"><span>${esc(tr.secao || ap.titulo)}</span><small>${tr.vezes}×</small></span>
+                <span class="busca-item__trecho">${destacarTrecho(tr.trecho || "", tr.inicio, tr.tamanho)}</span>
+              </li>`;
+            }
+          }
+          listaBusca.innerHTML = html;
+          listaBusca.hidden = false;
+          listaBusca.querySelectorAll(".busca-item").forEach(li => {
+            li.onclick = () => {
+              listaBusca.hidden = true;
+              campoBusca.value = "";
+              if (window.interativos) {
+                window.interativos.abrir(li.dataset.pasta, { hash: li.dataset.hash, termo: li.dataset.termo });
+              }
+            };
+          });
+        } catch (e) {
+          listaBusca.hidden = true;
+        }
+      }
+
+      campoBusca.addEventListener("input", () => {
+        clearTimeout(timerBusca);
+        timerBusca = setTimeout(() => executarBuscaGlobal(campoBusca.value), 160);
+      });
+      campoBusca.addEventListener("focus", () => {
+        if (campoBusca.value.trim().length >= 2) executarBuscaGlobal(campoBusca.value);
+      });
+      document.addEventListener("mousedown", e => {
+        if (!e.target.closest(".shell-header-center")) listaBusca.hidden = true;
+      });
+      document.addEventListener("keydown", e => {
+        if (e.key === "/" && telaBV.hidden && document.activeElement !== campoBusca && !["INPUT", "TEXTAREA"].includes(document.activeElement?.tagName)) {
+          e.preventDefault();
+          campoBusca.focus();
+        } else if (e.key === "Escape" && !listaBusca.hidden) {
+          listaBusca.hidden = true;
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

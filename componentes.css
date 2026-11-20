@@ -1,0 +1,277 @@
+/* Gerado por gerar_tema.py. Componentes do app de estudos. */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--cor-fundo);
+  color: var(--cor-tinta);
+  font: var(--fw-corpo) var(--fs-corpo)/var(--lh-corpo) var(--fonte-ui);
+  letter-spacing: var(--ls-corpo);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- Tipografia (2 pesos, tracking por tamanho) ---------- */
+.display  { font: var(--fw-display) var(--fs-display)/var(--lh-display) var(--fonte-titulo); letter-spacing: var(--ls-display); margin: 0; }
+.titulo-1 { font: var(--fw-titulo-1) var(--fs-titulo-1)/var(--lh-titulo-1) var(--fonte-titulo); letter-spacing: var(--ls-titulo-1); margin: 0; }
+.titulo-2 { font: var(--fw-titulo-2) var(--fs-titulo-2)/var(--lh-titulo-2) var(--fonte-titulo); letter-spacing: var(--ls-titulo-2); margin: 0; }
+.titulo-3 { font: var(--fw-titulo-3) var(--fs-titulo-3)/var(--lh-titulo-3) var(--fonte-titulo); letter-spacing: var(--ls-titulo-3); margin: 0; }
+.pequeno  { font-size: var(--fs-pequeno); line-height: var(--lh-pequeno); color: var(--cor-suave); }
+.rotulo   { font: var(--fw-rotulo) var(--fs-rotulo)/var(--lh-rotulo) var(--fonte-ui); letter-spacing: var(--ls-rotulo); text-transform: uppercase; color: var(--cor-suave); }
+.acento   { color: var(--cor-acento); }  /* so no titulo da tela */
+
+/* Titulo em duas partes, padrao Apple: "Nome. Tese." */
+.titulo-duplo .tese { color: var(--cor-suave); }
+
+a, .link { color: var(--cor-veia); text-decoration: none; }
+a:hover, .link:hover { text-decoration: underline; }
+
+/* ---------- Estrutura ---------- */
+.container { max-width: var(--largura-max); margin: 0 auto; padding: 0 24px; }
+.secao { padding-bottom: var(--espaco-secao); }
+.secao > .titulo-2 { margin-bottom: 20px; }
+
+/* Navegacao translucida (Apple) */
+.nav {
+  position: sticky; top: 0; z-index: 10; height: 48px;
+  display: flex; align-items: center; gap: 24px; padding: 0 16px;
+  background: var(--cor-nav);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid var(--cor-fio);
+  font-size: var(--fs-pequeno);
+}
+.nav a { color: var(--cor-tinta); opacity: .8; }
+.nav a:hover { opacity: 1; text-decoration: none; }
+
+/* Fileira de categorias (equivale a fileira de produtos / "Neste capitulo") */
+.categorias { display: flex; gap: 20px; overflow-x: auto; padding: 8px 0 24px; scrollbar-width: none; }
+.categoria { flex: 0 0 auto; width: 104px; text-align: center; font-size: var(--fs-pequeno); color: var(--cor-tinta); }
+.categoria__icone {
+  width: 72px; height: 72px; margin: 0 auto 8px; border-radius: var(--raio-figura);
+  background: var(--cor-superficie); display: grid; place-items: center;
+  font: 300 32px/1 var(--fonte-titulo); color: var(--cor-veia); letter-spacing: -0.02em;
+}
+
+/* Prateleira: cards do mesmo tipo com o MESMO tamanho, rolagem horizontal */
+.prateleira {
+  display: grid; grid-auto-flow: column; grid-auto-columns: minmax(280px, 340px);
+  gap: 20px; overflow-x: auto; scroll-snap-type: x mandatory;
+  padding: 4px 4px 24px; scrollbar-width: none;
+}
+.prateleira > * { scroll-snap-align: start; }
+
+.card {
+  background: var(--cor-superficie);
+  border-radius: var(--raio-card);
+  box-shadow: var(--sombra-card);
+  padding: 36px;
+  transition: transform var(--duracao) var(--curva), box-shadow var(--duracao) var(--curva);
+}
+a.card, button.card { color: inherit; text-align: left; border: 0; cursor: pointer; display: block; }
+a.card:hover, button.card:hover { transform: translateY(-2px) scale(1.01); box-shadow: var(--sombra-card-hover); text-decoration: none; }
+.card .rotulo { margin-bottom: 6px; display: block; }
+.card .titulo-2 { margin-bottom: 8px; }
+
+/* Barra de assinatura com a cor da disciplina */
+.assinatura { width: 48px; height: 4px; border-radius: 2px; background: var(--cor-acento); margin: 16px 0; }
+
+/* ---------- Botoes (retangulos de canto discreto) ---------- */
+.botao {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 20px; border-radius: var(--raio-pilula); border: 0; cursor: pointer;
+  font: 400 var(--fs-corpo)/1 var(--fonte-ui); letter-spacing: var(--ls-corpo);
+  transition: filter var(--duracao) var(--curva);
+}
+.botao--primario { background: var(--cor-veia); color: #fff; }
+:root[data-tema="escuro"] .botao--primario { color: #000; }
+@media (prefers-color-scheme: dark) { :root:not([data-tema="claro"]) .botao--primario { color: #000; } }
+.botao--secundario { background: var(--cor-superficie-2); color: var(--cor-tinta); }
+.botao:hover { filter: brightness(1.08); }
+.botao:focus-visible, a:focus-visible, .card:focus-visible { outline: 3px solid var(--cor-veia); outline-offset: 3px; }
+
+/* Abas segmentadas (Build / Grow / Manage, Apple e Hostinger) */
+.segmentos { display: inline-flex; padding: 4px; gap: 4px; border-radius: var(--raio-pilula); background: var(--cor-superficie-2); }
+.segmentos button { border: 0; background: transparent; color: var(--cor-tinta); padding: 8px 16px; border-radius: var(--raio-pilula); font: 600 var(--fs-pequeno)/1 var(--fonte-ui); cursor: pointer; }
+.segmentos button[aria-selected="true"] { background: var(--cor-superficie); box-shadow: 0 1px 4px rgba(0,0,0,.12); }
+
+/* ---------- Caixas didaticas (cor = significado) ---------- */
+.caixa { border-radius: var(--raio-caixa); padding: 16px 20px; margin: var(--espaco-bloco) 0; }
+.caixa__rotulo { display: block; font: 600 var(--fs-rotulo)/var(--lh-rotulo) var(--fonte-ui); letter-spacing: var(--ls-rotulo); text-transform: uppercase; margin-bottom: 6px; }
+.caixa p { margin: 0; }
+.caixa--atencao { background: var(--cor-superficie-2); }
+.caixa--atencao .caixa__rotulo { color: var(--cor-suave); }
+
+/* Conceito-chave, links, ação */
+.caixa--veia { background: var(--cor-veia-fundo); }
+.caixa--veia .caixa__rotulo { color: var(--cor-veia); }
+.etiqueta--veia { color: var(--cor-veia); background: var(--cor-veia-fundo); }
+/* Correlação clínica */
+.caixa--arteria { background: var(--cor-arteria-fundo); }
+.caixa--arteria .caixa__rotulo { color: var(--cor-arteria); }
+.etiqueta--arteria { color: var(--cor-arteria); background: var(--cor-arteria-fundo); }
+/* Ponto de prova */
+.caixa--nervo { background: var(--cor-nervo-fundo); }
+.caixa--nervo .caixa__rotulo { color: var(--cor-nervo); }
+.etiqueta--nervo { color: var(--cor-nervo); background: var(--cor-nervo-fundo); }
+/* Síntese e revisão */
+.caixa--linfa { background: var(--cor-linfa-fundo); }
+.caixa--linfa .caixa__rotulo { color: var(--cor-linfa); }
+.etiqueta--linfa { color: var(--cor-linfa); background: var(--cor-linfa-fundo); }
+/* Caiu em prova, testes */
+.caixa--prova { background: var(--cor-prova-fundo); }
+.caixa--prova .caixa__rotulo { color: var(--cor-prova); }
+.etiqueta--prova { color: var(--cor-prova); background: var(--cor-prova-fundo); }
+/* Destaque da professora */
+.caixa--professora { background: var(--cor-professora-fundo); }
+.caixa--professora .caixa__rotulo { color: var(--cor-professora); }
+.etiqueta--professora { color: var(--cor-professora); background: var(--cor-professora-fundo); }
+/* Aprofunde no livro */
+.caixa--livro { background: var(--cor-livro-fundo); }
+.caixa--livro .caixa__rotulo { color: var(--cor-livro); }
+.etiqueta--livro { color: var(--cor-livro); background: var(--cor-livro-fundo); }
+
+.etiqueta { display: inline-block; padding: 2px 8px; border-radius: var(--raio-etiqueta); font: 600 var(--fs-rotulo)/var(--lh-rotulo) var(--fonte-ui); letter-spacing: var(--ls-rotulo); text-transform: uppercase; }
+
+/* Fala da professora: italico com filete */
+.fala { font-family: var(--fonte-leitura); font-style: italic; border-left: 3px solid var(--cor-professora); padding-left: 14px; color: var(--cor-tinta); }
+
+/* ---------- Modo Leitor (texto dissertativo, serifa) ---------- */
+.leitor {
+  max-width: var(--largura-leitura); margin: 0 auto;
+  font: var(--fw-leitura) var(--fs-leitura)/var(--lh-leitura) var(--fonte-leitura);
+  hyphens: none;
+}
+.leitor p { margin: 0 0 1em; }
+.leitor h2 { font: var(--fw-titulo-2) var(--fs-titulo-2)/var(--lh-titulo-2) var(--fonte-titulo); letter-spacing: var(--ls-titulo-2); margin: 1.6em 0 .6em; }
+.leitor h3 { font: var(--fw-titulo-3) var(--fs-titulo-3)/var(--lh-titulo-3) var(--fonte-titulo); margin: 1.4em 0 .4em; }
+.leitor .numero { color: var(--cor-veia); }
+/* Trecho sendo narrado pelo Modo Leitor */
+.leitor .narrando { background: var(--cor-veia-fundo); border-radius: 4px; box-shadow: 0 0 0 3px var(--cor-veia-fundo); }
+
+/* ---------- Figuras e tabelas ---------- */
+.figura { margin: var(--espaco-bloco) 0; }
+.figura img { width: 100%; border-radius: var(--raio-figura); display: block; }
+.figura figcaption { font-family: var(--fonte-ui); font-size: var(--fs-pequeno); line-height: var(--lh-pequeno); color: var(--cor-suave); margin-top: 8px; }
+.figura figcaption b { color: var(--cor-tinta); font-weight: 600; }
+
+.tabela { width: 100%; border-collapse: collapse; font: var(--fs-pequeno)/var(--lh-pequeno) var(--fonte-ui); }
+.tabela th { text-align: left; font-weight: 600; border-bottom: 1.5px solid var(--cor-tinta); padding: 8px 10px; }
+.tabela td { border-bottom: 1px solid var(--cor-fio); padding: 8px 10px; vertical-align: top; }
+.tabela td:first-child { font-weight: 600; }
+
+/* ---------- Quiz (tudo que e avaliacao usa roxo) ---------- */
+.quiz { border-radius: var(--raio-card); background: var(--cor-superficie); box-shadow: var(--sombra-card); overflow: hidden; }
+.quiz__topo { background: var(--cor-prova-fundo); color: var(--cor-prova); padding: 12px 24px; font: 600 var(--fs-rotulo)/var(--lh-rotulo) var(--fonte-ui); letter-spacing: var(--ls-rotulo); text-transform: uppercase; }
+.quiz__corpo { padding: 20px 24px 24px; }
+.quiz__opcao {
+  display: block; width: 100%; text-align: left; margin-top: 10px; padding: 12px 16px;
+  border: 1px solid var(--cor-fio); border-radius: var(--raio-caixa); background: transparent;
+  color: var(--cor-tinta); font: inherit; cursor: pointer;
+  transition: border-color var(--duracao) var(--curva), background var(--duracao) var(--curva);
+}
+.quiz__opcao:hover { border-color: var(--cor-prova); }
+.quiz__opcao[aria-checked="true"] { border-color: var(--cor-prova); background: var(--cor-prova-fundo); }
+.quiz__opcao.correta { border-color: var(--cor-linfa); background: var(--cor-linfa-fundo); }
+.quiz__opcao.errada  { border-color: var(--cor-arteria); background: var(--cor-arteria-fundo); }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
+@media (max-width: 640px) {
+  :root { --fs-display: 44px; --lh-display: 48px; --fs-titulo-1: 32px; --lh-titulo-1: 36px; --fs-leitura: 18px; --lh-leitura: 29px; }
+  .card { padding: 28px; }
+}
+
+/* ---------- Extras do app ---------- */
+
+/* Cabecalho estilo "Loja": titulo grande a esquerda, contexto e links a direita */
+.hero { display: grid; grid-template-columns: 1fr auto; gap: 32px; align-items: end; padding: 80px 0 48px; }
+.hero__lado { max-width: 300px; display: grid; gap: 6px; font-size: var(--fs-pequeno); line-height: var(--lh-pequeno); }
+.hero__lado .titulo-3 { margin-bottom: 4px; }
+@media (max-width: 760px) { .hero { grid-template-columns: 1fr; gap: 16px; padding-top: 32px; } }
+
+/* Barra de progresso */
+.progresso { height: 4px; border-radius: 2px; background: var(--cor-fio); overflow: hidden; }
+.progresso > span { display: block; height: 100%; background: var(--cor-veia); border-radius: 2px; }
+
+/* Faixa de capitulo (mesma da apostila) */
+.faixa { background: var(--cor-veia); color: #fff; border-radius: var(--raio-caixa); padding: 14px 18px;
+         display: flex; justify-content: space-between; align-items: flex-end; }
+.faixa__rotulo { font: 600 var(--fs-rotulo)/1.3 var(--fonte-ui); letter-spacing: var(--ls-rotulo); text-transform: uppercase; opacity: .85; }
+.faixa__numero { font: 300 88px/0.8 var(--fonte-titulo); letter-spacing: -0.04em; }
+:root[data-tema="escuro"] .faixa { color: #0b1626; }
+@media (prefers-color-scheme: dark) { :root:not([data-tema="claro"]) .faixa { color: #0b1626; } }
+
+/* Player do Modo Leitor (pilula translucida fixa no rodape do texto) */
+.player { position: sticky; bottom: 16px; display: flex; align-items: center; gap: 14px; padding: 8px 18px 8px 8px;
+          border-radius: var(--raio-pilula); background: var(--cor-nav); border: 1px solid var(--cor-fio);
+          backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px);
+          box-shadow: 0 6px 24px rgba(0,0,0,.10); font-size: var(--fs-pequeno); }
+.player__play { width: 40px; height: 40px; border-radius: 50%; border: 0; background: var(--cor-tinta); color: var(--cor-superficie);
+                display: grid; place-items: center; cursor: pointer; flex: none; }
+.player .progresso { flex: 1; }
+.player__tempo { color: var(--cor-suave); font-variant-numeric: tabular-nums; }
+
+/* Notas de margem (coluna lateral do brand book) */
+.notas { display: grid; gap: 22px; align-content: start; font-size: var(--fs-pequeno); line-height: var(--lh-pequeno); color: var(--cor-suave); }
+.nota b { display: block; color: var(--cor-tinta); font-weight: 600; margin-bottom: 2px; }
+.nota--livro b { color: var(--cor-livro); }
+
+/* Amostra de cor */
+.amostra { display: grid; gap: 10px; padding: 18px; border-radius: var(--raio-caixa); }
+.amostra__bola { width: 28px; height: 28px; border-radius: 50%; }
+
+/* Numeros de desempenho */
+.numero-grande { font: 600 48px/1 var(--fonte-titulo); letter-spacing: -0.03em; }
+.barra-rotulo { display: flex; justify-content: space-between; font-size: var(--fs-pequeno); margin: 14px 0 6px; }
+
+/* ---------- Card vitrine (estilo Apple Store: duas cores no mesmo card) ----------
+   Topo em tom pastel da cor do tipo, base em tom forte. A arte cruza a divisa.
+   Tipos: --veia (apostila/conceito), --prova, --linfa (revisao), --arteria (clinica),
+          --neutro (Modo Leitor e geral), --acento (disciplina).
+   A divisa fica em --vitrine-corte (padrao 72%). */
+.vitrine {
+  --v: var(--cor-tinta);
+  --vitrine-corte: 72%;
+  --v-topo: color-mix(in srgb, var(--v) 20%, #fff);
+  --v-base: var(--v);
+  position: relative; overflow: hidden; display: block;
+  min-height: 440px; padding: 28px 28px 0;
+  border-radius: var(--raio-card);
+  background: linear-gradient(to bottom, var(--v-topo) 0 var(--vitrine-corte), var(--v-base) var(--vitrine-corte) 100%);
+  color: #1D1D1F; text-decoration: none;
+  transition: transform var(--duracao) var(--curva), box-shadow var(--duracao) var(--curva);
+}
+.vitrine:hover { transform: scale(1.012); box-shadow: 0 12px 32px rgba(0,0,0,.14); text-decoration: none; }
+.vitrine .rotulo { color: rgba(0,0,0,.72); display: block; margin-bottom: 6px; }
+.vitrine .titulo-2 { margin-bottom: 6px; color: #1D1D1F; }
+.vitrine p { margin: 0; font-size: var(--fs-corpo); line-height: var(--lh-corpo); color: #1D1D1F; }
+.vitrine__arte { position: absolute; left: 0; right: 0; bottom: 0; height: 62%; pointer-events: none;
+                 transition: transform 500ms var(--curva); }
+.vitrine__arte svg { width: 100%; height: 100%; display: block; filter: drop-shadow(0 10px 18px rgba(0,0,0,.22)); }
+.vitrine:hover .vitrine__arte { transform: translateY(-6px); }
+.vitrine__seta { position: absolute; right: 16px; bottom: 16px; width: 36px; height: 36px; border-radius: 50%;
+                 background: rgba(232,232,237,.88); color: #1D1D1F; display: grid; place-items: center;
+                 backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.vitrine__seta svg { width: 14px; height: 14px; }
+
+.vitrine--veia    { --v: var(--cor-veia);    --v-topo: #C9DCF2; }
+.vitrine--prova   { --v: var(--cor-prova);   --v-topo: #DCD3F5; }
+.vitrine--linfa   { --v: var(--cor-linfa);   --v-topo: #CBE8D6; }
+.vitrine--arteria { --v: var(--cor-arteria); --v-topo: #F6D3D0; }
+.vitrine--acento  { --v: var(--cor-acento); }
+.vitrine--neutro  { --v: #1D1D1F; --v-topo: #E8E8ED; }
+
+/* Escuro: topo escurecido, base media; texto claro */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema="claro"]) .vitrine { --v-topo: color-mix(in srgb, var(--v) 20%, #1C1C1E); --v-base: color-mix(in srgb, var(--v) 55%, #1C1C1E); color: #F5F5F7; }
+  :root:not([data-tema="claro"]) .vitrine :is(.titulo-2, p) { color: #F5F5F7; }
+  :root:not([data-tema="claro"]) .vitrine .rotulo { color: rgba(255,255,255,.72); }
+  :root:not([data-tema="claro"]) .vitrine--neutro { --v: #8E8E93; }
+}
+:root[data-tema="escuro"] .vitrine { --v-topo: color-mix(in srgb, var(--v) 20%, #1C1C1E); --v-base: color-mix(in srgb, var(--v) 55%, #1C1C1E); color: #F5F5F7; }
+:root[data-tema="escuro"] .vitrine :is(.titulo-2, p) { color: #F5F5F7; }
+:root[data-tema="escuro"] .vitrine .rotulo { color: rgba(255,255,255,.72); }
+:root[data-tema="escuro"] .vitrine--neutro { --v: #8E8E93; }
+@media (prefers-reduced-motion: reduce) { .vitrine, .vitrine__arte { transition: none; } .vitrine:hover { transform: none; } }

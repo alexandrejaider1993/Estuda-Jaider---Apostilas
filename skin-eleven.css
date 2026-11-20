@@ -1,0 +1,1255 @@
+/* Skin "ElevenLabs" (reescrita em 17/11/2026, etapa 1 do novo design). Vale por cima de Claro e Escuro:
+   html[data-skin="eleven"] + html[data-tema]. Referência: o kit de componentes que o usuário mandou (estilo ElevenLabs UI:
+   Shadcn/Geist + áudio). Monocromático: fundo #F7F7F8, cartão branco, poço #F4F4F6, fio de 1 px #E6E7EB e PRETO
+   (#0F0F0F) como cor de ação e de seleção; sombra quase invisível. Cantos: botão e campo 12 px, chip 6 px, item 8 px,
+   cartão 16 px. Só pesos 400 e 600 (as fontes embutidas não têm 500).
+   Etapa 1 = base: cores, botões, grupos de opções, campos, chaves, sliders e barra lateral. Cartões, players e ondas
+   vêm nas etapas 2 e 3. Etapa 2 (cartões, sem as ilustrações de aramado) está no fim deste arquivo.
+   Arquivo escrito à mão (não é gerado por gerar_tema.py), carregado por ÚLTIMO no <head> do index.html para vencer as
+   regras antigas dos <style>. Para desligar: Configurações > Personalização > Estilo visual > Clássico. */
+
+/* ---------- forma e tipografia (as duas luzes) ---------- */
+:root[data-skin="eleven"] {
+  --fonte-titulo: "Inter Display", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --fw-display: 600;   --ls-display: -0.03em;
+  --fw-titulo-1: 600;  --ls-titulo-1: -0.025em;
+  --fw-titulo-2: 600;  --ls-titulo-2: -0.02em;
+  --fw-titulo-3: 600;  --ls-titulo-3: -0.01em;
+  --fs-rotulo: 11px;   --fw-rotulo: 600;  --ls-rotulo: 0.06em;
+  --raio-etiqueta: 6px;
+  --raio-caixa: 12px;
+  --raio-figura: 12px;
+  --raio-card: 16px;
+  --curva: cubic-bezier(0.2, 0, 0, 1);
+  --duracao: 150ms;
+  /* tokens próprios da skin */
+  --el-raio-bt: 12px;      /* botões e campos (rounded-xl) */
+  --el-raio-item: 8px;     /* itens de lista, abas da bandeja (rounded-lg) */
+  --el-raio-chip: 6px;     /* chips de estado (rounded-md) */
+}
+
+/* ---------- Claro ---------- */
+:root[data-skin="eleven"][data-tema="claro"] {
+  color-scheme: light;
+  --cor-fundo: #F7F7F8;          /* canvas */
+  --cor-superficie: #FFFFFF;     /* cartão */
+  --cor-superficie-2: #F4F4F6;   /* poço: ondas, inputs secundários, bandejas */
+  --cor-tinta: #0F0F0F;          /* obsidiana */
+  --cor-suave: #6B6B73;          /* texto secundário (4.9:1 no branco) */
+  --cor-fio: #E6E7EB;            /* fio de 1 px */
+  --cor-nav: #F7F7F8;
+  --cor-veia: #0F0F0F;           /* ação e seleção = preto */
+  --cor-veia-fundo: #F3F4F6;     /* item ativo da lista */
+  --cor-sobre-veia: #FFFFFF;
+  --cor-acento: #0F0F0F;
+  --cor-arteria: #C4202E;
+  --cor-arteria-fundo: #FCE9EA;
+  --cor-nervo: #84630A;
+  --cor-nervo-fundo: #FAF3DC;
+  --cor-linfa: #2B5B9E;          /* azul do orb: só informação e links */
+  --cor-linfa-fundo: #E8F0FA;
+  --cor-prova: #5B4B8A;
+  --cor-prova-fundo: #F3EFFA;
+  --cor-professora: #B23C0B;
+  --cor-professora-fundo: #FFF3EB;
+  --cor-livro: #6B5A3E;
+  --cor-livro-fundo: #F6F2EA;
+  --sombra-card: 0 0 0 1px var(--cor-fio), 0 2px 10px rgba(0, 0, 0, .02);
+  --sombra-card-hover: 0 0 0 1px #D9DAE0, 0 4px 14px rgba(0, 0, 0, .05);
+  --el-hover: #FAFAFA;           /* fundo ao passar o mouse */
+  --el-press: #F0F0F2;
+  --el-chip: #F9FAFB;            /* chip não selecionado */
+  --el-borda-forte: #D4D4D8;
+  --el-trilho: #E5E7EB;          /* trilho de slider e de barra */
+  --el-chave-off: #D4D4D8;
+  --el-acao-hover: #262626;      /* preto ao passar o mouse (neutral-800) */
+  --el-sombra-bt: 0 1px 2px rgba(0, 0, 0, .05);
+  --el-sombra-xs: 0 1px 1px rgba(0, 0, 0, .03);
+  --el-ilustra: #B4532F;         /* ferrugem: só as ilustrações dos cartões Transcrever e Gravador */
+}
+
+/* ---------- Escuro: o mesmo sistema invertido (ação = branco) ---------- */
+:root[data-skin="eleven"][data-tema="escuro"] {
+  color-scheme: dark;
+  --cor-fundo: #0B0B0C;
+  --cor-superficie: #151517;
+  --cor-superficie-2: #1D1D20;
+  --cor-tinta: #F4F4F5;
+  --cor-suave: #A1A1AA;
+  --cor-fio: #2A2A2F;
+  --cor-nav: #0B0B0C;
+  --cor-veia: #F4F4F5;
+  --cor-veia-fundo: #232327;
+  --cor-sobre-veia: #0F0F0F;
+  --cor-acento: #F4F4F5;
+  --cor-arteria: #FF7480;
+  --cor-arteria-fundo: #3A1519;
+  --cor-nervo: #E5C566;
+  --cor-nervo-fundo: #34290C;
+  --cor-linfa: #8AB6F9;
+  --cor-linfa-fundo: #13233A;
+  --cor-prova: #B8A8EE;
+  --cor-prova-fundo: #241D3A;
+  --cor-professora: #FF9F66;
+  --cor-professora-fundo: #3A1D0C;
+  --cor-livro: #D2BE98;
+  --cor-livro-fundo: #2B2418;
+  --sombra-card: 0 0 0 1px var(--cor-fio);
+  --sombra-card-hover: 0 0 0 1px #3A3A40;
+  --el-hover: #1B1B1E;
+  --el-press: #232327;
+  --el-chip: #1A1A1D;
+  --el-borda-forte: #3A3A40;
+  --el-trilho: #2E2E33;
+  --el-chave-off: #3F3F46;
+  --el-acao-hover: #D4D4D8;
+  --el-sombra-bt: 0 1px 2px rgba(0, 0, 0, .4);
+  --el-sombra-xs: none;
+  --el-ilustra: #E58A64;
+}
+
+/* ================= ETAPA 1: componentes base ================= */
+
+/* ---------- foco: anel preto (branco no escuro), igual em tudo ---------- */
+:root[data-skin="eleven"] :is(.botao, .ctrl, .t-iniciar, .topbar-btn, .tema-botao, .btn-seletor-modelo, .btn-seletor-motor, .segmentos button,
+  .cad-aba, .doc-aba, .eleven-modo-btn, .chave-liga, .nav__item, .gr-rapida, #segSkinOpcoes button):focus-visible {
+  outline: 2px solid var(--cor-tinta) !important; outline-offset: 2px !important;
+}
+
+/* ---------- 1. Botões: Primary (preto) e Secondary (branco com fio), cantos de 12 px ---------- */
+:root[data-skin="eleven"] .botao,
+:root[data-skin="eleven"] .ctrl {
+  border-radius: var(--el-raio-bt); min-height: 36px; padding: 0 16px; font-weight: 600; font-size: 13px; letter-spacing: 0;
+  filter: none; transition: background var(--duracao) ease, border-color var(--duracao) ease, color var(--duracao) ease, transform 100ms ease;
+}
+:root[data-skin="eleven"] .botao:active:not([disabled]),
+:root[data-skin="eleven"] .ctrl:active:not([disabled]) { transform: scale(0.99); }
+:root[data-skin="eleven"] .botao--primario,
+:root[data-skin="eleven"] .t-iniciar:not(:disabled) {
+  background: var(--cor-veia); color: var(--cor-sobre-veia); border: 1px solid var(--cor-veia); box-shadow: var(--el-sombra-bt);
+}
+:root[data-skin="eleven"] .botao--primario:hover:not([disabled]),
+:root[data-skin="eleven"] .t-iniciar:hover:not(:disabled) {
+  background: var(--el-acao-hover); border-color: var(--el-acao-hover); color: var(--cor-sobre-veia); filter: none; box-shadow: var(--el-sombra-bt);
+}
+:root[data-skin="eleven"] .botao--secundario,
+:root[data-skin="eleven"] .ctrl--pausa {
+  background: var(--cor-superficie); color: var(--cor-tinta); border: 1px solid var(--cor-fio); box-shadow: var(--el-sombra-xs);
+}
+:root[data-skin="eleven"] .botao--secundario:hover:not([disabled]),
+:root[data-skin="eleven"] .ctrl--pausa:hover:not([disabled]) { background: var(--el-hover); border-color: var(--el-borda-forte); color: var(--cor-tinta); }
+:root[data-skin="eleven"] .botao--perigo { background: var(--cor-arteria); border: 1px solid var(--cor-arteria); color: #fff; }
+:root[data-skin="eleven"] .ctrl--parar { background: var(--cor-superficie); border: 1px solid var(--cor-fio); color: var(--cor-arteria); }
+/* liga/desliga dentro de botões: ligado = preto */
+:root[data-skin="eleven"] .botao--secundario[aria-pressed="true"],
+:root[data-skin="eleven"] .ctrl--pausa.pausado { background: var(--cor-veia); border-color: var(--cor-veia); color: var(--cor-sobre-veia); }
+/* iniciar transcrição desabilitado: cinza neutro (era cinza azulado em pílula) */
+:root[data-skin="eleven"] .t-iniciar { border-radius: var(--el-raio-bt); font-size: 13px; }
+:root[data-skin="eleven"] .t-iniciar:disabled { background: var(--el-trilho); color: var(--cor-suave); border: 1px solid var(--el-trilho); }
+
+/* ---------- 2. Grupos de opções = bandeja cinza, opção ativa preta ---------- */
+:root[data-skin="eleven"] :is(.segmentos, .cad-abas-grupo, .eleven-modo-switcher, .motor-seg, #segSkinOpcoes) {
+  display: inline-flex; gap: 2px !important; padding: 3px !important; border-radius: var(--el-raio-bt) !important;
+  background: var(--cor-superficie-2) !important; border: 1px solid var(--cor-fio) !important; box-shadow: none !important;
+}
+:root[data-skin="eleven"] :is(.segmentos > button, .cad-abas-grupo > .cad-aba, .eleven-modo-switcher > button, .motor-seg > button, #segSkinOpcoes > button) {
+  border: 0 !important; border-radius: var(--el-raio-item) !important; background: transparent !important; box-shadow: none !important;
+  color: var(--cor-suave) !important; font-weight: 600 !important; font-size: 12px !important; padding: 6px 12px !important; transform: none;
+}
+:root[data-skin="eleven"] :is(.segmentos > button, .cad-abas-grupo > .cad-aba, .eleven-modo-switcher > button, .motor-seg > button, #segSkinOpcoes > button):hover {
+  color: var(--cor-tinta) !important;
+}
+:root[data-skin="eleven"] :is(.segmentos > button[aria-selected="true"], .segmentos > button[aria-checked="true"], .segmentos > button.atual,
+  .cad-abas-grupo > .cad-aba.atual, .eleven-modo-switcher > button.ativo, .motor-seg > button[aria-checked="true"],
+  #segSkinOpcoes > button.atual, #segSkinOpcoes > button[aria-checked="true"]) {
+  background: var(--cor-veia) !important; color: var(--cor-sobre-veia) !important; box-shadow: var(--el-sombra-xs) !important;
+}
+
+/* ---------- 3. Chips de estado soltos (Connecting / Listening / 1.0x ...): rounded-md, ativo preto ---------- */
+:root[data-skin="eleven"] :is(button.doc-aba, .cad-aba:not(.cad-abas-grupo > .cad-aba), .eleven-btn-fonte, .eleven-btn-tamanho, .saude-btn-acao) {
+  border-radius: var(--el-raio-chip) !important; background: var(--el-chip) !important; border: 1px solid var(--cor-fio) !important;
+  color: var(--cor-tinta) !important; font-weight: 600 !important; font-size: 12px !important; box-shadow: none !important; transform: none;
+}
+:root[data-skin="eleven"] :is(button.doc-aba, .cad-aba:not(.cad-abas-grupo > .cad-aba), .eleven-btn-fonte, .eleven-btn-tamanho, .saude-btn-acao):hover { background: var(--el-press) !important; }
+:root[data-skin="eleven"] :is(button.doc-aba.atual, button.doc-aba[aria-pressed="true"], .cad-aba.atual:not(.cad-abas-grupo > .cad-aba), .eleven-btn-fonte.ativo) {
+  background: var(--cor-veia) !important; border-color: var(--cor-veia) !important; color: var(--cor-sobre-veia) !important;
+}
+
+/* ---------- 4. Campos: rounded-lg, fio de 1 px, foco = borda preta ---------- */
+:root[data-skin="eleven"] :is(.campo, input.campo, textarea.campo, select.campo, .cad-fonte-select, .calc-motor) {
+  border-radius: var(--el-raio-item) !important; background-color: var(--cor-superficie) !important; border: 1px solid var(--cor-fio) !important;
+  box-shadow: none !important; color: var(--cor-tinta); font-size: 13px;
+}
+:root[data-skin="eleven"] :is(.campo, input.campo, textarea.campo, select.campo, .cad-fonte-select, .calc-motor):focus {
+  outline: 0 !important; border-color: var(--cor-tinta) !important; box-shadow: 0 0 0 3px color-mix(in srgb, var(--cor-tinta) 8%, transparent) !important;
+}
+:root[data-skin="eleven"] :is(.campo, input, textarea)::placeholder { color: color-mix(in srgb, var(--cor-suave) 80%, transparent); }
+/* busca do topo e as outras buscas/filtros: cartão branco rounded-xl com lupa cinza */
+:root[data-skin="eleven"] .busca-campo,
+:root[data-skin="eleven"] .cad-dock-topo__busca {
+  height: 34px; border-radius: var(--el-raio-bt) !important; background: var(--cor-superficie) !important;
+  border: 1px solid var(--cor-fio) !important; box-shadow: var(--el-sombra-xs) !important;
+}
+:root[data-skin="eleven"] .busca-campo:hover { border-color: var(--el-borda-forte) !important; }
+:root[data-skin="eleven"] .busca-campo:focus-within,
+:root[data-skin="eleven"] .cad-dock-topo__busca:focus-within { border-color: var(--cor-tinta) !important; box-shadow: 0 0 0 3px color-mix(in srgb, var(--cor-tinta) 8%, transparent) !important; }
+:root[data-skin="eleven"] :is(input.cad-busca-input, input.an-home__busca, input.calc-busca, .eleven-sidebar-busca input, input.eleven-sidebar-busca) {
+  border-radius: var(--el-raio-bt) !important; background: var(--cor-superficie) !important; border: 1px solid var(--cor-fio) !important; box-shadow: none !important;
+}
+:root[data-skin="eleven"] :is(input.cad-busca-input, input.an-home__busca, input.calc-busca, .eleven-sidebar-busca input, input.eleven-sidebar-busca):focus {
+  border-color: var(--cor-tinta) !important; outline: 0 !important;
+}
+:root[data-skin="eleven"] .busca-icone { color: var(--cor-suave); }
+
+/* ---------- 5. Chave liga/desliga: cinza / preto, bolinha branca ---------- */
+:root[data-skin="eleven"] .chave-liga { background: var(--el-chave-off); box-shadow: none; }
+:root[data-skin="eleven"] .chave-liga[aria-checked="true"] { background: var(--cor-veia); }
+:root[data-skin="eleven"] .chave-liga::after { background: #fff; box-shadow: 0 1px 2px rgba(0, 0, 0, .2); }
+:root[data-skin="eleven"][data-tema="escuro"] .chave-liga[aria-checked="true"]::after { background: #0F0F0F; }
+
+/* ---------- 6. Sliders: trilho fino cinza, polegar preto ---------- */
+:root[data-skin="eleven"] input[type="range"] { accent-color: var(--cor-veia); }
+
+/* ---------- 7. Barra do topo: botões de ícone rounded-lg com fio (como o play do mini player) ---------- */
+:root[data-skin="eleven"] .shell-header-right :is(.topbar-btn, .tema-botao) {
+  width: 32px !important; height: 32px !important; border-radius: var(--el-raio-item) !important; border: 1px solid var(--cor-fio) !important;
+  background: var(--el-hover) !important; color: var(--cor-tinta) !important; box-shadow: none !important;
+}
+:root[data-skin="eleven"] .shell-header-right :is(.topbar-btn, .tema-botao):hover { background: var(--el-press) !important; }
+:root[data-skin="eleven"] .shell-header-right :is(.topbar-btn[aria-pressed="true"], .topbar-btn--foco[aria-pressed="true"], .topbar-btn--painel[aria-pressed="true"]) {
+  background: var(--cor-veia) !important; border-color: var(--cor-veia) !important; color: var(--cor-sobre-veia) !important;
+}
+:root[data-skin="eleven"] .gr-rapida { border-radius: var(--el-raio-bt) !important; background: var(--cor-superficie) !important; border: 1px solid var(--cor-fio) !important; height: 34px; }
+:root[data-skin="eleven"] .gr-rapida:hover { background: var(--el-hover) !important; }
+
+/* ---------- 8. Barra lateral (como a navegação do kit): itens rounded-lg, ativo em cinza claro e negrito ---------- */
+:root[data-skin="eleven"] .nav .nav__item {
+  border-radius: var(--el-raio-item); min-height: 32px; font-size: 13px; color: color-mix(in srgb, var(--cor-tinta) 72%, transparent) !important;
+}
+:root[data-skin="eleven"] .nav .nav__item svg { color: var(--cor-suave); }
+:root[data-skin="eleven"] .nav .nav__item:hover { background: var(--el-hover); color: var(--cor-tinta) !important; }
+:root[data-skin="eleven"] .nav .nav__item[aria-current] {
+  background: var(--cor-veia-fundo); color: var(--cor-tinta) !important; font-weight: 600; box-shadow: none;
+}
+:root[data-skin="eleven"] .nav .nav__item[aria-current] svg { color: var(--cor-tinta); }
+/* título de grupo: "FERRAMENTAS" pequeno, caixa alta, espaçado, cinza */
+:root[data-skin="eleven"] :is(.nav__secao, .nav__secao-titulo, .nav__rotulo) {
+  font-family: var(--fonte-ui); font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cor-suave);
+}
+/* seletor de modelo = "Platform switcher": rounded-xl, fio, fundo quase branco */
+:root[data-skin="eleven"] .btn-seletor-modelo {
+  border-radius: var(--el-raio-bt) !important; background: var(--el-hover) !important; border: 1px solid var(--cor-fio) !important;
+  font-weight: 600 !important; font-size: 12px !important; box-shadow: none !important;
+}
+:root[data-skin="eleven"] .btn-seletor-modelo:hover { background: var(--el-press) !important; border-color: var(--el-borda-forte) !important; }
+:root[data-skin="eleven"] .nav__recolher { border-radius: var(--el-raio-item) !important; border: 1px solid var(--cor-fio) !important; background: var(--cor-superficie) !important; }
+
+/* ---------- 9. Rótulos e textos pequenos (caixa alta sem monoespaçado, como os grupos do kit) ---------- */
+:root[data-skin="eleven"] :is(.rotulo, .motor-rotulo, .t-saude__titulo, .t-fila-titulo, .ga-campo small) {
+  font-family: var(--fonte-ui); font-weight: 600; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--cor-suave);
+}
+:root[data-skin="eleven"] :is(.campo-rotulo) { font-size: 12px; font-weight: 600; color: var(--cor-tinta); }
+/* números alinhados (tempos, contagens) */
+:root[data-skin="eleven"] :is(.tempo, .ga-tempo, .pa__tempo, .t-vivo__eta, .zoom-indicador) { font-variant-numeric: tabular-nums; }
+
+/* ---------- 10. Modais e confirmações: cartão rounded-2xl com fio ---------- */
+:root[data-skin="eleven"] .modal-login-cartao { border-radius: 16px; box-shadow: 0 0 0 1px var(--cor-fio), 0 16px 40px rgba(0, 0, 0, .12); }
+:root[data-skin="eleven"] .modal-login__icone-box { border-radius: var(--el-raio-bt); background: var(--cor-superficie-2); color: var(--cor-tinta); }
+
+/* ::selection discreta */
+:root[data-skin="eleven"] ::selection { background: color-mix(in srgb, var(--cor-linfa) 22%, transparent); }
+
+/* ================= ETAPA 2: cartões (Início, pastas do Gravador, entrada e escolha do Transcrever) =================
+   Cartão branco com fio de 1 px, ícone Lucide numa casinha cinza, título e descrição, seta discreta no canto.
+   Sem figurinhas: a ilustração colorida (.card-image) some neste estilo e o .card-icone aparece (no Clássico é o
+   contrário). O seletor leva :is(#hubFerramentas, .hub) porque as regras antigas dos cartões usam o id com !important. */
+.apple-card .card-icone { display: none; }
+:root[data-skin="eleven"] :is(#hubFerramentas, .hub) .apple-card.apple-card {
+  display: flex !important; flex-direction: column !important; justify-content: flex-start !important; gap: 0 !important;
+  position: relative !important; width: auto !important; max-width: none !important; flex: none !important;
+  height: auto !important; min-height: 0 !important; padding: 16px 16px 18px !important; box-sizing: border-box !important;
+  background: var(--cor-superficie) !important; border: 1px solid var(--cor-fio) !important; border-top: 1px solid var(--cor-fio) !important;
+  border-radius: var(--raio-card) !important; box-shadow: none !important; transform: none !important;
+  text-align: left !important; color: var(--cor-tinta) !important;
+  transition: background-color var(--duracao) var(--curva), border-color var(--duracao) var(--curva) !important;
+}
+:root[data-skin="eleven"] :is(#hubFerramentas, .hub) .apple-card.apple-card:hover { background: var(--el-hover) !important; border-color: var(--el-borda-forte) !important; box-shadow: none !important; transform: none !important; }
+:root[data-skin="eleven"] :is(#hubFerramentas, .hub) .apple-card.apple-card:active { background: var(--el-press) !important; transform: none !important; }
+:root[data-skin="eleven"] :is(#hubFerramentas, .hub) .apple-card.apple-card:focus-visible { outline: 2px solid var(--cor-tinta) !important; outline-offset: 2px !important; }
+
+/* ícone: casinha de 36 px, poço cinza com fio, traço na cor da tinta */
+:root[data-skin="eleven"] .apple-card .card-icone {
+  display: grid; place-items: center; flex: none; width: 36px; height: 36px; margin: 0 0 16px;
+  border-radius: var(--el-raio-item); background: var(--cor-superficie-2); border: 1px solid var(--cor-fio); color: var(--cor-tinta);
+}
+:root[data-skin="eleven"] .apple-card .card-icone svg { width: 18px; height: 18px; display: block; }
+
+/* texto: título 15/20 e descrição 13/18 em no máximo duas linhas */
+:root[data-skin="eleven"] :is(#hubFerramentas, .hub) .apple-card.apple-card .card-content { display: flex; flex-direction: column; gap: 4px !important; padding: 0 !important; margin: 0 !important; }
+:root[data-skin="eleven"] :is(#hubFerramentas, .hub) .apple-card.apple-card .title {
+  font: 600 15px/20px var(--fonte-ui) !important; letter-spacing: -0.01em !important; text-transform: none !important;
+  color: var(--cor-tinta) !important; margin: 0 !important; white-space: normal !important; text-wrap: balance;
+}
+:root[data-skin="eleven"] :is(#hubFerramentas, .hub) .apple-card.apple-card .subtitle {
+  font: 400 13px/18px var(--fonte-ui) !important; color: var(--cor-suave) !important; margin: 0 !important;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
+}
+:root[data-skin="eleven"] .apple-card .card-image { display: none !important; }
+
+/* seta no canto de cima (no lugar do "+" que virava pílula "Abrir") */
+:root[data-skin="eleven"] :is(#hubFerramentas, .hub) .apple-card.apple-card .card-button.card-button {
+  position: absolute !important; top: 18px !important; right: 16px !important; bottom: auto !important; left: auto !important;
+  width: 16px !important; height: 16px !important; margin: 0 !important; padding: 0 !important; border: 0 !important; border-radius: 0 !important;
+  background: none !important; overflow: visible !important; font-size: 0 !important; color: transparent !important;
+  transition: none !important;
+}
+:root[data-skin="eleven"] :is(#hubFerramentas, .hub) .apple-card.apple-card .card-button.card-button::before { content: none !important; }
+:root[data-skin="eleven"] :is(#hubFerramentas, .hub) .apple-card.apple-card .card-button.card-button::after {
+  content: "" !important; position: absolute; inset: 0; width: 16px; height: 16px; display: block; animation: none !important;
+  background-color: var(--cor-suave);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 7h10v10'/%3E%3Cpath d='M7 17 17 7'/%3E%3C/svg%3E") center / 16px 16px no-repeat;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 7h10v10'/%3E%3Cpath d='M7 17 17 7'/%3E%3C/svg%3E") center / 16px 16px no-repeat;
+  transition: background-color var(--duracao) var(--curva), transform var(--duracao) var(--curva);
+}
+:root[data-skin="eleven"] :is(#hubFerramentas, .hub) .apple-card.apple-card:is(:hover, :focus-visible, .cb-hover) .card-button.card-button { width: 16px !important; background: none !important; }
+:root[data-skin="eleven"] :is(#hubFerramentas, .hub) .apple-card.apple-card:is(:hover, :focus-visible, .cb-hover) .card-button.card-button::after { background-color: var(--cor-tinta); transform: translate(1px, -1px); }
+
+/* grades: altura do conteúdo, sem esticar os cartões para encher a tela */
+:root[data-skin="eleven"] #hubFerramentas.hub { grid-template-rows: none !important; grid-auto-rows: auto !important; align-content: start !important; gap: 12px !important; flex: none !important; }
+:root[data-skin="eleven"] .wb-cartoes.hub-pasta { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)) !important; gap: 12px !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  :root[data-skin="eleven"] :is(#hubFerramentas, .hub) .apple-card.apple-card,
+  :root[data-skin="eleven"] :is(#hubFerramentas, .hub) .apple-card.apple-card .card-button.card-button::after { transition: none !important; }
+}
+
+/* ícones de linha (Lucide) um pouco mais finos neste estilo */
+:root[data-skin="eleven"] svg[stroke-width="1.75"], :root[data-skin="eleven"] svg[stroke-width="2"] { stroke-width: 1.4px; }
+
+/* título do Início: mais respiro acima (encostava na barra de abas) */
+:root[data-skin="eleven"] #inicio .hero { padding: 24px 0 0 !important; margin: 0 0 16px !important; }
+
+/* ---------- Ilustração do cartão Transcrever (onda -> folha com "00:16"), no lugar da casinha do ícone ---------- */
+.apple-card .card-ilustra { display: none; }
+:root[data-skin="eleven"] .apple-card:has(.card-ilustra) .card-icone { display: none; }
+:root[data-skin="eleven"] .apple-card .card-ilustra {
+  display: block; margin: -16px -16px 14px; padding: 14px 18px 10px 6px;
+  background: var(--cor-superficie-2); border-bottom: 1px solid var(--cor-fio); border-radius: 15px 15px 0 0;
+}
+:root[data-skin="eleven"] .apple-card .card-ilustra svg { display: block; width: 100%; height: auto; aspect-ratio: 262 / 120; overflow: visible; }
+.card-ilustra .il-fundo { fill: color-mix(in srgb, var(--cor-tinta) 4%, transparent); }
+.card-ilustra .il-onda { stroke: var(--el-ilustra); stroke-width: 1.3; stroke-linecap: round; transform-box: fill-box; transform-origin: center; }
+.card-ilustra .il-fio { fill: none; stroke: var(--el-ilustra); stroke-width: 1.2; }
+.card-ilustra .il-no { fill: var(--el-ilustra); }
+.card-ilustra .il-folha { fill: var(--cor-superficie); stroke: var(--cor-fio); stroke-width: 1; filter: drop-shadow(0 4px 10px rgba(0, 0, 0, .06)); }
+.card-ilustra .il-regua { stroke: var(--el-ilustra); stroke-width: 1.4; stroke-linecap: round; }
+.card-ilustra .il-linha { stroke: var(--el-borda-forte); stroke-width: 2.4; stroke-linecap: round; }
+.card-ilustra .il-trecho { stroke: var(--el-ilustra); stroke-width: 2.4; stroke-linecap: round; }
+.card-ilustra .il-tempo { fill: var(--el-ilustra); font: 600 9px var(--fonte-ui); font-variant-numeric: tabular-nums; }
+.card-ilustra .il-ponto { stroke: var(--el-borda-forte); stroke-width: 1; stroke-dasharray: 1 3; stroke-linecap: round; }
+.card-ilustra .il-no-claro { fill: var(--el-borda-forte); }
+:root[data-skin="eleven"][data-tema="escuro"] .card-ilustra .il-folha { filter: none; }
+/* com o mouse no cartão a onda "fala" (um único movimento, só no hover) */
+:root[data-skin="eleven"] .apple-card:hover .card-ilustra .il-onda { animation: ilFala .9s cubic-bezier(.2, 0, 0, 1) infinite alternate; animation-delay: calc(var(--i) * -70ms); }
+@keyframes ilFala { from { transform: scaleY(1); } to { transform: scaleY(.45); } }
+@media (prefers-reduced-motion: reduce) { :root[data-skin="eleven"] .apple-card:hover .card-ilustra .il-onda { animation: none; } }
+
+/* ================= ETAPA 3: players e ondas ================= */
+
+/* ---------- Player padrão (player_audio.js, .pa): cartão com fio, play preto redondo, barra fina, tempos em Inter ---------- */
+:root[data-skin="eleven"] .pa {
+  --pa-linha: var(--cor-tinta); --pa-suave: var(--cor-suave); --pa-borda: var(--cor-fio);
+  background: var(--cor-superficie); border: 1px solid var(--cor-fio); border-radius: var(--el-raio-bt);
+  box-shadow: var(--el-sombra-xs); padding: 12px 14px;
+}
+:root[data-skin="eleven"] .pa__tempo { font: 400 12px/1 var(--fonte-ui); font-variant-numeric: tabular-nums; color: var(--cor-suave); }
+:root[data-skin="eleven"] .pa__barra { height: 16px; }
+:root[data-skin="eleven"] .pa__trilho { height: 4px; background: var(--el-trilho); }
+:root[data-skin="eleven"] .pa__feito { height: 4px; background: var(--cor-tinta); }
+:root[data-skin="eleven"] .pa__bola { width: 12px; height: 12px; margin-left: -6px; background: var(--cor-tinta); box-shadow: 0 0 0 2px var(--cor-superficie); transform: scale(0); transition: transform var(--duracao) var(--curva); }
+:root[data-skin="eleven"] .pa__barra:hover .pa__bola, :root[data-skin="eleven"] .pa__barra:focus-visible .pa__bola { transform: scale(1); }
+:root[data-skin="eleven"] .pa__barra:focus-visible { outline: 2px solid var(--cor-tinta); outline-offset: 3px; }
+:root[data-skin="eleven"] .pa__btn { border-radius: var(--el-raio-item); color: var(--cor-tinta); }
+:root[data-skin="eleven"] .pa__btn:hover:not(:disabled) { background: var(--el-press); }
+:root[data-skin="eleven"] .pa__btn:focus-visible, :root[data-skin="eleven"] .pa__transc:focus-visible { outline: 2px solid var(--cor-tinta); }
+:root[data-skin="eleven"] .pa__btn--salto { color: var(--cor-suave); }
+:root[data-skin="eleven"] .pa__btn--play { width: 36px; height: 36px; border-radius: 50%; background: var(--cor-veia); color: var(--cor-sobre-veia); box-shadow: var(--el-sombra-bt); }
+:root[data-skin="eleven"] .pa__btn--play:hover:not(:disabled) { background: var(--el-acao-hover); filter: none; transform: none; }
+:root[data-skin="eleven"] .pa__btn--play:active:not(:disabled) { transform: scale(0.96); }
+:root[data-skin="eleven"] .pa__vel { border-radius: var(--el-raio-chip); border: 1px solid var(--cor-fio); background: var(--el-chip); color: var(--cor-tinta); font: 600 11px/1.4 var(--fonte-ui); font-variant-numeric: tabular-nums; }
+:root[data-skin="eleven"] .pa__vel:hover { background: var(--el-press); border-color: var(--el-borda-forte); color: var(--cor-tinta); }
+:root[data-skin="eleven"] .pa__titulo { font: 600 13px/18px var(--fonte-ui); color: var(--cor-tinta); }
+
+/* ---------- Barra do Ouvir Aulas (#elevenFloatingDock): mesma linguagem; os estilos da marcação são inline, daí os !important ---------- */
+/* rodapé colado na coluna (como antes), em grade: título | controles | velocidade em cima e o progresso na largura toda
+   embaixo (antes a barra dividia a linha com a velocidade e ficava com uns 35 px). O miolo vira display:contents. */
+:root[data-skin="eleven"] #elevenFloatingDock {
+  display: grid !important; grid-template-columns: minmax(0, 1fr) auto auto; grid-template-areas: "info transporte acoes" "barra barra barra";
+  align-items: center; column-gap: 16px; row-gap: 4px; padding: 10px 20px 12px !important;
+  background: var(--cor-superficie) !important; color: var(--cor-tinta) !important; box-shadow: none !important; backdrop-filter: none !important;
+}
+:root[data-skin="eleven"] #elevenFloatingDock > div:nth-of-type(1) { grid-area: info; min-width: 0 !important; max-width: none !important; }
+:root[data-skin="eleven"] #elevenFloatingDock > div:nth-of-type(2) { display: contents !important; }
+:root[data-skin="eleven"] #elevenFloatingDock .eleven-dock-transport { grid-area: transporte; }
+:root[data-skin="eleven"] #elevenFloatingDock > div:nth-of-type(2) > div:last-child { grid-area: barra; }
+:root[data-skin="eleven"] #elevenFloatingDock > div:nth-of-type(3) { grid-area: acoes; justify-self: end; }
+:root[data-skin="eleven"] #ouvirTempoAtual { min-width: 44px !important; }
+:root[data-skin="eleven"] #ouvirTempoTotal { min-width: 44px !important; }
+@media (max-width: 720px) {
+  :root[data-skin="eleven"] #elevenFloatingDock { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "info transporte" "barra barra" "acoes acoes"; }
+  :root[data-skin="eleven"] #elevenFloatingDock > div:nth-of-type(3) { justify-self: center; }
+}
+:root[data-skin="eleven"] #elevenDockTitulo { font: 600 13px/18px var(--fonte-ui) !important; }
+:root[data-skin="eleven"] #ouvirInfoBloco { font: 400 12px/16px var(--fonte-ui) !important; color: var(--cor-suave) !important; opacity: 1 !important; font-variant-numeric: tabular-nums; }
+:root[data-skin="eleven"] #elevenFloatingDock .eleven-btn-play {
+  width: 40px !important; height: 40px !important; border-radius: 50% !important;
+  background: var(--cor-veia) !important; color: var(--cor-sobre-veia) !important; box-shadow: var(--el-sombra-bt) !important;
+}
+:root[data-skin="eleven"] #elevenFloatingDock .eleven-btn-play:hover { background: var(--el-acao-hover) !important; transform: none !important; }
+:root[data-skin="eleven"] #elevenFloatingDock .eleven-btn-play:active { transform: scale(.96) !important; }
+:root[data-skin="eleven"] #elevenFloatingDock .eleven-btn-skip {
+  width: 32px !important; height: 32px !important; border-radius: var(--el-raio-item) !important;
+  border: 0 !important; background: transparent !important; color: var(--cor-suave) !important;
+}
+:root[data-skin="eleven"] #elevenFloatingDock .eleven-btn-skip:hover { background: var(--el-press) !important; color: var(--cor-tinta) !important; }
+:root[data-skin="eleven"] :is(#ouvirTempoAtual, #ouvirTempoTotal) { font: 400 12px/1 var(--fonte-ui) !important; font-variant-numeric: tabular-nums; color: var(--cor-suave) !important; opacity: 1 !important; }
+:root[data-skin="eleven"] #ouvirBarraTrilha { height: 4px !important; background: var(--el-trilho) !important; overflow: visible !important; }
+:root[data-skin="eleven"] #ouvirBarraTrilha::before { content: ""; position: absolute; inset: -6px 0; }   /* área de clique maior que o traço */
+:root[data-skin="eleven"] #ouvirBarraProgresso { background: var(--cor-tinta) !important; position: relative; }
+:root[data-skin="eleven"] #ouvirBarraProgresso::after {
+  content: ""; position: absolute; right: -6px; top: 50%; width: 12px; height: 12px; margin-top: -6px; border-radius: 50%;
+  background: var(--cor-tinta); box-shadow: 0 0 0 2px var(--cor-superficie); transform: scale(0); transition: transform var(--duracao) var(--curva);
+}
+:root[data-skin="eleven"] #ouvirBarraTrilha:hover #ouvirBarraProgresso::after { transform: scale(1); }
+/* velocidade: bandeja cinza com a opção ativa preta (como os grupos da etapa 1) */
+:root[data-skin="eleven"] #elevenFloatingDock div:has(> .ouvir-vel) { background: var(--cor-superficie-2) !important; border: 1px solid var(--cor-fio); border-radius: var(--el-raio-item) !important; padding: 2px !important; gap: 2px !important; }
+:root[data-skin="eleven"] #elevenFloatingDock .ouvir-vel {
+  border: 0 !important; border-radius: var(--el-raio-chip) !important; background: transparent !important; color: var(--cor-suave) !important;
+  font: 600 11px/1.4 var(--fonte-ui) !important; font-variant-numeric: tabular-nums; padding: 3px 7px !important; box-shadow: none !important;
+}
+:root[data-skin="eleven"] #elevenFloatingDock .ouvir-vel:hover { color: var(--cor-tinta) !important; }
+:root[data-skin="eleven"] #elevenFloatingDock .ouvir-vel.atual { background: var(--cor-veia) !important; color: var(--cor-sobre-veia) !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  :root[data-skin="eleven"] .pa__bola, :root[data-skin="eleven"] #ouvirBarraProgresso::after { transition: none; }
+}
+
+/* ================= ETAPA 4: chips de estado, sliders e seletor de voz ================= */
+
+/* ---------- Chips de estado: selo com fio, 6 px, texto normal (sem caixa alta) e ponto na cor do significado ---------- */
+:root[data-skin="eleven"] .etiqueta {
+  display: inline-flex; align-items: center; gap: 6px; padding: 2px 8px; border-radius: var(--el-raio-chip);
+  font: 600 11px/16px var(--fonte-ui); letter-spacing: 0; text-transform: none;
+  border: 1px solid var(--cor-fio); background: var(--el-chip); color: var(--cor-tinta);
+}
+:root[data-skin="eleven"] .etiqueta:is(.etiqueta--veia, .etiqueta--arteria, .etiqueta--nervo, .etiqueta--linfa, .etiqueta--prova, .etiqueta--professora, .etiqueta--livro)::before {
+  content: ""; flex: none; width: 6px; height: 6px; border-radius: 50%; background: var(--sv-cor, currentColor);
+}
+:root[data-skin="eleven"] .etiqueta--veia { --sv-cor: var(--cor-tinta); }
+:root[data-skin="eleven"] .etiqueta--arteria { --sv-cor: var(--cor-arteria); color: var(--cor-arteria); border-color: color-mix(in srgb, var(--cor-arteria) 25%, var(--cor-fio)); background: var(--cor-arteria-fundo); }
+:root[data-skin="eleven"] .etiqueta--nervo { --sv-cor: var(--cor-nervo); color: var(--cor-nervo); border-color: color-mix(in srgb, var(--cor-nervo) 25%, var(--cor-fio)); background: var(--cor-nervo-fundo); }
+:root[data-skin="eleven"] .etiqueta--linfa { --sv-cor: var(--cor-linfa); color: var(--cor-linfa); border-color: color-mix(in srgb, var(--cor-linfa) 25%, var(--cor-fio)); background: var(--cor-linfa-fundo); }
+:root[data-skin="eleven"] .etiqueta--prova { --sv-cor: var(--cor-prova); }
+:root[data-skin="eleven"] .etiqueta--professora { --sv-cor: var(--cor-professora); }
+:root[data-skin="eleven"] .etiqueta--livro { --sv-cor: var(--cor-livro); }
+
+/* "Pronto / Conectar" (status-ponto-txt): o mesmo selo neutro com o ponto */
+:root[data-skin="eleven"] .status-ponto-txt {
+  padding: 2px 8px; border-radius: var(--el-raio-chip); border: 1px solid var(--cor-fio); background: var(--el-chip);
+  font: 600 11px/16px var(--fonte-ui); color: var(--cor-tinta);
+}
+:root[data-skin="eleven"] .ponto-status { width: 6px; height: 6px; }
+
+/* Saúde das APIs: selo neutro + ponto (eram verde, âmbar e vermelho fora da paleta) */
+:root[data-skin="eleven"] .badge-saude-geral {
+  display: inline-flex; align-items: center; gap: 6px; padding: 2px 8px; border-radius: var(--el-raio-chip);
+  font: 600 11px/16px var(--fonte-ui); letter-spacing: 0; text-transform: none;
+  border: 1px solid var(--cor-fio) !important; background: var(--el-chip) !important; color: var(--cor-tinta) !important;
+}
+:root[data-skin="eleven"] .badge-saude-geral::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--cor-suave); }
+:root[data-skin="eleven"] .badge-saude-geral--operacional::before { background: var(--cor-linfa); }
+:root[data-skin="eleven"] .badge-saude-geral--atencao::before { background: var(--cor-nervo); }
+:root[data-skin="eleven"] .badge-saude-geral--critico::before { background: var(--cor-arteria); }
+
+/* Selo do motor no cabeçalho da transcrição ("Groq", "GPU") e no painel do motor */
+:root[data-skin="eleven"] .cabc__motor {
+  height: 24px; padding: 0 8px; border-radius: var(--el-raio-chip); border: 1px solid var(--cor-fio);
+  background: var(--el-chip) !important; color: var(--cor-tinta) !important; font: 600 12px/1 var(--fonte-ui);
+}
+:root[data-skin="eleven"] .cabc__motor svg { color: var(--cor-suave); }
+:root[data-skin="eleven"] .motor-status {
+  display: inline-flex; align-items: center; gap: 6px; padding: 2px 8px; border-radius: var(--el-raio-chip);
+  border: 1px solid var(--cor-fio); background: var(--el-chip); color: var(--cor-tinta); font: 600 11px/16px var(--fonte-ui); text-transform: none; letter-spacing: 0;
+}
+:root[data-skin="eleven"] .motor-status::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--cor-suave); }
+:root[data-skin="eleven"] .motor-status[data-estado="online"]::before { background: var(--cor-linfa); }
+:root[data-skin="eleven"] .motor-status:is([data-estado="offline"], [data-estado="erro"])::before { background: var(--cor-arteria); }
+
+/* ---------- Sliders: trilho de 4 px com a parte preenchida em tinta (--p vem do faixa_preenchida.js), polegar branco com fio ---------- */
+:root[data-skin="eleven"] input[type="range"] {
+  -webkit-appearance: none; appearance: none; height: 16px; margin: 0; padding: 0; background: transparent; cursor: pointer; accent-color: auto;
+}
+:root[data-skin="eleven"] input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px; border-radius: 2px; background: linear-gradient(to right, var(--cor-tinta) var(--p, 50%), var(--el-trilho) var(--p, 50%));
+}
+:root[data-skin="eleven"] input[type="range"]::-moz-range-track { height: 4px; border-radius: 2px; background: var(--el-trilho); }
+:root[data-skin="eleven"] input[type="range"]::-moz-range-progress { height: 4px; border-radius: 2px; background: var(--cor-tinta); }
+:root[data-skin="eleven"] input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 16px; height: 16px; margin-top: -6px; border-radius: 50%;
+  background: #fff; border: 1px solid var(--el-borda-forte); box-shadow: 0 1px 3px rgba(0, 0, 0, .15);
+  transition: transform var(--duracao) var(--curva);
+}
+:root[data-skin="eleven"] input[type="range"]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: #fff; border: 1px solid var(--el-borda-forte); box-shadow: 0 1px 3px rgba(0, 0, 0, .15); }
+:root[data-skin="eleven"] input[type="range"]:active::-webkit-slider-thumb { transform: scale(1.1); }
+:root[data-skin="eleven"] input[type="range"]:focus-visible { outline: none; }
+:root[data-skin="eleven"] input[type="range"]:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 3px var(--cor-fundo), 0 0 0 5px var(--cor-tinta); }
+:root[data-skin="eleven"] input[type="range"]:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 3px var(--cor-fundo), 0 0 0 5px var(--cor-tinta); }
+/* meta da Calculadora: rótulo do valor pequeno e preso ao slider, eixo 0% / 100% embaixo */
+:root[data-skin="eleven"] .calc-slider { gap: 8px; }
+:root[data-skin="eleven"] .calc-slider input[type=range] { height: 20px; background: transparent; }
+:root[data-skin="eleven"] .calc-slider-valor { align-self: flex-start; font: 600 24px/1 var(--fonte-ui); letter-spacing: -0.02em; }
+:root[data-skin="eleven"] .calc-slider-eixo { font: 400 12px/1 var(--fonte-ui); font-variant-numeric: tabular-nums; }
+
+/* ---------- Seletor de voz (seletor_voz.js): botão com bolinha, nome e descrição; lista com busca ---------- */
+.sv { display: none; }
+:root[data-skin="eleven"] #ouvirSelectVoz { display: none !important; }
+:root[data-skin="eleven"] .sv { display: block; position: relative; min-width: 0; }
+:root[data-skin="eleven"] .sv__bola {
+  flex: none; width: 24px; height: 24px; border-radius: 50%;
+  background: radial-gradient(circle at 32% 28%, color-mix(in srgb, var(--cor-linfa) 18%, #fff), color-mix(in srgb, var(--cor-linfa) var(--sv-tom, 40%), var(--cor-tinta)) 78%);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .06);
+}
+:root[data-skin="eleven"] .sv__botao {
+  display: flex; align-items: center; gap: 10px; width: 280px; max-width: 100%; height: 40px; padding: 0 10px 0 8px;
+  border: 1px solid var(--cor-fio); border-radius: var(--el-raio-bt); background: var(--cor-superficie); color: var(--cor-tinta);
+  box-shadow: var(--el-sombra-xs); cursor: pointer; text-align: left; font-family: var(--fonte-ui);
+  transition: background-color var(--duracao) var(--curva), border-color var(--duracao) var(--curva);
+}
+:root[data-skin="eleven"] .sv__botao:hover { background: var(--el-hover); border-color: var(--el-borda-forte); }
+:root[data-skin="eleven"] .sv__botao[aria-expanded="true"] { border-color: var(--cor-tinta); }
+:root[data-skin="eleven"] .sv__botao:focus-visible { outline: 2px solid var(--cor-tinta); outline-offset: 2px; }
+:root[data-skin="eleven"] .sv__botao:disabled { opacity: .6; cursor: default; }
+:root[data-skin="eleven"] .sv__textos { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+:root[data-skin="eleven"] .sv__nome { font: 600 13px/16px var(--fonte-ui); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+:root[data-skin="eleven"] .sv__desc { font: 400 11px/14px var(--fonte-ui); color: var(--cor-suave); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+:root[data-skin="eleven"] .sv__seta { flex: none; display: grid; color: var(--cor-suave); transition: transform var(--duracao) var(--curva); }
+:root[data-skin="eleven"] .sv__seta svg { width: 16px; height: 16px; }
+:root[data-skin="eleven"] .sv__botao[aria-expanded="true"] .sv__seta { transform: rotate(180deg); }
+:root[data-skin="eleven"] .sv__pop {
+  position: absolute; z-index: 60; top: calc(100% + 6px); left: 0; width: 320px; max-width: min(320px, 90vw);
+  padding: 6px; border: 1px solid var(--cor-fio); border-radius: var(--el-raio-bt); background: var(--cor-superficie);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, .12), 0 2px 6px rgba(0, 0, 0, .05);
+}
+:root[data-skin="eleven"][data-tema="escuro"] .sv__pop { box-shadow: 0 12px 32px rgba(0, 0, 0, .55); }
+:root[data-skin="eleven"] .sv__pop[hidden] { display: none; }
+:root[data-skin="eleven"] .sv__busca {
+  display: flex; align-items: center; gap: 8px; height: 34px; padding: 0 10px; margin-bottom: 4px;
+  border: 1px solid var(--cor-fio); border-radius: var(--el-raio-item); background: var(--cor-superficie-2); color: var(--cor-suave);
+}
+:root[data-skin="eleven"] .sv__busca:focus-within { border-color: var(--cor-tinta); }
+:root[data-skin="eleven"] .sv__busca svg { width: 15px; height: 15px; flex: none; }
+:root[data-skin="eleven"] .sv__busca input { flex: 1; min-width: 0; height: 100%; border: 0 !important; outline: 0; padding: 0 !important; background: transparent !important; box-shadow: none !important; font: 400 13px var(--fonte-ui); color: var(--cor-tinta); }
+:root[data-skin="eleven"] .sv__lista { max-height: 300px; overflow-y: auto; overscroll-behavior: contain; }
+:root[data-skin="eleven"] .sv__grupo { padding: 10px 8px 4px; font: 600 11px/14px var(--fonte-ui); color: var(--cor-suave); }
+:root[data-skin="eleven"] .sv__item { display: flex; align-items: center; gap: 10px; padding: 6px 8px; border-radius: var(--el-raio-item); cursor: pointer; }
+:root[data-skin="eleven"] .sv__item.ativo { background: var(--el-press); }
+:root[data-skin="eleven"] .sv__item:hover { background: var(--el-hover); }
+:root[data-skin="eleven"] .sv__item.ativo:hover { background: var(--el-press); }
+:root[data-skin="eleven"] .sv__check { flex: none; display: grid; width: 16px; color: var(--cor-tinta); visibility: hidden; }
+:root[data-skin="eleven"] .sv__check svg { width: 16px; height: 16px; }
+:root[data-skin="eleven"] .sv__item[aria-selected="true"] .sv__check { visibility: visible; }
+:root[data-skin="eleven"] .sv__vazio { padding: 16px 8px; font: 400 13px/18px var(--fonte-ui); color: var(--cor-suave); text-align: center; }
+@media (prefers-reduced-motion: reduce) {
+  :root[data-skin="eleven"] .sv__seta, :root[data-skin="eleven"] input[type="range"]::-webkit-slider-thumb { transition: none; }
+}
+
+/* Estado do Colab (Configurações > Sistema): estilos inline do JS, daí os !important; ponto pela fase */
+:root[data-skin="eleven"] #statusColabGpu {
+  display: inline-flex !important; align-items: center; gap: 8px; padding: 4px 10px !important; border-radius: var(--el-raio-chip) !important;
+  border: 1px solid var(--cor-fio) !important; background: var(--el-chip) !important; color: var(--cor-tinta) !important;
+  font: 600 12px/16px var(--fonte-ui) !important; text-transform: none; letter-spacing: 0;
+}
+:root[data-skin="eleven"] #statusColabGpu::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--cor-suave); }
+:root[data-skin="eleven"] #statusColabGpu[data-fase="conectado"]::before { background: var(--cor-linfa); }
+:root[data-skin="eleven"] #statusColabGpu[data-fase="aguardando"]::before { background: var(--cor-nervo); animation: svPisca 1.2s ease-in-out infinite alternate; }
+:root[data-skin="eleven"] #statusColabGpu[data-fase="caiu"]::before { background: var(--cor-arteria); }
+@keyframes svPisca { to { opacity: .3; } }
+@media (prefers-reduced-motion: reduce) { :root[data-skin="eleven"] #statusColabGpu::before { animation: none !important; } }
+/* botão do Colab tinha azul fixo inline: aqui é o primário da skin */
+:root[data-skin="eleven"] #btnIniciarColab { background: var(--cor-veia) !important; color: var(--cor-sobre-veia) !important; font: 600 14px/1 var(--fonte-ui) !important; padding: 10px 18px !important; }
+:root[data-skin="eleven"] #btnIniciarColab:hover { background: var(--el-acao-hover) !important; }
+
+/* ================= Tela "Hoje" no topo do Início (hoje.js) ================= */
+.hoje { display: none; }
+:root[data-skin="eleven"] .hoje { display: block; padding: 24px 0 0; }
+:root[data-skin="eleven"] .hoje__cab { margin: 0 0 16px; }
+:root[data-skin="eleven"] .hoje__data { margin: 0 0 2px; font: 400 13px/18px var(--fonte-ui); color: var(--cor-suave); }
+:root[data-skin="eleven"] .hoje__titulo { margin: 0; font: 600 26px/32px var(--fonte-titulo); letter-spacing: -0.025em; color: var(--cor-tinta); }
+:root[data-skin="eleven"] .hoje__grade { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; align-items: start; }
+:root[data-skin="eleven"] .hoje__painel {
+  min-width: 0; padding: 14px 14px 10px; border: 1px solid var(--cor-fio); border-radius: var(--raio-card);
+  background: var(--cor-superficie); box-shadow: var(--el-sombra-xs);
+}
+:root[data-skin="eleven"] .hoje__painel-cab { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 28px; margin: 0 0 6px; padding: 0 2px; }
+:root[data-skin="eleven"] .hoje__painel-cab h2 { margin: 0; font: 600 14px/20px var(--fonte-ui); color: var(--cor-tinta); letter-spacing: -0.005em; }
+:root[data-skin="eleven"] .hoje__mini {
+  display: inline-flex; align-items: center; gap: 4px; height: 28px; padding: 0 8px; border: 0; border-radius: var(--el-raio-item);
+  background: transparent; color: var(--cor-suave); font: 600 12px/1 var(--fonte-ui); cursor: pointer;
+}
+:root[data-skin="eleven"] .hoje__mini:hover { background: var(--el-press); color: var(--cor-tinta); }
+:root[data-skin="eleven"] .hoje__mini svg { width: 14px; height: 14px; }
+:root[data-skin="eleven"] .hoje__mini:focus-visible, :root[data-skin="eleven"] .hoje__item:focus-visible, :root[data-skin="eleven"] .hoje__apagar:focus-visible { outline: 2px solid var(--cor-tinta); outline-offset: 1px; }
+:root[data-skin="eleven"] .hoje__carregando, :root[data-skin="eleven"] .hoje__vazio { margin: 4px 2px 8px; font: 400 13px/19px var(--fonte-ui); color: var(--cor-suave); }
+
+/* linhas */
+:root[data-skin="eleven"] .hoje__lista { list-style: none; margin: 0 -6px; padding: 0; }
+:root[data-skin="eleven"] .hoje__item {
+  display: flex; align-items: center; gap: 10px; width: 100%; min-height: 48px; padding: 6px; border: 0; border-radius: var(--el-raio-item);
+  background: transparent; color: var(--cor-tinta); text-align: left; cursor: pointer; font-family: var(--fonte-ui);
+  transition: background-color var(--duracao) var(--curva);
+}
+:root[data-skin="eleven"] .hoje__item:hover { background: var(--el-hover); }
+:root[data-skin="eleven"] .hoje__item:active { background: var(--el-press); }
+:root[data-skin="eleven"] .hoje__ic { flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: var(--el-raio-item); background: var(--cor-superficie-2); border: 1px solid var(--cor-fio); color: var(--cor-tinta); }
+:root[data-skin="eleven"] .hoje__ic svg { width: 16px; height: 16px; }
+:root[data-skin="eleven"] .hoje__txt { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+:root[data-skin="eleven"] .hoje__t { font: 600 13px/18px var(--fonte-ui); color: var(--cor-tinta); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+:root[data-skin="eleven"] .hoje__s { font: 400 12px/16px var(--fonte-ui); color: var(--cor-suave); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+:root[data-skin="eleven"] .hoje__meta { flex: none; font: 400 12px/16px var(--fonte-ui); font-variant-numeric: tabular-nums; color: var(--cor-suave); }
+:root[data-skin="eleven"] .hoje__seta { flex: none; display: grid; width: 14px; color: var(--cor-suave); opacity: 0; transition: opacity var(--duracao) var(--curva); }
+:root[data-skin="eleven"] .hoje__seta svg { width: 14px; height: 14px; }
+:root[data-skin="eleven"] .hoje__item:is(:hover, :focus-visible) .hoje__seta { opacity: 1; }
+
+/* próxima prova: contagem grande, cor só quando está perto (artéria até 3 dias, nervo até 7) */
+:root[data-skin="eleven"] .hoje__prova { position: relative; display: flex; align-items: center; gap: 14px; padding: 6px 2px 12px; }
+:root[data-skin="eleven"] .hoje__dias { flex: none; display: flex; align-items: baseline; gap: 4px; min-width: 56px; }
+:root[data-skin="eleven"] .hoje__num { font: 600 36px/1 var(--fonte-titulo); letter-spacing: -0.03em; font-variant-numeric: tabular-nums; color: var(--cor-tinta); }
+:root[data-skin="eleven"] .hoje__prova[data-urg="alta"] .hoje__num { color: var(--cor-arteria); }
+:root[data-skin="eleven"] .hoje__prova[data-urg="media"] .hoje__num { color: var(--cor-nervo); }
+:root[data-skin="eleven"] .hoje__un { font: 400 13px/1 var(--fonte-ui); color: var(--cor-suave); }
+:root[data-skin="eleven"] .hoje__prova-txt { display: flex; flex-direction: column; min-width: 0; flex: 1; padding-right: 28px; }
+:root[data-skin="eleven"] .hoje__prova .hoje__t { font-size: 14px; line-height: 20px; white-space: normal; }
+:root[data-skin="eleven"] .hoje__provas { list-style: none; margin: 0; padding: 8px 2px 2px; border-top: 1px solid var(--cor-fio); }
+:root[data-skin="eleven"] .hoje__provas li { position: relative; display: flex; flex-direction: column; padding: 6px 28px 6px 0; }
+:root[data-skin="eleven"] .hoje__apagar {
+  position: absolute; top: 50%; right: 0; transform: translateY(-50%); display: grid; place-items: center; min-width: 26px; height: 26px; padding: 0 6px;
+  border: 0; border-radius: var(--el-raio-item); background: transparent; color: var(--cor-suave); cursor: pointer; opacity: 0;
+  font: 600 12px/1 var(--fonte-ui); transition: opacity var(--duracao) var(--curva), background-color var(--duracao) var(--curva);
+}
+:root[data-skin="eleven"] .hoje__apagar svg { width: 14px; height: 14px; }
+:root[data-skin="eleven"] :is(.hoje__prova, .hoje__provas li):is(:hover, :focus-within) .hoje__apagar, :root[data-skin="eleven"] .hoje__apagar.confirmando { opacity: 1; }
+:root[data-skin="eleven"] .hoje__apagar:hover { background: var(--el-press); color: var(--cor-tinta); }
+:root[data-skin="eleven"] .hoje__apagar.confirmando { background: var(--cor-arteria-fundo); color: var(--cor-arteria); }
+@media (hover: none) { :root[data-skin="eleven"] .hoje__apagar { opacity: 1; } }
+:root[data-skin="eleven"] .hoje__acao { display: inline-flex; align-items: center; gap: 6px; margin: 0 2px 6px; }
+:root[data-skin="eleven"] .hoje__acao svg { width: 14px; height: 14px; }
+
+/* formulário de marcar prova */
+:root[data-skin="eleven"] .hoje__form { display: flex; flex-direction: column; gap: 10px; padding: 2px 2px 8px; }
+:root[data-skin="eleven"] .hoje__campo { display: flex; flex-direction: column; gap: 4px; }
+:root[data-skin="eleven"] .hoje__campo > span { font: 600 12px/16px var(--fonte-ui); color: var(--cor-suave); }
+:root[data-skin="eleven"] .hoje__campo .campo { width: 100%; height: 36px; box-sizing: border-box; }
+:root[data-skin="eleven"] .hoje__erro { margin: 0; font: 400 12px/16px var(--fonte-ui); color: var(--cor-arteria); }
+:root[data-skin="eleven"] .hoje__form-acoes { display: flex; justify-content: flex-end; gap: 8px; }
+
+/* com a tela Hoje em cima, o título antigo vira o título da seção das ferramentas */
+:root[data-skin="eleven"] #inicio .hero { padding: 32px 0 0 !important; margin: 0 0 12px !important; }
+:root[data-skin="eleven"] #inicio .hero .titulo-1 { font: 600 14px/20px var(--fonte-ui) !important; letter-spacing: -0.005em !important; color: var(--cor-tinta); }
+@media (prefers-reduced-motion: reduce) { :root[data-skin="eleven"] :is(.hoje__item, .hoje__seta, .hoje__apagar) { transition: none; } }
+
+/* o Início deixou de caber numa tela só (Hoje + ferramentas): rola por dentro, sem perder o respiro do foco */
+:root[data-skin="eleven"] #inicio { overflow-y: auto !important; overflow-x: hidden !important; padding-bottom: 32px !important; scrollbar-gutter: stable; }
+:root[data-skin="eleven"] #hubFerramentas.hub { overflow: visible !important; padding: 2px !important; }
+/* títulos dos itens em até 2 linhas; a data vai na linha de baixo */
+:root[data-skin="eleven"] .hoje__item .hoje__t { white-space: normal; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+:root[data-skin="eleven"] .hoje__prova .hoje__s { white-space: normal; }
+
+/* ================= Configurações > Sistema em seções (cfg_sistema.js) ================= */
+.cfs { display: none; }
+:root[data-skin="eleven"] .cfs { display: block; }
+:root[data-skin="eleven"] .cfs-fora { display: none !important; }
+
+/* linha de estado: uma linha só, sem caixa */
+:root[data-skin="eleven"] .cfs__estado {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; padding: 14px 0; margin: 0 0 20px;
+  border-bottom: 1px solid var(--cor-fio); font: 400 13px/18px var(--fonte-ui); color: var(--cor-suave);
+}
+:root[data-skin="eleven"] .cfs__estado b { font-weight: 600; color: var(--cor-tinta); font-variant-numeric: tabular-nums; }
+:root[data-skin="eleven"] .cfs__geral { font-weight: 600; color: var(--cor-tinta); }
+:root[data-skin="eleven"] .cfs__ponto { width: 8px; height: 8px; border-radius: 50%; background: var(--cor-suave); }
+:root[data-skin="eleven"] .cfs__estado[data-estado="ok"] .cfs__ponto { background: var(--cor-linfa); }
+:root[data-skin="eleven"] .cfs__estado[data-estado="atencao"] .cfs__ponto { background: var(--cor-nervo); }
+:root[data-skin="eleven"] .cfs__estado[data-estado="critico"] .cfs__ponto { background: var(--cor-arteria); }
+:root[data-skin="eleven"] .cfs__sep { color: var(--el-borda-forte); }
+:root[data-skin="eleven"] .cfs__hora { font-variant-numeric: tabular-nums; }
+:root[data-skin="eleven"] .cfs__testar {
+  margin-left: auto; height: 30px; padding: 0 12px; border: 1px solid var(--cor-fio); border-radius: var(--el-raio-item);
+  background: var(--cor-superficie); color: var(--cor-tinta); font: 600 12px/1 var(--fonte-ui); cursor: pointer;
+}
+:root[data-skin="eleven"] .cfs__testar:hover { background: var(--el-hover); border-color: var(--el-borda-forte); }
+
+/* corpo: menu lateral numa bandeja + conteúdo livre */
+:root[data-skin="eleven"] .cfs__corpo { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 32px; align-items: start; }
+:root[data-skin="eleven"] .cfs__nav {
+  position: sticky; top: 8px; display: flex; flex-direction: column; gap: 2px; padding: 4px;
+  border: 1px solid var(--cor-fio); border-radius: var(--el-raio-bt); background: var(--cor-superficie-2);
+}
+:root[data-skin="eleven"] .cfs__item {
+  display: flex; align-items: center; gap: 10px; width: 100%; min-height: 36px; padding: 0 10px; border: 1px solid transparent;
+  border-radius: var(--el-raio-item); background: transparent; color: var(--cor-suave); text-align: left; cursor: pointer;
+  font: 400 13px/18px var(--fonte-ui); transition: background-color var(--duracao) var(--curva), color var(--duracao) var(--curva);
+}
+:root[data-skin="eleven"] .cfs__item svg { width: 16px; height: 16px; flex: none; }
+:root[data-skin="eleven"] .cfs__item > span:first-of-type { flex: 1; min-width: 0; }
+:root[data-skin="eleven"] .cfs__item:hover { color: var(--cor-tinta); background: color-mix(in srgb, var(--cor-superficie) 60%, transparent); }
+:root[data-skin="eleven"] .cfs__item.ativo { background: var(--cor-superficie); border-color: var(--cor-fio); color: var(--cor-tinta); font-weight: 600; box-shadow: var(--el-sombra-xs); }
+:root[data-skin="eleven"] .cfs__item:focus-visible { outline: 2px solid var(--cor-tinta); outline-offset: 1px; }
+:root[data-skin="eleven"] .cfs__conta { font: 400 12px/1 var(--fonte-ui); font-variant-numeric: tabular-nums; color: var(--cor-suave); }
+
+/* cabeçalho de cada seção */
+:root[data-skin="eleven"] .cfs__cab { padding: 0 0 16px; border-bottom: 1px solid var(--cor-fio); }
+:root[data-skin="eleven"] .cfs__cab h2 { margin: 0; font: 600 18px/24px var(--fonte-titulo); letter-spacing: -0.015em; color: var(--cor-tinta); }
+:root[data-skin="eleven"] .cfs__cab p { margin: 2px 0 0; font: 400 13px/18px var(--fonte-ui); color: var(--cor-suave); }
+
+/* os blocos movidos: sem cartão, separados por fio (como o modelo) */
+:root[data-skin="eleven"] .cfs__painel > .secao { margin: 0 !important; padding: 24px 0 !important; border-top: 0 !important; border-bottom: 1px solid var(--cor-fio); }
+:root[data-skin="eleven"] .cfs__painel > .secao:last-child { border-bottom: 0; }
+:root[data-skin="eleven"] .cfs__painel > .secao > .card,
+:root[data-skin="eleven"] .cfs__painel > .secao > details.card {
+  border: 0 !important; background: transparent !important; box-shadow: none !important; padding: 0 !important; border-radius: 0 !important;
+}
+:root[data-skin="eleven"] .cfs .rotulo:has(+ .titulo-2) { display: none !important; }      /* sem rótulos em caixa alta acima dos títulos */
+:root[data-skin="eleven"] .cfs .titulo-2 { font: 600 15px/20px var(--fonte-ui) !important; letter-spacing: -0.005em !important; margin: 0 0 2px !important; }
+:root[data-skin="eleven"] .cfs h3 { font: 600 14px/20px var(--fonte-ui) !important; }
+
+/* Chaves: o cabeçalho e as 4 métricas da Saúde já estão na linha de estado */
+:root[data-skin="eleven"] .cfs #cardSaudeApis > div:first-child, :root[data-skin="eleven"] .cfs .saude-metricas-grid { display: none !important; }
+:root[data-skin="eleven"] .cfs #cardChavesAvancado > summary { display: none; }
+/* provedores em linhas finas, com as chaves de cada um embaixo */
+:root[data-skin="eleven"] .cfs #gradeProvedoresSaude { display: flex !important; flex-direction: column; gap: 0 !important; border-top: 1px solid var(--cor-fio); }
+:root[data-skin="eleven"] .cfs .saude-prov-card {
+  border: 0 !important; border-bottom: 1px solid var(--cor-fio) !important; border-radius: 0 !important; background: transparent !important;
+  box-shadow: none !important; padding: 14px 0 !important; transform: none !important;
+}
+:root[data-skin="eleven"] .cfs .saude-prov-card .saude-prov-msg { margin: 4px 0 6px; }
+:root[data-skin="eleven"] .cfs .saude-chaves-lista { gap: 0 !important; }
+:root[data-skin="eleven"] .cfs .saude-chave-linha { background: transparent !important; border: 0 !important; border-top: 1px solid var(--cor-fio) !important; border-radius: 0 !important; padding: 8px 0 !important; }
+:root[data-skin="eleven"] .cfs .saude-prov-adicionar { margin-top: 14px; min-height: 0 !important; height: 40px; border-radius: var(--el-raio-bt) !important; justify-content: center; }
+
+/* Visão geral: resumo dos provedores */
+:root[data-skin="eleven"] .cfs__resumo { padding: 24px 0 0; }
+:root[data-skin="eleven"] .cfs__sub { display: flex; align-items: baseline; justify-content: space-between; margin: 0 0 8px; }
+:root[data-skin="eleven"] .cfs__sub h3 { margin: 0; }
+:root[data-skin="eleven"] .cfs__link { border: 0; background: none; padding: 0; color: var(--cor-tinta); font: 600 12px/16px var(--fonte-ui); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--el-borda-forte); }
+:root[data-skin="eleven"] .cfs__link:hover { text-decoration-color: var(--cor-tinta); }
+:root[data-skin="eleven"] .cfs__prov { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--cor-fio); }
+:root[data-skin="eleven"] .cfs__prov > li:not(.cfs__nota) {
+  display: grid; grid-template-columns: 10px minmax(150px, 200px) minmax(0, 1fr) auto 64px; align-items: center; gap: 12px;
+  padding: 12px 0; border-bottom: 1px solid var(--cor-fio); font: 400 12px/16px var(--fonte-ui); color: var(--cor-suave);
+}
+:root[data-skin="eleven"] .cfs__pp { width: 8px; height: 8px; border-radius: 50%; background: var(--cor-suave); }
+:root[data-skin="eleven"] .cfs__prov li[data-st="operacional"] .cfs__pp { background: var(--cor-linfa); }
+:root[data-skin="eleven"] .cfs__prov li[data-st="alerta"] .cfs__pp { background: var(--cor-nervo); }
+:root[data-skin="eleven"] .cfs__prov li[data-st="desconectado"] .cfs__pp { background: var(--cor-arteria); }
+:root[data-skin="eleven"] .cfs__pn { display: flex; flex-direction: column; min-width: 0; }
+:root[data-skin="eleven"] .cfs__pn b { font: 600 13px/18px var(--fonte-ui); color: var(--cor-tinta); }
+:root[data-skin="eleven"] .cfs__pm { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+:root[data-skin="eleven"] :is(.cfs__pc, .cfs__pl) { font-variant-numeric: tabular-nums; white-space: nowrap; }
+:root[data-skin="eleven"] .cfs__pl { text-align: right; color: var(--cor-tinta); }
+
+/* Motores: ordem real do automático */
+:root[data-skin="eleven"] .cfs__ordem { padding: 18px 0 4px; border-top: 1px solid var(--cor-fio); margin-top: 18px; }
+:root[data-skin="eleven"] .cfs__ordem h3 { margin: 0 0 2px; }
+:root[data-skin="eleven"] .cfs__nota { margin: 0; font: 400 13px/18px var(--fonte-ui); color: var(--cor-suave); list-style: none; }
+:root[data-skin="eleven"] .cfs__ordem-lista { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; counter-reset: none; }
+:root[data-skin="eleven"] .cfs__ordem-lista > li:not(.cfs__nota) {
+  display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 10px 0 4px;
+  border: 1px solid var(--cor-fio); border-radius: var(--el-raio-item); background: var(--cor-superficie); font: 400 12px/16px var(--fonte-ui); color: var(--cor-suave);
+}
+:root[data-skin="eleven"] .cfs__ordem-lista > li:first-child:not(.cfs__nota) { border-color: var(--cor-tinta); }
+:root[data-skin="eleven"] .cfs__n { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 6px; background: var(--cor-superficie-2); color: var(--cor-tinta); font: 600 11px/1 var(--fonte-ui); font-variant-numeric: tabular-nums; }
+:root[data-skin="eleven"] .cfs__m { font-weight: 600; color: var(--cor-tinta); }
+
+/* telas estreitas: menu vira uma faixa no topo */
+@media (max-width: 1000px) {
+  :root[data-skin="eleven"] .cfs__corpo { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  :root[data-skin="eleven"] .cfs__nav { position: static; flex-direction: row; overflow-x: auto; }
+  :root[data-skin="eleven"] .cfs__item { width: auto; flex: none; }
+  :root[data-skin="eleven"] .cfs__prov > li:not(.cfs__nota) { grid-template-columns: 10px minmax(0, 1fr) auto 56px; }
+  :root[data-skin="eleven"] .cfs__pm { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { :root[data-skin="eleven"] .cfs__item { transition: none; } }
+
+/* no Sistema a linha de estado já diz o mesmo que o selo "APIs Prontas" do topo */
+:root[data-skin="eleven"] #pillSaudeConfig { display: none !important; }   /* a linha de estado do Sistema faz o papel dele */
+/* selos da grade de provedores (eram verde, âmbar e vermelho fora da paleta): selo neutro com ponto */
+:root[data-skin="eleven"] :is(.saude-prov-badge, .saude-chave-tag-ok, .saude-chave-tag-erro, .saude-chave-tag-pausa) {
+  display: inline-flex !important; align-items: center; gap: 6px; padding: 2px 8px !important; border-radius: var(--el-raio-chip) !important;
+  border: 1px solid var(--cor-fio) !important; background: var(--el-chip) !important; color: var(--cor-tinta) !important;
+  font: 600 11px/16px var(--fonte-ui) !important; letter-spacing: 0 !important; text-transform: none !important;
+}
+:root[data-skin="eleven"] :is(.saude-prov-badge, .saude-chave-tag-ok, .saude-chave-tag-erro, .saude-chave-tag-pausa)::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--cor-suave); }
+:root[data-skin="eleven"] :is(.saude-prov-badge--operacional, .saude-chave-tag-ok)::before { background: var(--cor-linfa); }
+:root[data-skin="eleven"] :is(.saude-prov-badge--alerta, .saude-chave-tag-pausa)::before { background: var(--cor-nervo); }
+:root[data-skin="eleven"] :is(.saude-prov-badge--desconectado, .saude-chave-tag-erro)::before { background: var(--cor-arteria); }
+:root[data-skin="eleven"] .saude-chave-indicador { width: 6px !important; height: 6px !important; }
+:root[data-skin="eleven"] .saude-chave-linha.ativa .saude-chave-indicador { background: var(--cor-linfa) !important; box-shadow: none !important; }
+:root[data-skin="eleven"] .saude-chave-linha.pausada .saude-chave-indicador { background: var(--cor-nervo) !important; box-shadow: none !important; }
+:root[data-skin="eleven"] .saude-chave-linha.inativa .saude-chave-indicador { background: var(--cor-arteria) !important; box-shadow: none !important; }
+
+/* ---------- as outras abas de Configurações (cfg_abas.js): Personalização e Conta com menu; Hora e idioma e
+   Atualizações numa página só, com o mesmo visual (sem cartões, sem rótulo em caixa alta, fios finos) ---------- */
+:root[data-skin="eleven"] .cfs--sem-estado { padding-top: 16px; }
+:root[data-skin="eleven"] :is(#cfgTabHoraIdioma, #cfgTabUpdate) > .secao { margin: 0 !important; padding: 24px 0 !important; border-top: 0 !important; border-bottom: 1px solid var(--cor-fio); }
+:root[data-skin="eleven"] :is(#cfgTabHoraIdioma, #cfgTabUpdate) > .secao:last-child { border-bottom: 0; }
+:root[data-skin="eleven"] :is(#cfgTabHoraIdioma, #cfgTabUpdate) > .secao > .card {
+  border: 0 !important; background: transparent !important; box-shadow: none !important; padding: 0 !important; border-radius: 0 !important;
+}
+:root[data-skin="eleven"] :is(#cfgTabHoraIdioma, #cfgTabUpdate) .rotulo:has(+ .titulo-2) { display: none !important; }
+:root[data-skin="eleven"] :is(#cfgTabHoraIdioma, #cfgTabUpdate) .titulo-2 { font: 600 15px/20px var(--fonte-ui) !important; letter-spacing: -0.005em !important; margin: 0 0 2px !important; }
+
+:root[data-skin="eleven"] .cfs__cab[hidden] { display: none; }
+:root[data-skin="eleven"] .cfs__cab[hidden] + .secao { padding-top: 0 !important; }
+/* Ferramentas ativas: lista leve em duas colunas (era uma caixa grossa por item, a marcada com borda preta) */
+:root[data-skin="eleven"] #listaFerramentasAtivas { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important; gap: 4px 12px !important; }
+:root[data-skin="eleven"] #listaFerramentasAtivas .ga-opcao {
+  display: flex; align-items: center; gap: 10px; min-height: 40px; padding: 0 10px !important; margin: 0;
+  border: 0 !important; border-bottom: 1px solid var(--cor-fio) !important; border-radius: 0 !important; background: transparent !important; box-shadow: none !important;
+  font: 400 13px/18px var(--fonte-ui); color: var(--cor-tinta); cursor: pointer;
+}
+:root[data-skin="eleven"] #listaFerramentasAtivas .ga-opcao:hover { background: var(--el-hover) !important; }
+:root[data-skin="eleven"] #listaFerramentasAtivas .ga-opcao input { accent-color: var(--cor-tinta); width: 16px; height: 16px; margin: 0; }
+/* bloco sem nada visível dentro (ex.: "Sua Conta Google" antes de entrar) não deixa faixa vazia */
+:root[data-skin="eleven"] .cfs__painel > .secao:not(:has(> :not([hidden]))) { display: none; }
+:root[data-skin="eleven"] .cfs__painel > .secao:has(> #cardGoogleConta) { display: none; }   /* o cartão já é escondido por uma regra antiga (#cardGoogleConta { display: none }) */
+:root[data-skin="eleven"] #cardUpdateStatus .rotulo { display: none; }
+
+/* ---------- Barra lateral como barra de tarefas (vale nos dois estilos; o arquivo é carregado sempre) ---------- */
+.nav__item--app { position: relative; }
+.nav__fechar {
+  position: absolute; right: 6px; top: 50%; transform: translateY(-50%); display: grid; place-items: center;
+  width: 22px; height: 22px; padding: 0; border: 0; border-radius: 6px; background: transparent; color: var(--cor-suave);
+  cursor: pointer; opacity: 0; transition: opacity .12s ease, background-color .12s ease;
+}
+.nav__fechar svg { width: 13px; height: 13px; }
+.nav__item--app:is(:hover, :focus-within) .nav__fechar { opacity: 1; }
+.nav__fechar:hover { background: color-mix(in srgb, var(--cor-tinta) 10%, transparent); color: var(--cor-tinta); }
+.nav__fechar:focus-visible { opacity: 1; outline: 2px solid var(--cor-tinta); outline-offset: 1px; }
+.nav__item--app.tem-toggle .nav__fechar { right: 30px; }      /* ferramenta-pasta: o X fica antes da setinha dos subitens */
+.nav__item--app:is(:hover, :focus-within) > span:first-of-type { padding-right: 26px; }
+:root[data-menu="mini"] .nav__fechar { display: none; }        /* menu só de ícones: fecha com o botão do meio */
+.nav__vazio { margin: 4px 12px 8px; font: 400 12px/17px var(--fonte-ui); color: var(--cor-suave); }
+:root[data-menu="mini"] .nav__vazio { display: none; }
+@media (hover: none) { .nav__fechar { opacity: 1; } }
+
+/* ---------- Início em duas janelas (hoje.js): Dashboard = tela Hoje; Ferramentas = os cartões ---------- */
+:root[data-skin="eleven"] #inicio[data-vista="dashboard"] > :not(.hoje) { display: none !important; }
+:root[data-skin="eleven"] #inicio[data-vista="ferramentas"] > .hoje { display: none !important; }
+:root[data-skin="eleven"] #inicio[data-vista="ferramentas"] .hero { padding: 24px 0 0 !important; margin: 0 0 16px !important; }
+:root[data-skin="eleven"] #inicio[data-vista="ferramentas"] .hero .titulo-1 { font: 600 26px/32px var(--fonte-titulo) !important; letter-spacing: -0.025em !important; }
+
+/* ================= Tela de boas-vindas no estilo ElevenLabs (login_eleven.js) ================= */
+@font-face { font-family: "Source Serif 4"; font-style: italic; font-weight: 400; font-display: swap; src: url("fonts/SourceSerif4-Italic.woff2") format("woff2"); }
+.bv11 { display: none; }
+:root[data-skin="eleven"] .tela-boasvindas { background: var(--cor-fundo) !important; color: var(--cor-tinta) !important; }
+:root[data-skin="eleven"] .tela-boasvindas__layout { display: none !important; }
+:root[data-skin="eleven"] .bv11 { display: flex; flex-direction: column; width: 100%; height: 100%; position: relative; overflow: hidden; }
+
+/* topo */
+:root[data-skin="eleven"] .bv11__topo { flex: none; display: flex; align-items: center; justify-content: space-between; padding: 26px 48px 0; position: relative; z-index: 3; }
+:root[data-skin="eleven"] .bv11__marca { font: 600 20px/1 var(--fonte-ui); letter-spacing: -0.025em; color: var(--cor-tinta); }
+:root[data-skin="eleven"] .bv11 #btnTemaLogin {
+  position: static !important; width: 36px; height: 36px; display: grid; place-items: center; border-radius: 50%;
+  border: 1px solid var(--cor-fio); background: var(--cor-superficie); color: var(--cor-tinta); box-shadow: var(--el-sombra-xs); cursor: pointer;
+}
+:root[data-skin="eleven"] .bv11 #btnTemaLogin svg { width: 16px; height: 16px; }
+
+/* palco */
+:root[data-skin="eleven"] .bv11__palco { flex: 1; min-height: 0; position: relative; display: flex; flex-direction: column; align-items: center; }
+:root[data-skin="eleven"] .bv11__hero { position: relative; z-index: 3; text-align: center; padding: clamp(16px, 4.5vh, 48px) 24px 0; }
+:root[data-skin="eleven"] .bv11__titulo {
+  margin: 0; font-family: var(--fonte-leitura); font-weight: 400; color: var(--cor-tinta);
+  font-size: clamp(44px, min(6.4vw, 10vh), 96px); line-height: .98; letter-spacing: -0.035em;
+}
+:root[data-skin="eleven"] .bv11__l1, :root[data-skin="eleven"] .bv11__l2 { display: block; }
+:root[data-skin="eleven"] .bv11__l2 { font-style: italic; letter-spacing: -0.04em; }
+:root[data-skin="eleven"] .bv11__sub { margin: clamp(12px, 2.2vh, 20px) auto clamp(16px, 2.8vh, 24px); max-width: 420px; font: 400 15px/22px var(--fonte-ui); color: var(--cor-suave); }
+:root[data-skin="eleven"] .bv11__acoes { display: flex; justify-content: center; gap: 10px; }
+:root[data-skin="eleven"] .bv11 .tela-boasvindas__btn {
+  all: unset; box-sizing: border-box; display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 20px; border-radius: 8px;
+  font: 600 14px/1 var(--fonte-ui); letter-spacing: -0.005em; cursor: pointer;
+  transition: background-color var(--duracao) var(--curva), border-color var(--duracao) var(--curva), transform var(--duracao) var(--curva);
+}
+:root[data-skin="eleven"] .bv11 .tela-boasvindas__btn svg { width: 16px; height: 16px; transition: transform var(--duracao) var(--curva); }
+:root[data-skin="eleven"] .bv11 .tela-boasvindas__btn--primario { background: var(--cor-veia); color: var(--cor-sobre-veia); box-shadow: 0 1px 2px rgba(0, 0, 0, .12); }
+:root[data-skin="eleven"] .bv11 .tela-boasvindas__btn--primario:hover { background: var(--el-acao-hover); }
+:root[data-skin="eleven"] .bv11 .tela-boasvindas__btn--primario:hover svg { transform: translateX(2px); }
+:root[data-skin="eleven"] .bv11 .tela-boasvindas__btn--secundario { background: var(--cor-superficie); color: var(--cor-tinta); border: 1px solid var(--cor-fio); box-shadow: var(--el-sombra-xs); }
+:root[data-skin="eleven"] .bv11 .tela-boasvindas__btn--secundario:hover { background: var(--el-hover); border-color: var(--el-borda-forte); }
+:root[data-skin="eleven"] .bv11 .tela-boasvindas__btn:active { transform: scale(.98); }
+:root[data-skin="eleven"] .bv11 .tela-boasvindas__btn:focus-visible { outline: 2px solid var(--cor-tinta); outline-offset: 3px; }
+:root[data-skin="eleven"] .bv11__dica { margin-top: 10px; }
+:root[data-skin="eleven"] .bv11 .tela-boasvindas__atalho-dica { font: 400 12px/1 var(--fonte-ui); color: var(--cor-suave); }
+:root[data-skin="eleven"] .bv11 .tela-boasvindas__tecla-enter { font: 600 11px/1 var(--fonte-ui) !important; padding: 2px 6px !important; border-radius: 6px !important; border: 1px solid var(--cor-fio) !important; background: var(--cor-superficie) !important; color: var(--cor-tinta) !important; box-shadow: none !important; }
+
+/* cena: esfera em cinza com cartões de vidro em volta (o vidro só existe por cima da esfera) */
+:root[data-skin="eleven"] .bv11__cena { position: relative; z-index: 2; flex: 1; min-height: 0; width: clamp(360px, calc(100vw - 600px), 760px); margin-top: clamp(8px, 2vh, 24px); }   /* deixa 300 px de cada lado para o rodapé */
+:root[data-skin="eleven"] .bv11__globo { position: absolute; left: 50%; top: 8%; bottom: 2%; transform: translateX(-50%); aspect-ratio: 1; max-width: 100%; }   /* cabe no espaço livre abaixo dos botões */
+/* um fio fino marca a borda do globo; os temas giram por cima (posição, escala e opacidade vêm do login_eleven.js) */
+:root[data-skin="eleven"] .bv11__globo::before { content: ""; position: absolute; inset: 6%; border-radius: 50%; border: 1px solid var(--cor-fio); }
+:root[data-skin="eleven"] .bv11__globo::after { content: ""; position: absolute; left: 6%; right: 6%; top: 50%; height: 26%; transform: translateY(-50%) rotate(-8deg); border-radius: 50%; border: 1px solid color-mix(in srgb, var(--cor-fio) 70%, transparent); }
+:root[data-skin="eleven"] .bv11__tema { position: absolute; left: 0; top: 0; white-space: nowrap; pointer-events: none; will-change: transform, opacity; color: var(--cor-tinta); }
+:root[data-skin="eleven"] .bv11__tema--materia { font: italic 400 24px/1.1 var(--fonte-leitura); letter-spacing: -0.02em; }
+:root[data-skin="eleven"] .bv11__tema--assunto { font: 600 14px/1.2 var(--fonte-ui); letter-spacing: -0.01em; }
+:root[data-skin="eleven"] .bv11__tema--termo { font: 400 12px/1.2 var(--fonte-ui); color: var(--cor-suave); }
+:root[data-skin="eleven"] .bv11__tema--ferramenta {
+  font: 600 12px/1 var(--fonte-ui); padding: 6px 9px; border-radius: 6px; border: 1px solid var(--cor-fio);
+  background: var(--cor-superficie); box-shadow: var(--el-sombra-xs);
+}
+:root[data-skin="eleven"] .bv11__vidro {
+  position: absolute; display: flex; align-items: center; gap: 10px; padding: 10px 14px 10px 10px; border-radius: 16px;
+  background: color-mix(in srgb, var(--cor-superficie) 72%, transparent); border: 1px solid color-mix(in srgb, var(--cor-tinta) 8%, transparent);
+  -webkit-backdrop-filter: blur(10px) saturate(1.1); backdrop-filter: blur(10px) saturate(1.1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .08), 0 1px 2px rgba(0, 0, 0, .04);
+  animation: bv11Flutua 7s ease-in-out infinite alternate;
+}
+:root[data-skin="eleven"] .bv11__vidro b { display: block; font: 600 13px/17px var(--fonte-ui); color: var(--cor-tinta); }
+:root[data-skin="eleven"] .bv11__vidro small { display: block; font: 400 11px/15px var(--fonte-ui); color: var(--cor-suave); }
+:root[data-skin="eleven"] .bv11__vi { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 9px; background: var(--cor-superficie-2); border: 1px solid var(--cor-fio); color: var(--cor-tinta); }
+:root[data-skin="eleven"] .bv11__vi svg { width: 15px; height: 15px; }
+:root[data-skin="eleven"] .bv11__vidro--a { left: 14%; bottom: 46%; transform: rotate(-6deg); }
+:root[data-skin="eleven"] .bv11__vidro--b { left: 22%; bottom: 14%; transform: rotate(4deg); animation-delay: -2s; }
+:root[data-skin="eleven"] .bv11__vidro--c { right: 14%; bottom: 40%; transform: rotate(5deg); animation-delay: -4s; }
+:root[data-skin="eleven"] .bv11__vidro--d { right: 20%; bottom: 10%; transform: rotate(-3deg); animation-delay: -1s; }
+@keyframes bv11Flutua { from { translate: 0 -4px; } to { translate: 0 4px; } }
+
+/* cartões laterais + fios */
+:root[data-skin="eleven"] .bv11__fios { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+:root[data-skin="eleven"] .bv11__fios path { fill: none; stroke: var(--el-borda-forte); stroke-width: 1; vector-effect: non-scaling-stroke; }
+:root[data-skin="eleven"] .bv11__cartao {
+  position: absolute; z-index: 2; width: 190px; padding: 18px; border-radius: 22px; background: var(--cor-superficie);
+  border: 1px solid var(--cor-fio); box-shadow: 0 18px 40px rgba(0, 0, 0, .07), 0 2px 6px rgba(0, 0, 0, .03);
+}
+:root[data-skin="eleven"] .bv11__cartao b { display: block; margin: 14px 0 6px; font: 600 15px/20px var(--fonte-ui); letter-spacing: -0.01em; color: var(--cor-tinta); }
+:root[data-skin="eleven"] .bv11__cartao small { display: block; font: 400 12px/17px var(--fonte-ui); color: var(--cor-suave); }
+:root[data-skin="eleven"] .bv11__ci { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 10px; background: var(--cor-superficie-2); color: var(--cor-tinta); }
+:root[data-skin="eleven"] .bv11__ci svg { width: 16px; height: 16px; }
+:root[data-skin="eleven"] .bv11__cartao--esq { left: 7%; top: 26%; transform: rotate(-4deg); }
+:root[data-skin="eleven"] .bv11__cartao--dir { right: 7%; top: 40%; transform: rotate(4deg); }
+:root[data-skin="eleven"][data-tema="escuro"] .bv11__cartao { box-shadow: 0 18px 40px rgba(0, 0, 0, .5); }
+
+/* selo circular que gira devagar */
+:root[data-skin="eleven"] .bv11__selo { position: absolute; z-index: 2; right: 9%; top: 8%; width: 104px; height: 104px; color: var(--cor-tinta); }
+:root[data-skin="eleven"] .bv11__anel { width: 100%; height: 100%; animation: bv11Gira 36s linear infinite; }
+:root[data-skin="eleven"] .bv11__selo text { font: 600 8px var(--fonte-ui); fill: currentColor; }
+:root[data-skin="eleven"] .bv11__selo-estrela { position: absolute; inset: 0; display: grid; place-items: center; }
+:root[data-skin="eleven"] .bv11__selo-estrela svg { width: 22px; height: 22px; }
+@keyframes bv11Gira { to { transform: rotate(360deg); } }
+
+/* rodapé: à esquerda a IA do app (os botões de sempre), à direita uma nota */
+:root[data-skin="eleven"] .bv11__rodape-esq { position: absolute; z-index: 3; left: 48px; bottom: 32px; width: 240px; }
+:root[data-skin="eleven"] .bv11 .tela-boasvindas__contas { margin: 0 !important; padding: 14px 0 0 !important; border-top: 1px solid var(--cor-fio); display: flex; flex-direction: column; gap: 6px; }
+:root[data-skin="eleven"] .bv11 .tela-boasvindas__contas-titulo { margin: 0 0 2px !important; font: 600 12px/16px var(--fonte-ui) !important; letter-spacing: 0 !important; text-transform: none !important; color: var(--cor-tinta) !important; }
+:root[data-skin="eleven"] .bv11 .tela-boasvindas__conta {
+  all: unset; box-sizing: border-box; display: flex; align-items: center; justify-content: center; height: 34px; padding: 0 14px; border-radius: 8px;
+  border: 1px solid var(--cor-fio); background: var(--cor-superficie); color: var(--cor-tinta); font: 600 12px/1 var(--fonte-ui); cursor: pointer;
+}
+:root[data-skin="eleven"] .bv11 .tela-boasvindas__conta:hover { background: var(--el-hover); border-color: var(--el-borda-forte); }
+:root[data-skin="eleven"] .bv11 .tela-boasvindas__conta:focus-visible { outline: 2px solid var(--cor-tinta); outline-offset: 2px; }
+:root[data-skin="eleven"] .bv11 .tela-boasvindas__contas-nota { margin: 2px 0 0 !important; font: 400 11px/15px var(--fonte-ui) !important; color: var(--cor-suave) !important; }
+:root[data-skin="eleven"] .bv11__rodape-dir {
+  position: absolute; z-index: 3; right: 56px; bottom: 40px; display: grid; grid-template-columns: auto auto; column-gap: 18px; row-gap: 14px;
+}
+:root[data-skin="eleven"] .bv11__estrela { grid-column: 2; grid-row: 1; display: grid; margin-left: 18px; color: var(--cor-tinta); }
+:root[data-skin="eleven"] .bv11__estrela svg { width: 24px; height: 24px; }
+:root[data-skin="eleven"] .bv11__traco { grid-column: 1; grid-row: 2; align-self: start; width: 34px; height: 1px; margin-top: 11px; background: var(--cor-tinta); }
+:root[data-skin="eleven"] .bv11__rodape-dir p { grid-column: 2; grid-row: 2; margin: 0; font: 400 16px/22px var(--fonte-ui); letter-spacing: -0.01em; color: var(--cor-tinta); }
+
+/* janelas menores: some o que é enfeite lateral */
+@media (max-width: 980px), (max-height: 600px) {
+  :root[data-skin="eleven"] :is(.bv11__cartao, .bv11__fios, .bv11__selo, .bv11__rodape-dir) { display: none; }
+}
+@media (max-width: 960px) {
+  :root[data-skin="eleven"] .bv11__rodape-esq { position: static; margin: 0 auto 24px; }
+  :root[data-skin="eleven"] :is(.bv11__vidro--b, .bv11__vidro--d) { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root[data-skin="eleven"] :is(.bv11__vidro, .bv11__anel) { animation: none; }
+}
+
+/* ================= Moldura e área de trabalho (referência do usuário, adaptada) =================
+   Barra de cima, barra lateral e painel direito viram UMA moldura (mesmo fundo, sem linhas entre eles); a área de
+   trabalho é um cartão arredondado solto dentro dela. Itens da lateral em pílula: o ativo é uma pílula clara com
+   sombra leve. A barra de cima segue a lateral: botões fantasmas que viram pílula, busca em pílula. */
+:root[data-skin="eleven"][data-tema="claro"] {
+  --el-moldura: #F2F2F4;          /* fundo da moldura (um tom abaixo do cartão) */
+  --el-pilula-ativa: #FFFFFF;
+  --el-sombra-pilula: 0 1px 2px rgba(0, 0, 0, .06), 0 0 0 1px rgba(0, 0, 0, .04);
+  --sidebar-bg: var(--el-moldura); --topbar-bg: var(--el-moldura); --workspace-bg: var(--cor-superficie);
+}
+:root[data-skin="eleven"][data-tema="escuro"] {
+  --el-moldura: #0B0B0C;
+  --el-pilula-ativa: #1F1F23;
+  --el-sombra-pilula: 0 0 0 1px rgba(255, 255, 255, .06);
+  --sidebar-bg: var(--el-moldura); --topbar-bg: var(--el-moldura); --workspace-bg: var(--cor-superficie);
+}
+:root[data-skin="eleven"] body { background: var(--el-moldura) !important; }
+:root[data-skin="eleven"] .app-shell-header { background: var(--el-moldura) !important; border: 0 !important; box-shadow: none !important; }
+:root[data-skin="eleven"] .nav, :root[data-skin="eleven"] .nav.rolou { background: var(--el-moldura) !important; border: 0 !important; box-shadow: none !important; }
+:root[data-skin="eleven"] .painel-dir { background: var(--el-moldura) !important; border: 0 !important; }
+/* as linhas entre lateral, área de trabalho e painel somem; a do painel continua arrastável e aparece no hover */
+:root[data-skin="eleven"] #divisoriaLateral { display: none !important; }
+:root[data-skin="eleven"] #divisoriaPainel { background: transparent !important; }
+:root[data-skin="eleven"] #divisoriaPainel:is(:hover, .arrastando, :focus-visible) { background: var(--el-borda-forte) !important; box-shadow: none !important; }
+
+/* a área de trabalho: cartão com cantos de 16 px, fio e sombra leve, com 10 px de folga da borda da janela */
+:root[data-skin="eleven"] .app-workspace-shell {
+  top: var(--header-altura) !important; left: var(--largura-lateral) !important; right: 10px !important; bottom: 10px !important;
+  width: calc(100vw - var(--largura-lateral) - 10px) !important; height: calc(100vh - var(--header-altura) - 10px) !important;
+  border-radius: 16px !important; border: 1px solid var(--cor-fio) !important; border-top: 1px solid var(--cor-fio) !important;
+  background: var(--cor-superficie) !important; box-shadow: 0 1px 2px rgba(0, 0, 0, .04), 0 8px 24px rgba(0, 0, 0, .04) !important; overflow: hidden !important;
+}
+:root[data-skin="eleven"][data-painel-dir="aberto"] .app-workspace-shell {
+  right: var(--largura-painel-dir) !important;
+  width: calc(100vw - var(--largura-lateral) - var(--largura-painel-dir)) !important;
+}
+:root[data-skin="eleven"][data-tema="escuro"] .app-workspace-shell { box-shadow: none !important; }
+
+/* abas da área de trabalho (subferramentas): faixa de cima, abas retangulares com canto de 6 px, a ativa em cinza claro */
+:root[data-skin="eleven"] .app-workspace-shell .wb-tab-bar { background: transparent !important; border-bottom: 1px solid var(--cor-fio) !important; padding: 0 8px !important; }
+:root[data-skin="eleven"] .app-workspace-shell .wb-tabs-list { gap: 4px !important; align-items: center !important; }
+:root[data-skin="eleven"] .app-workspace-shell .wb-tab-bar .wb-tabs-list .wb-tab {
+  flex: 0 0 auto !important; min-width: 0 !important; height: 32px !important; padding: 0 12px !important; border: 0 !important; border-radius: 6px !important;
+  background: transparent !important; color: var(--cor-suave) !important; font-weight: 400 !important; justify-content: flex-start !important;
+}
+:root[data-skin="eleven"] .app-workspace-shell .wb-tab-bar .wb-tabs-list .wb-tab .wb-tab-title { flex: 0 1 auto !important; text-align: left !important; }
+:root[data-skin="eleven"] .app-workspace-shell .wb-tab-bar .wb-tabs-list .wb-tab:hover { background: var(--el-hover) !important; color: var(--cor-tinta) !important; }
+:root[data-skin="eleven"] .app-workspace-shell .wb-tab-bar .wb-tabs-list .wb-tab.active {
+  background: var(--cor-superficie-2) !important; color: var(--cor-tinta) !important; font-weight: 600 !important; border: 0 !important;
+}
+
+/* barra lateral: itens em pílula; o ativo é uma pílula clara com sombra leve (como na referência) */
+:root[data-skin="eleven"] .nav .nav__item { border-radius: 8px !important; min-height: 34px; padding-left: 12px; }
+:root[data-skin="eleven"] .nav .nav__item:hover { background: color-mix(in srgb, var(--el-pilula-ativa) 55%, transparent) !important; }
+:root[data-skin="eleven"] .nav .nav__item[aria-current] {
+  background: var(--el-pilula-ativa) !important; box-shadow: var(--el-sombra-pilula) !important; color: var(--cor-tinta) !important; font-weight: 600;
+}
+:root[data-skin="eleven"] .nav .nav__subitem { min-height: 30px; }
+/* títulos de grupo em texto normal (sem caixa alta), como "Main menu" da referência */
+:root[data-skin="eleven"] :is(.nav__secao, .nav__secao-titulo, .nav__rotulo) {
+  font-size: 12px !important; font-weight: 400 !important; letter-spacing: 0 !important; text-transform: none !important; color: var(--cor-suave) !important;
+}
+:root[data-skin="eleven"] .btn-seletor-modelo { border-radius: 8px !important; background: var(--el-pilula-ativa) !important; box-shadow: var(--el-sombra-pilula) !important; border-color: transparent !important; }
+:root[data-skin="eleven"] .nav__recolher { border-radius: 8px !important; background: transparent !important; border-color: transparent !important; }
+:root[data-skin="eleven"] .nav__recolher:hover { background: var(--el-pilula-ativa) !important; box-shadow: var(--el-sombra-pilula); }
+
+/* barra de cima no mesmo desenho da lateral: botões fantasmas que viram pílula clara; ligado = pílula clara com sombra */
+:root[data-skin="eleven"] .shell-header-right :is(.topbar-btn, .tema-botao) {
+  border-radius: 8px !important; border: 0 !important; background: transparent !important; color: var(--cor-suave) !important; box-shadow: none !important;
+}
+:root[data-skin="eleven"] .shell-header-right :is(.topbar-btn, .tema-botao):hover { background: var(--el-pilula-ativa) !important; color: var(--cor-tinta) !important; box-shadow: var(--el-sombra-pilula) !important; }
+:root[data-skin="eleven"] .shell-header-right :is(.topbar-btn[aria-pressed="true"], .topbar-btn--foco[aria-pressed="true"], .topbar-btn--painel[aria-pressed="true"]) {
+  background: var(--el-pilula-ativa) !important; color: var(--cor-tinta) !important; box-shadow: var(--el-sombra-pilula) !important; border: 0 !important;
+}
+:root[data-skin="eleven"] .shell-header-center .busca, :root[data-skin="eleven"] .app-shell-header .busca {
+  border-radius: 8px !important; background: var(--el-pilula-ativa) !important; border: 0 !important; box-shadow: var(--el-sombra-pilula) !important;
+}
+:root[data-skin="eleven"] .gr-rapida { border-radius: 8px !important; background: var(--el-pilula-ativa) !important; border: 0 !important; box-shadow: var(--el-sombra-pilula) !important; }
+
+/* ---------- login mais limpo (17/11/2026): sem os cartõezinhos em volta da esfera, cartões laterais só com texto ---------- */
+:root[data-skin="eleven"] .bv11__cartao { width: 210px; padding: 20px 22px; }
+:root[data-skin="eleven"] .bv11__cartao b { margin-top: 0; }
+:root[data-skin="eleven"] .bv11__cartao--esq { left: 6%; top: 30%; }
+:root[data-skin="eleven"] .bv11__cartao--dir { right: 6%; top: 44%; }
+:root[data-skin="eleven"] .bv11__selo { right: 6%; top: 6%; }
+/* foto do centro (opcional): preto e branco, apoiada no pé da tela, sumindo em cima e nas laterais */
+:root[data-skin="eleven"] .bv11__foto {
+  position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); height: 100%; max-height: 62vh; width: auto; max-width: 100%;
+  object-fit: contain; object-position: bottom; filter: grayscale(1) contrast(1.05);
+  -webkit-mask-image: radial-gradient(ellipse 50% 92% at 50% 100%, #000 48%, transparent 100%);
+          mask-image: radial-gradient(ellipse 50% 92% at 50% 100%, #000 48%, transparent 100%);
+}
+:root[data-skin="eleven"] .bv11--foto .bv11__globo { display: none; }
+
+/* ---------- Retangular, não pílula (18/11/2026, preferência do usuário: canto discreto em vez de pílula) ----------
+   Itens da barra lateral (também no menu só de ícones), botões da barra de cima, busca, Gravar e seletor de modelo
+   passaram de 999px para 8px (bloco da moldura acima). O anel de foco segue o mesmo canto. */
+:root[data-skin="eleven"] .nav .nav__item:focus-visible, :root[data-skin="eleven"] .nav .nav__subitem:focus-visible { border-radius: 8px !important; }
+:root[data-skin="eleven"] .nav .nav__subitem { border-radius: 8px !important; }
+
+/* Menu só de ícones (18/11/2026, pedido do usuário): ícones no centro da coluna. O recuo de 12 px dos itens
+   (regra da moldura acima) e o recuo dos subitens empurravam os ícones para a direita. */
+:root[data-skin="eleven"][data-menu="mini"] .nav .nav__item,
+:root[data-skin="eleven"][data-menu="mini"] .nav .nav__subitem { justify-content: center !important; padding-left: 0 !important; padding-right: 0 !important; margin-left: 0 !important; gap: 0 !important; }
+:root[data-skin="eleven"][data-menu="mini"] .nav .nav__item > svg,
+:root[data-skin="eleven"][data-menu="mini"] .nav .nav__subitem > svg { margin: 0 !important; }
+
+/* ---------- Ilustração no lugar do globo (18/11/2026, escolha do usuário) ----------
+   Coordenadas em % da imagem original (1024 x 1536). Flores: x 520-880, y 150-480 (balançam presas no pé dos caules,
+   em 655, 480); botão CLOSE: x 413-655, y 720-792. Em cartão de papel com canto de 14 px nos dois temas. */
+:root[data-skin="eleven"] .bv11--arte .bv11__globo { display: none; }
+:root[data-skin="eleven"] .bv11__arte { display: none; }
+:root[data-skin="eleven"] .bv11--arte .bv11__arte {
+  display: block; position: absolute; left: 50%; top: 3%; bottom: 3%; transform: translateX(-50%); aspect-ratio: 1024 / 1536; max-width: 100%;
+  border-radius: 14px; overflow: hidden; background: #FDF4F0; border: 1px solid var(--cor-fio);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, .12); animation: bv11Arte 8s ease-in-out infinite; }
+:root[data-skin="eleven"][data-tema="escuro"] .bv11--arte .bv11__arte { box-shadow: 0 20px 60px rgba(0, 0, 0, .55); border-color: transparent; }
+.bv11__arte img { position: absolute; display: block; user-select: none; pointer-events: none; }
+.bv11__arte-base { inset: 0; width: 100%; height: 100%; }
+.bv11__arte-flores { left: 50.78%; top: 9.766%; width: 35.156%; height: 21.484%; transform-origin: 37.5% 100%; animation: bv11Flores 6s ease-in-out infinite; }
+.bv11__petala { position: absolute; width: 1.6%; aspect-ratio: 1 / 2.4; border-radius: 50%; background: #B9A6DA; opacity: 0; pointer-events: none; }
+.bv11__petala--1 { left: 66%; top: 16%; animation: bv11Petala 11s linear 1.5s infinite; }
+.bv11__petala--2 { left: 58%; top: 24%; animation: bv11Petala 13s linear 6s infinite; }
+.bv11__petala--3 { left: 77%; top: 23.5%; animation: bv11Petala 12s linear 9.5s infinite; }
+.bv11__arte-close { position: absolute; left: 40.33%; top: 46.875%; width: 23.63%; height: 4.69%; border-radius: 6px; animation: bv11Clique 9s ease-in-out infinite; }
+.bv11__arte-cursor { position: absolute; width: 4.6%; left: 0; top: 0; opacity: 0; filter: drop-shadow(0 2px 3px rgba(0,0,0,.25)); animation: bv11Cursor 9s ease-in-out infinite; }
+@keyframes bv11Arte { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(-6px); } }
+@keyframes bv11Flores { 0%, 100% { transform: rotate(-1.4deg); } 50% { transform: rotate(1.6deg); } }
+@keyframes bv11Petala {
+  0% { opacity: 0; transform: translate(0, 0) rotate(0deg); }
+  6% { opacity: .9; }
+  60% { opacity: .85; transform: translate(-3vh, 9vh) rotate(160deg); }
+  80% { opacity: 0; transform: translate(-1vh, 13vh) rotate(260deg); }
+  100% { opacity: 0; transform: translate(-1vh, 13vh) rotate(260deg); } }
+/* um cursor entra, clica em CLOSE e sai (o botão afunda um pouco no clique) */
+@keyframes bv11Cursor {
+  0%, 30% { opacity: 0; left: 78%; top: 66%; }
+  38% { opacity: 1; left: 78%; top: 66%; }
+  55% { opacity: 1; left: 54%; top: 49.6%; transform: scale(1); }
+  59% { transform: scale(.82); }
+  63% { opacity: 1; left: 54%; top: 49.6%; transform: scale(1); }
+  76% { opacity: 0; left: 62%; top: 58%; }
+  100% { opacity: 0; left: 78%; top: 66%; } }
+@keyframes bv11Clique {
+  0%, 56%, 66%, 100% { background: transparent; box-shadow: none; }
+  59%, 62% { background: rgba(60, 50, 45, .12); box-shadow: inset 0 2px 4px rgba(0, 0, 0, .18); } }
+@media (prefers-reduced-motion: reduce) { .bv11__arte, .bv11__arte * { animation: none !important; } .bv11--arte .bv11__arte { transform: translateX(-50%); } }
+
+/* Ilustração do cartão Gravador (18/11/2026): microfone pendurado, letras na cápsula, ondas em ferrugem */
+.card-ilustra .il-cabo { stroke: var(--cor-tinta); stroke-width: 2.2; stroke-linecap: round; }
+.card-ilustra .il-mic { fill: none; stroke: var(--cor-tinta); stroke-width: 2.6; stroke-linejoin: round; }
+.card-ilustra .il-letra { fill: var(--cor-tinta); font: 600 13px var(--fonte-ui); letter-spacing: 0; }
+.card-ilustra .il-arco { fill: none; stroke: var(--el-ilustra); stroke-width: 1.4; stroke-linecap: round; opacity: .75; }
+.card-ilustra .il-pendulo { transform-box: view-box; transform-origin: 131px 0px; }
+:root[data-skin="eleven"] .apple-card:hover .card-ilustra .il-pendulo { animation: ilPendulo 2.4s ease-in-out infinite; }
+:root[data-skin="eleven"] .apple-card:hover .card-ilustra .il-arco { animation: ilArco 1.2s ease-out infinite; animation-delay: calc(var(--i) * 180ms); }
+:root[data-skin="eleven"] .apple-card:hover .card-ilustra .il-no { animation: ilRec 1s steps(2, jump-none) infinite; }
+@keyframes ilPendulo { 0%, 100% { transform: rotate(-2.5deg); } 50% { transform: rotate(2.5deg); } }
+@keyframes ilArco { 0% { opacity: 0; } 30% { opacity: .9; } 100% { opacity: 0; } }
+@keyframes ilRec { 0% { opacity: 1; } 100% { opacity: .2; } }
+@media (prefers-reduced-motion: reduce) { :root[data-skin="eleven"] .apple-card:hover .card-ilustra :is(.il-pendulo, .il-arco, .il-no) { animation: none; } }
+
+/* ---------- Login: ilustração solta e nada em pílula (18/11/2026, pedido do usuário) ----------
+   A ilustração deixa de ser um cartão (sem borda, sombra, canto nem fundo próprio): fica apoiada no pé da tela e o papel
+   se dissolve no fundo da página em cima e nos lados. Botões, contas da IA e o botão de tema viram retângulos de 8 px;
+   os cartões laterais ficam com 10 px. Os botões do login deixam de ser a exceção da regra "retangular, não pílula". */
+:root[data-skin="eleven"] .bv11--arte .bv11__arte,
+:root[data-skin="eleven"][data-tema="escuro"] .bv11--arte .bv11__arte {
+  top: auto; bottom: 0; height: 100%; max-height: 100%;
+  border: 0; border-radius: 0; box-shadow: none; background: transparent; animation: none;
+  -webkit-mask-image: radial-gradient(ellipse 50% 66% at 50% 66%, #000 40%, transparent 97%);
+          mask-image: radial-gradient(ellipse 50% 66% at 50% 66%, #000 40%, transparent 97%);
+}
+/* no escuro o papel fica um pouco mais baixo para não acender */
+:root[data-skin="eleven"][data-tema="escuro"] .bv11--arte .bv11__arte { filter: brightness(.86) saturate(.9); }
+:root[data-skin="eleven"] .bv11 .tela-boasvindas__btn { border-radius: 8px; }
+:root[data-skin="eleven"] .bv11 .tela-boasvindas__conta { border-radius: 8px; }
+:root[data-skin="eleven"] .bv11 #btnTemaLogin { border-radius: 8px; }
+:root[data-skin="eleven"] .bv11 .tela-boasvindas__btn:focus-visible,
+:root[data-skin="eleven"] .bv11 .tela-boasvindas__conta:focus-visible { border-radius: 8px; }
+:root[data-skin="eleven"] .bv11__cartao { border-radius: 10px; }
+
+/* ---------- Margem do topo pequena e igual em todas as telas (18/11/2026, pedido do usuário) ----------
+   Vale nas duas skins. Antes: 24 px do painel + sobras de cada tela (Configurações chegava a 64 px, Gravador a 121 px).
+   Agora o conteúdo começa a --margem-topo (12 px) abaixo das abas. Telas que zeram o padding com !important continuam assim. */
+:root { --margem-topo: 12px; }
+.wb-pane-content { padding-top: var(--margem-topo); }
+/* hubs de cartões (Gravador, Transcrever...): dentro do painel não somam outra margem; o #tEntrada (painel sem padding) usa a padrão */
+.wb-cartoes.hub-pasta { padding-top: var(--margem-topo) !important; }
+.wb-pane-content > .wb-cartoes.hub-pasta { padding: 0 !important; }   /* o painel já dá a margem: não soma outra (topo nem lados) */
+/* Início (Hoje) */
+:root[data-skin="eleven"] .hoje { padding-top: 0; }
+/* Configurações: cabeçalho vazio deixava 20 px de margem; a linha de estado começa colada */
+:root[data-skin="eleven"] #configuracoes > .hero.hero--com-status { margin-bottom: 0; }
+:root[data-skin="eleven"] .cfs__estado { padding-top: 0; padding-bottom: 12px; margin-bottom: 16px; }
+
+/* ================= Login em papel e dourado (19/11/2026, referência do usuário) =================
+   Tudo centrado: marca e tema no topo, manchete com "estudar?" em itálico dourado, "medicina" com um traço dourado,
+   Entrar em areia e Criar conta só com fio, a ilustração pequena (ORGANIZADO / ACEITAR por cima do ERROR / CLOSE) e,
+   embaixo, a linha de arcos com "Constância". Cantos de 8 px (nada em pílula). O dourado é exclusivo desta tela. */
+:root[data-skin="eleven"] .tela-boasvindas {
+  --bv-ouro: #A9834A; --bv-areia: #EBD6AE; --bv-areia-hover: #E3C995; --bv-sobre-areia: #2A2216;
+  --bv-papel: #F8F5EF; --bv-papel-centro: #FFFEFB; --bv-sombra-areia: 0 8px 20px rgba(169, 131, 74, .28);
+  background: radial-gradient(ellipse 70% 62% at 50% 46%, var(--bv-papel-centro) 0%, var(--bv-papel) 70%, #F1ECE3 100%) !important;
+}
+@media (prefers-color-scheme: dark) { :root[data-skin="eleven"]:not([data-tema="claro"]) .tela-boasvindas {
+  --bv-ouro: #D4B27A; --bv-areia: #CDAE76; --bv-areia-hover: #D9BC86; --bv-sobre-areia: #1A150C;
+  --bv-papel: #14120F; --bv-papel-centro: #1E1B16; --bv-sombra-areia: 0 8px 22px rgba(0, 0, 0, .45); } }
+:root[data-skin="eleven"][data-tema="escuro"] .tela-boasvindas {
+  --bv-ouro: #D4B27A; --bv-areia: #CDAE76; --bv-areia-hover: #D9BC86; --bv-sobre-areia: #1A150C;
+  --bv-papel: #14120F; --bv-papel-centro: #1E1B16; --bv-sombra-areia: 0 8px 22px rgba(0, 0, 0, .45);
+  background: radial-gradient(ellipse 70% 62% at 50% 46%, var(--bv-papel-centro) 0%, var(--bv-papel) 72%, #0F0D0B 100%) !important;
+}
+:root[data-skin="eleven"] .bv11__topo { padding: 22px 32px 0; }
+:root[data-skin="eleven"] .bv11__marca { font: 400 18px/1 var(--fonte-ui); letter-spacing: -0.01em; }
+:root[data-skin="eleven"] .bv11 #btnTemaLogin { background: transparent; box-shadow: none; }
+:root[data-skin="eleven"] .bv11__hero { padding-top: clamp(4px, 2vh, 28px); }
+:root[data-skin="eleven"] .bv11__titulo { font-size: clamp(38px, min(5.6vw, 8.4vh), 78px); line-height: 1.04; letter-spacing: -0.02em; }
+/* "vamos" na cor da tinta; só "estudar?" (.bv11__ouro, posto pelo login_eleven.js) em itálico dourado */
+:root[data-skin="eleven"] .bv11__l2 { font-style: normal; letter-spacing: -0.02em; }
+:root[data-skin="eleven"] .bv11__ouro { font-style: italic; color: var(--bv-ouro); }
+:root[data-skin="eleven"] .bv11__sub { max-width: 480px; margin: clamp(10px, 1.8vh, 18px) auto clamp(16px, 2.6vh, 26px); font: 400 17px/26px var(--fonte-ui); color: color-mix(in srgb, var(--cor-tinta) 82%, transparent); }
+:root[data-skin="eleven"] .bv11__grifo { position: relative; display: inline-block; color: var(--bv-ouro); }
+:root[data-skin="eleven"] .bv11__grifo svg { position: absolute; left: -2%; right: -4%; bottom: -5px; width: 106%; height: 8px; overflow: visible; }
+:root[data-skin="eleven"] .bv11__grifo path { fill: none; stroke: var(--bv-ouro); stroke-width: 1.6; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+:root[data-skin="eleven"] .bv11__acoes { gap: 18px; }
+:root[data-skin="eleven"] .bv11 .tela-boasvindas__btn { height: 40px; min-width: 148px; justify-content: center; font-weight: 400; font-size: 15px; }
+:root[data-skin="eleven"] .bv11 .tela-boasvindas__btn--primario { background: var(--bv-areia); color: var(--bv-sobre-areia); box-shadow: var(--bv-sombra-areia); }
+:root[data-skin="eleven"] .bv11 .tela-boasvindas__btn--primario:hover { background: var(--bv-areia-hover); }
+:root[data-skin="eleven"] .bv11 .tela-boasvindas__btn--secundario { background: transparent; border: 1px solid color-mix(in srgb, var(--cor-tinta) 55%, transparent); box-shadow: none; }
+:root[data-skin="eleven"] .bv11 .tela-boasvindas__btn--secundario:hover { background: color-mix(in srgb, var(--cor-tinta) 5%, transparent); border-color: var(--cor-tinta); }
+:root[data-skin="eleven"] .bv11 .tela-boasvindas__btn:focus-visible { outline-color: var(--bv-ouro); }
+:root[data-skin="eleven"] .bv11__dica { margin-top: 12px; }
+:root[data-skin="eleven"] .bv11 .tela-boasvindas__tecla-enter { background: transparent !important; }
+/* cena: a ilustração (pequena, centrada) e a linha de arcos embaixo */
+:root[data-skin="eleven"] .bv11__cena { width: auto; display: flex; flex-direction: column; align-items: center; margin-top: clamp(4px, 1.5vh, 18px); padding-bottom: clamp(16px, 4vh, 44px); }
+:root[data-skin="eleven"] .bv11--arte .bv11__arte,
+:root[data-skin="eleven"][data-tema="escuro"] .bv11--arte .bv11__arte {
+  position: relative; left: auto; top: auto; bottom: auto; transform: none; flex: 1 1 0; min-height: 120px; max-height: 380px; height: auto; width: auto;
+  container-type: size; margin: -2% 0 -3%;
+  -webkit-mask-image: radial-gradient(ellipse 46% 44% at 50% 52%, #000 62%, transparent 100%);
+          mask-image: radial-gradient(ellipse 46% 44% at 50% 52%, #000 62%, transparent 100%);
+}
+/* ORGANIZADO / ACEITAR por cima do ERROR / CLOSE (19/11/2026): UM quadro só cobre o título e o botão da imagem
+   (x 404-668, y 646-800 da imagem 1024 x 1536) e desenha os dois empilhados, então nunca se cobrem, mesmo quando a
+   letra fica no tamanho mínimo do navegador (antes eram duas tampas e o ACEITAR cobria o ORGANIZADO em telas baixas).
+   O botão desenhado ocupa o lugar do CLOSE (x 413-655, y 720-792), onde o cursor animado clica. */
+.bv11__arte-dialogo { position: absolute; left: 39.45%; top: 42.06%; width: 25.78%; height: 10.03%; background: #E8DEDC;
+  box-shadow: 0 0 5px 3px #E8DEDC; pointer-events: none; font-family: var(--fonte-ui); white-space: nowrap; }
+.bv11__arte-dialogo b { position: absolute; left: 0; right: 0; top: 4%; height: 40%; display: grid; place-items: center; overflow: hidden;
+  font-weight: 600; font-size: 3.1cqw; line-height: 1; letter-spacing: .02em; color: #2E2A28; }
+.bv11__arte-dialogo span { position: absolute; left: 3.41%; top: 48.05%; width: 91.67%; height: 46.75%; box-sizing: border-box;
+  display: grid; place-items: center; overflow: hidden; border: max(1px, .15cqw) solid #8E8282; border-radius: .9cqw;
+  font-size: 2.9cqw; line-height: 1; letter-spacing: .03em; color: #8E8784; }
+:root[data-skin="eleven"] .bv11__constancia { flex: none; display: flex; flex-direction: column; align-items: center; gap: 6px; color: var(--bv-ouro); }
+:root[data-skin="eleven"] .bv11__constancia svg { width: clamp(180px, 22vw, 240px); height: auto; overflow: visible; }
+:root[data-skin="eleven"] .bv11__constancia path { fill: none; stroke: color-mix(in srgb, var(--cor-tinta) 55%, transparent); stroke-width: 1.2; }
+:root[data-skin="eleven"] .bv11__constancia circle { fill: var(--bv-ouro); }
+:root[data-skin="eleven"] .bv11__constancia span { font: italic 400 22px/1.2 var(--fonte-leitura); letter-spacing: -0.01em; color: color-mix(in srgb, var(--cor-tinta) 80%, transparent); }
+/* a IA do app fica discreta no canto de baixo à esquerda */
+:root[data-skin="eleven"] .bv11__rodape-esq { left: 32px; bottom: 24px; width: 220px; opacity: .85; }
+:root[data-skin="eleven"] .bv11 .tela-boasvindas__contas { border-top-color: color-mix(in srgb, var(--cor-tinta) 12%, transparent); }
+:root[data-skin="eleven"] .bv11 .tela-boasvindas__conta { background: transparent; }
+/* sem oval (19/11/2026): a ilustração agora é recortada (base_recorte.webp: papel de fundo transparente, a sombra das
+   flores virou sombra translúcida), então fica solta no fundo da tela nos dois temas, sem máscara nem filtro */
+:root[data-skin="eleven"] .bv11--arte .bv11__arte,
+:root[data-skin="eleven"][data-tema="escuro"] .bv11--arte .bv11__arte { -webkit-mask-image: none; mask-image: none; filter: none; }
+/* Constância animada (19/11/2026): a bolinha dourada pula de arco em arco e cada arco fica dourado quando ela passa */
+:root[data-skin="eleven"] .bv11__constancia .bv11__arco { stroke: var(--bv-ouro); stroke-width: 1.6; stroke-dasharray: 1; stroke-dashoffset: 1; stroke-linecap: round; }
+:root[data-skin="eleven"] .bv11__constancia .bv11__bola { fill: var(--bv-ouro); filter: drop-shadow(0 0 3px color-mix(in srgb, var(--bv-ouro) 70%, transparent)); }
+/* ilustração (rosto e pastas) 20% maior (19/11/2026, pedido do usuário): 380 -> 456 px, menos folga em volta */
+:root[data-skin="eleven"] .bv11--arte .bv11__arte,
+:root[data-skin="eleven"][data-tema="escuro"] .bv11--arte .bv11__arte { min-height: 144px; max-height: 456px; margin: clamp(-48px, -5vh, -16px) 0 -8px; max-width: 90vw; }
+/* a largura da ilustração vinha presa à da linha Constância (240 px) e ela ficava achatada; agora segue a proporção */
+:root[data-skin="eleven"] .bv11__cena { padding-bottom: clamp(10px, 2.5vh, 32px); }
+@media (max-height: 640px) { :root[data-skin="eleven"] .bv11__constancia span { font-size: 18px; } :root[data-skin="eleven"] .bv11__dica { display: none; } }
