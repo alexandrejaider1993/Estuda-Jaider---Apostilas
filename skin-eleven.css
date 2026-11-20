@@ -1006,7 +1006,7 @@
   top: var(--header-altura) !important; left: var(--largura-lateral) !important; right: 10px !important; bottom: 10px !important;
   width: calc(100vw - var(--largura-lateral) - 10px) !important; height: calc(100vh - var(--header-altura) - 10px) !important;
   border-radius: 16px !important; border: 1px solid var(--cor-fio) !important; border-top: 1px solid var(--cor-fio) !important;
-  background: var(--cor-superficie) !important; box-shadow: 0 1px 2px rgba(0, 0, 0, .04), 0 8px 24px rgba(0, 0, 0, .04) !important; overflow: hidden !important;
+  background: var(--cor-superficie) !important; box-shadow: 0 1px 2px rgba(0, 0, 0, .04), 0 8px 24px rgba(0, 0, 0, .04) !important; overflow-y: auto !important; overflow-x: hidden !important; -webkit-overflow-scrolling: touch;
 }
 :root[data-skin="eleven"][data-painel-dir="aberto"] .app-workspace-shell {
   right: var(--largura-painel-dir) !important;
@@ -1252,6 +1252,24 @@
 /* a largura da ilustração vinha presa à da linha Constância (240 px) e ela ficava achatada; agora segue a proporção */
 :root[data-skin="eleven"] .bv11__cena { padding-bottom: clamp(10px, 2.5vh, 32px); }
 @media (max-height: 640px) { :root[data-skin="eleven"] .bv11__constancia span { font-size: 18px; } :root[data-skin="eleven"] .bv11__dica { display: none; } }
+html[data-dispositivo="celular"]:root[data-skin="eleven"] .tela-boasvindas { overflow-y: auto !important; -webkit-overflow-scrolling: touch; }
+html[data-dispositivo="celular"]:root[data-skin="eleven"] .bv11 { height: auto; min-height: 100%; overflow: visible; }
+html[data-dispositivo="celular"]:root[data-skin="eleven"] .app-workspace-shell {
+  top: calc(var(--header-altura) + env(safe-area-inset-top)) !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  height: calc(100vh - var(--header-altura) - env(safe-area-inset-top)) !important;
+  height: calc(100dvh - var(--header-altura) - env(safe-area-inset-top)) !important;
+  border-radius: 14px 14px 0 0 !important;
+  border-left: 0 !important;
+  border-right: 0 !important;
+  border-bottom: 0 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch;
+}
 html[data-dispositivo="celular"]:root[data-skin="eleven"] .bv11__topo { padding: calc(14px + env(safe-area-inset-top)) 16px 0; }
 html[data-dispositivo="celular"]:root[data-skin="eleven"] .bv11__hero { padding: 12px 16px 0; }
 html[data-dispositivo="celular"]:root[data-skin="eleven"] .bv11__sub { font-size: 15px; line-height: 22px; padding: 0 8px; }
