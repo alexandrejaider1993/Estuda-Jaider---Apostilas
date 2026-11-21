@@ -1446,7 +1446,7 @@
     },
     {
       "pasta": "Beta lactâmicos e Glicopeptídeos",
-      "titulo": "β-lactâmicos e glicopeptídeos | Estuda Jaider",
+      "titulo": "β-lactâmicos e glicopeptídeos",
       "subtitulo": "",
       "disciplina": "",
       "periodo": "",
@@ -1456,272 +1456,173 @@
       "contagem": {},
       "url": "/interativos/Beta lactâmicos e Glicopeptídeos/index.html",
       "capa": "",
-      "modificado": 1795297979,
-      "chave_local": "farmacoterapia-betalactamicos-glicopeptideos-v63",
+      "modificado": 1795300005,
+      "chave_local": "beta-lactamicos-glicopeptideos",
       "conceitos": [
         {
-          "id": "parede",
-          "nome": "Peptidoglicano e parede"
+          "id": "parede-bactericida",
+          "nome": "Inibição da parede e ação bactericida"
         },
         {
-          "id": "pbp",
-          "nome": "PBP e transpeptidação"
+          "id": "pbp-transpeptidacao",
+          "nome": "PBPs e transpeptidação"
         },
         {
-          "id": "alvo",
-          "nome": "Inibição da parede"
+          "id": "anel-beta-resistencia",
+          "nome": "Anel β-lactâmico, alergia cruzada e β-lactamases"
         },
         {
-          "id": "pen-natural",
-          "nome": "Penicilinas tradicionais"
+          "id": "penicilinas-subclasses",
+          "nome": "Classificação e espectro das penicilinas"
         },
         {
-          "id": "amino",
-          "nome": "Aminopenicilinas"
+          "id": "oxacilina-mrsa",
+          "nome": "Oxacilina e alerta de MRSA"
         },
         {
-          "id": "oxa",
-          "nome": "Oxacilina"
+          "id": "penicilinas-pk-interacoes",
+          "nome": "Farmacocinética, efeitos adversos e interações das penicilinas"
         },
         {
-          "id": "pipera",
-          "nome": "Ureidopenicilinas"
+          "id": "cefalosporinas-geracoes",
+          "nome": "Mudança de espectro da 1ª à 5ª geração"
         },
         {
-          "id": "blactamase",
-          "nome": "β-lactamases"
+          "id": "cefalosporinas-bhe-pk",
+          "nome": "Passagem pela BHE, eliminação biliar e toxicidade"
         },
         {
-          "id": "inibidores",
-          "nome": "Inibidores de β-lactamase"
+          "id": "inibidores-bl",
+          "nome": "Associações com inibidores de β-lactamases"
         },
         {
-          "id": "cef1",
-          "nome": "Primeira geração"
+          "id": "monobactamicos",
+          "nome": "Monobactâmicos (Aztreonam)"
         },
         {
-          "id": "cef23",
-          "nome": "Segunda e terceira gerações"
+          "id": "carbapenemicos-kpc",
+          "nome": "Carbapenêmicos, cilastatina e resistência por KPC"
         },
         {
-          "id": "cef45",
-          "nome": "Quarta e quinta gerações"
+          "id": "glicopeptideos-mecanismo",
+          "nome": "Mecanismo, espectro e ausência de resistência cruzada"
         },
         {
-          "id": "carba",
-          "nome": "Carbapenêmicos"
+          "id": "vanco-vs-teico",
+          "nome": "Vancomicina versus Teicoplanina e outros polipeptídeos"
         },
         {
-          "id": "cila",
-          "nome": "Cilastatina"
+          "id": "pescoco-vermelho",
+          "nome": "Síndrome do Pescoço Vermelho e infusão lenta"
         },
         {
-          "id": "aztre",
-          "nome": "Monobactâmico aztreonam"
-        },
-        {
-          "id": "glico",
-          "nome": "Glicopeptídeos"
-        },
-        {
-          "id": "vanco",
-          "nome": "Vancomicina"
-        },
-        {
-          "id": "teico",
-          "nome": "Teicoplanina"
-        },
-        {
-          "id": "alergia",
-          "nome": "Hipersensibilidade a β-lactâmicos"
-        },
-        {
-          "id": "toxi",
-          "nome": "Toxicidade por associações"
-        },
-        {
-          "id": "infusao",
-          "nome": "Reação relacionada à infusão de vancomicina"
-        },
-        {
-          "id": "resistencia",
-          "nome": "Mecanismos de resistência"
-        },
-        {
-          "id": "escolha",
-          "nome": "Seleção racional"
-        },
-        {
-          "id": "quadro",
-          "nome": "Interpretação do caso"
+          "id": "vanco-toxicidade-interacoes",
+          "nome": "Ototoxicidade, nefrotoxicidade e interação com aminoglicosídeos"
         }
       ],
       "testes": [
         {
           "id": "t1",
-          "conceito": "pbp",
+          "conceito": "pbp-transpeptidacao",
           "nivel": 1,
           "correta": 0,
           "n_alt": 4
         },
         {
           "id": "t2",
-          "conceito": "alvo",
-          "nivel": 2,
+          "conceito": "parede-bactericida",
+          "nivel": 1,
           "correta": 0,
           "n_alt": 4
         },
         {
           "id": "t3",
-          "conceito": "alvo",
-          "nivel": 3,
+          "conceito": "anel-beta-resistencia",
+          "nivel": 2,
           "correta": 0,
           "n_alt": 4
         },
         {
           "id": "t4",
-          "conceito": "amino",
+          "conceito": "penicilinas-subclasses",
           "nivel": 1,
           "correta": 0,
           "n_alt": 4
         },
         {
           "id": "t5",
-          "conceito": "pipera",
+          "conceito": "oxacilina-mrsa",
           "nivel": 2,
           "correta": 0,
           "n_alt": 4
         },
         {
           "id": "t6",
-          "conceito": "oxa",
+          "conceito": "penicilinas-pk-interacoes",
           "nivel": 3,
           "correta": 0,
           "n_alt": 4
         },
         {
           "id": "t7",
-          "conceito": "blactamase",
+          "conceito": "cefalosporinas-geracoes",
           "nivel": 1,
           "correta": 0,
           "n_alt": 4
         },
         {
           "id": "t8",
-          "conceito": "inibidores",
+          "conceito": "cefalosporinas-bhe-pk",
           "nivel": 2,
           "correta": 0,
           "n_alt": 4
         },
         {
           "id": "t9",
-          "conceito": "blactamase",
-          "nivel": 3,
-          "correta": 0,
-          "n_alt": 4
-        },
-        {
-          "id": "t10",
-          "conceito": "cef1",
+          "conceito": "inibidores-bl",
           "nivel": 1,
           "correta": 0,
           "n_alt": 4
         },
         {
+          "id": "t10",
+          "conceito": "monobactamicos",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
           "id": "t11",
-          "conceito": "cef23",
+          "conceito": "carbapenemicos-kpc",
           "nivel": 2,
           "correta": 0,
           "n_alt": 4
         },
         {
           "id": "t12",
-          "conceito": "cef45",
-          "nivel": 3,
+          "conceito": "glicopeptideos-mecanismo",
+          "nivel": 1,
           "correta": 0,
           "n_alt": 4
         },
         {
           "id": "t13",
-          "conceito": "aztre",
-          "nivel": 1,
+          "conceito": "vanco-vs-teico",
+          "nivel": 2,
           "correta": 0,
           "n_alt": 4
         },
         {
           "id": "t14",
-          "conceito": "cila",
-          "nivel": 2,
+          "conceito": "pescoco-vermelho",
+          "nivel": 1,
           "correta": 0,
           "n_alt": 4
         },
         {
           "id": "t15",
-          "conceito": "carba",
-          "nivel": 3,
-          "correta": 0,
-          "n_alt": 4
-        },
-        {
-          "id": "t16",
-          "conceito": "glico",
-          "nivel": 1,
-          "correta": 0,
-          "n_alt": 4
-        },
-        {
-          "id": "t17",
-          "conceito": "vanco",
+          "conceito": "vanco-toxicidade-interacoes",
           "nivel": 2,
-          "correta": 0,
-          "n_alt": 4
-        },
-        {
-          "id": "t18",
-          "conceito": "vanco",
-          "nivel": 3,
-          "correta": 0,
-          "n_alt": 4
-        },
-        {
-          "id": "t19",
-          "conceito": "alergia",
-          "nivel": 1,
-          "correta": 0,
-          "n_alt": 4
-        },
-        {
-          "id": "t20",
-          "conceito": "toxi",
-          "nivel": 2,
-          "correta": 0,
-          "n_alt": 4
-        },
-        {
-          "id": "t21",
-          "conceito": "infusao",
-          "nivel": 3,
-          "correta": 0,
-          "n_alt": 4
-        },
-        {
-          "id": "t22",
-          "conceito": "resistencia",
-          "nivel": 1,
-          "correta": 0,
-          "n_alt": 4
-        },
-        {
-          "id": "t23",
-          "conceito": "escolha",
-          "nivel": 2,
-          "correta": 0,
-          "n_alt": 4
-        },
-        {
-          "id": "t24",
-          "conceito": "quadro",
-          "nivel": 3,
           "correta": 0,
           "n_alt": 4
         }
