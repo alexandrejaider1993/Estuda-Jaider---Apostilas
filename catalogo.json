@@ -628,8 +628,8 @@
       ]
     },
     {
-      "pasta": "Antimicrobianos_Volume_1",
-      "titulo": "Antimicrobianos · Volume 1 | Estuda Jaider",
+      "pasta": "antimicrobianos-1b",
+      "titulo": "Antimicrobianos 1B",
       "subtitulo": "",
       "disciplina": "",
       "periodo": "",
@@ -637,208 +637,808 @@
       "data_aula": "",
       "capitulos": [],
       "contagem": {},
-      "url": "/interativos/Antimicrobianos_Volume_1/index.html",
+      "url": "/interativos/antimicrobianos-1b/index.html",
       "capa": "",
-      "modificado": 1795277218,
-      "chave_local": "estuda-jaider-antimicrobianos-v1",
+      "modificado": 1795280962,
+      "chave_local": "farmaco-antimicrobianos-1b",
       "conceitos": [
         {
-          "id": "b11-conceito",
-          "nome": "Espectro, agente provável e local da infecção"
+          "id": "escada-gn",
+          "nome": "Escada do Gram-negativo"
         },
         {
-          "id": "b12-conceito",
-          "nome": "Origem da infecção e exposição prévia"
+          "id": "escada-gp",
+          "nome": "Escada do Gram-positivo"
         },
         {
-          "id": "b13-conceito",
-          "nome": "Exposição, CIM e dose de ataque"
+          "id": "preservar",
+          "nome": "Preservar os fármacos de reserva"
         },
         {
-          "id": "b14-conceito",
-          "nome": "Dispensação, adesão e reavaliação"
+          "id": "mapa-alvos",
+          "nome": "Famílias por alvo"
         },
         {
-          "id": "b15-conceito",
-          "nome": "Associações, sinergismo e profilaxia"
+          "id": "subunidade",
+          "nome": "Subunidades 30S e 50S"
         },
         {
-          "id": "b16-conceito",
-          "nome": "Segurança e características do paciente"
+          "id": "mesmo-alvo",
+          "nome": "Não associar no mesmo alvo"
         },
         {
-          "id": "b21-conceito",
-          "nome": "Antimicrobiano, antibiótico, antissepsia e desinfecção"
+          "id": "alergia-bl",
+          "nome": "Alergia a beta-lactâmico"
         },
         {
-          "id": "b22-conceito",
-          "nome": "Efeito bactericida e bacteriostático"
+          "id": "alergia-evento",
+          "nome": "Alergia ou evento adverso"
         },
         {
-          "id": "b23-conceito",
-          "nome": "História e expansão das famílias"
+          "id": "conc-periferica",
+          "nome": "Concentração na veia periférica"
         },
         {
-          "id": "b24-conceito",
-          "nome": "Famílias definidas pela estrutura química"
+          "id": "flebite",
+          "nome": "Flebite"
         },
         {
-          "id": "b25-conceito",
-          "nome": "Organizar por espectro, origem, efeito e alvo"
+          "id": "efeito-caracteristico",
+          "nome": "Efeito adverso característico"
         },
         {
-          "id": "b26-conceito",
-          "nome": "Eficácia, microbioma e custos"
+          "id": "colite",
+          "nome": "Colite pseudomembranosa"
         },
         {
-          "id": "b31-conceito",
-          "nome": "Resistência natural e adquirida"
+          "id": "efeito-local",
+          "nome": "Efeito local sem absorção"
         },
         {
-          "id": "b32-conceito",
-          "nome": "Quatro mecanismos de resistência"
+          "id": "it-alto",
+          "nome": "Índice terapêutico alto"
         },
         {
-          "id": "b33-conceito",
-          "nome": "Escolha racional e reavaliação"
+          "id": "it-baixo",
+          "nome": "Índice terapêutico baixo"
         },
         {
-          "id": "b34-conceito",
-          "nome": "Dose, via e duração"
+          "id": "bebe-cinzento",
+          "nome": "Síndrome do bebê cinzento"
         },
         {
-          "id": "b35-conceito",
-          "nome": "Gram-positivos, Gram-negativos e acesso ao alvo"
+          "id": "kernicterus",
+          "nome": "Sulfa e kernicterus"
         },
         {
-          "id": "b36-conceito",
-          "nome": "Preservar antimicrobianos e interpretar evidências"
+          "id": "ossos-ouvido",
+          "nome": "Ototoxicidade e dentes"
+        },
+        {
+          "id": "ajuste-renal",
+          "nome": "Ajuste na insuficiência renal"
+        },
+        {
+          "id": "ajuste-hepatico",
+          "nome": "Ajuste na insuficiência hepática"
+        },
+        {
+          "id": "g6pd",
+          "nome": "Deficiência de G6PD"
+        },
+        {
+          "id": "categorias",
+          "nome": "Categorias de risco na gestação"
+        },
+        {
+          "id": "gestante-bl",
+          "nome": "Antimicrobiano na gestante"
+        },
+        {
+          "id": "fatores-locais",
+          "nome": "Fatores locais"
+        },
+        {
+          "id": "sinergismo",
+          "nome": "Sinergismo de potenciação"
+        },
+        {
+          "id": "principio-principal",
+          "nome": "Dose pelo princípio ativo principal"
+        },
+        {
+          "id": "assoc-motivos",
+          "nome": "Motivos para associar"
+        },
+        {
+          "id": "assoc-proibida",
+          "nome": "Associações que não se fazem"
+        },
+        {
+          "id": "metronidazol",
+          "nome": "Metronidazol"
+        },
+        {
+          "id": "profilaxia-especifica",
+          "nome": "Profilaxia de microrganismos específicos"
+        },
+        {
+          "id": "profilaxia-risco",
+          "nome": "Profilaxia em situações de alto risco"
+        },
+        {
+          "id": "duracao-nivel",
+          "nome": "Duração e nível plasmático"
+        },
+        {
+          "id": "alcool-indutor",
+          "nome": "Álcool como indutor enzimático"
+        },
+        {
+          "id": "dissulfiram",
+          "nome": "Efeito dissulfiram"
         }
       ],
       "testes": [
         {
           "id": "t1",
-          "conceito": "b11-conceito",
+          "conceito": "escada-gn",
           "nivel": 1,
           "correta": 0,
           "n_alt": 4
         },
         {
           "id": "t2",
-          "conceito": "b12-conceito",
+          "conceito": "escada-gp",
           "nivel": 2,
           "correta": 0,
           "n_alt": 4
         },
         {
           "id": "t3",
-          "conceito": "b13-conceito",
-          "nivel": 2,
+          "conceito": "preservar",
+          "nivel": 3,
           "correta": 0,
           "n_alt": 4
         },
         {
           "id": "t4",
-          "conceito": "b14-conceito",
+          "conceito": "subunidade",
           "nivel": 1,
           "correta": 0,
           "n_alt": 4
         },
         {
           "id": "t5",
-          "conceito": "b15-conceito",
+          "conceito": "mesmo-alvo",
           "nivel": 2,
           "correta": 0,
           "n_alt": 4
         },
         {
           "id": "t6",
-          "conceito": "b16-conceito",
-          "nivel": 2,
-          "correta": 0,
-          "n_alt": 4
-        },
-        {
-          "id": "t7",
-          "conceito": "b21-conceito",
+          "conceito": "mapa-alvos",
           "nivel": 1,
           "correta": 0,
           "n_alt": 4
         },
         {
+          "id": "t7",
+          "conceito": "alergia-bl",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
           "id": "t8",
-          "conceito": "b22-conceito",
+          "conceito": "alergia-evento",
           "nivel": 2,
           "correta": 0,
           "n_alt": 4
         },
         {
           "id": "t9",
-          "conceito": "b23-conceito",
-          "nivel": 2,
+          "conceito": "alergia-bl",
+          "nivel": 3,
           "correta": 0,
           "n_alt": 4
         },
         {
           "id": "t10",
-          "conceito": "b24-conceito",
+          "conceito": "conc-periferica",
           "nivel": 1,
           "correta": 0,
           "n_alt": 4
         },
         {
           "id": "t11",
-          "conceito": "b25-conceito",
+          "conceito": "flebite",
           "nivel": 2,
           "correta": 0,
           "n_alt": 4
         },
         {
           "id": "t12",
-          "conceito": "b26-conceito",
-          "nivel": 2,
-          "correta": 0,
-          "n_alt": 4
-        },
-        {
-          "id": "t13",
-          "conceito": "b31-conceito",
+          "conceito": "colite",
           "nivel": 1,
           "correta": 0,
           "n_alt": 4
         },
         {
+          "id": "t13",
+          "conceito": "efeito-local",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
           "id": "t14",
-          "conceito": "b32-conceito",
+          "conceito": "efeito-caracteristico",
           "nivel": 2,
           "correta": 0,
           "n_alt": 4
         },
         {
           "id": "t15",
-          "conceito": "b33-conceito",
-          "nivel": 2,
+          "conceito": "efeito-caracteristico",
+          "nivel": 3,
           "correta": 0,
           "n_alt": 4
         },
         {
           "id": "t16",
-          "conceito": "b34-conceito",
+          "conceito": "it-alto",
           "nivel": 1,
           "correta": 0,
           "n_alt": 4
         },
         {
           "id": "t17",
-          "conceito": "b35-conceito",
+          "conceito": "it-baixo",
           "nivel": 2,
           "correta": 0,
           "n_alt": 4
         },
         {
           "id": "t18",
-          "conceito": "b36-conceito",
+          "conceito": "it-baixo",
+          "nivel": 3,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t19",
+          "conceito": "kernicterus",
           "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t20",
+          "conceito": "bebe-cinzento",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t21",
+          "conceito": "ossos-ouvido",
+          "nivel": 3,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t22",
+          "conceito": "ajuste-renal",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t23",
+          "conceito": "g6pd",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t24",
+          "conceito": "ajuste-hepatico",
+          "nivel": 3,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t25",
+          "conceito": "categorias",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t26",
+          "conceito": "gestante-bl",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t27",
+          "conceito": "gestante-bl",
+          "nivel": 3,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t28",
+          "conceito": "fatores-locais",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t29",
+          "conceito": "fatores-locais",
+          "nivel": 3,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t30",
+          "conceito": "sinergismo",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t31",
+          "conceito": "principio-principal",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t32",
+          "conceito": "assoc-proibida",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t33",
+          "conceito": "assoc-motivos",
+          "nivel": 3,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t34",
+          "conceito": "metronidazol",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t35",
+          "conceito": "profilaxia-especifica",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t36",
+          "conceito": "profilaxia-risco",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t37",
+          "conceito": "profilaxia-risco",
+          "nivel": 3,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t38",
+          "conceito": "dissulfiram",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t39",
+          "conceito": "alcool-indutor",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t40",
+          "conceito": "duracao-nivel",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        }
+      ]
+    },
+    {
+      "pasta": "antimicrobianos-1c",
+      "titulo": "Antimicrobianos 1C",
+      "subtitulo": "",
+      "disciplina": "",
+      "periodo": "",
+      "prova": "",
+      "data_aula": "",
+      "capitulos": [],
+      "contagem": {},
+      "url": "/interativos/antimicrobianos-1c/index.html",
+      "capa": "",
+      "modificado": 1795178266,
+      "chave_local": "farmaco-antimicrobianos-1c",
+      "conceitos": [
+        {
+          "id": "via-folato",
+          "nome": "Via do folato bacteriana"
+        },
+        {
+          "id": "sulfa-dhps",
+          "nome": "Alvo da sulfa"
+        },
+        {
+          "id": "alvos-comparados",
+          "nome": "Folato entre os alvos"
+        },
+        {
+          "id": "trimetoprima-dhfr",
+          "nome": "Alvo da trimetoprima"
+        },
+        {
+          "id": "sinergismo-sequencial",
+          "nome": "Bloqueio sequencial e sinergismo"
+        },
+        {
+          "id": "cotrimoxazol",
+          "nome": "Cotrimoxazol"
+        },
+        {
+          "id": "espectro-sulfa",
+          "nome": "Espectro da sulfa"
+        },
+        {
+          "id": "resistencia-sulfa",
+          "nome": "Resistência à sulfa"
+        },
+        {
+          "id": "hipersens-pele",
+          "nome": "Reações de pele leves"
+        },
+        {
+          "id": "sjs-net",
+          "nome": "Stevens-Johnson e necrólise"
+        },
+        {
+          "id": "efeito-caracteristico",
+          "nome": "Efeito adverso característico"
+        },
+        {
+          "id": "cristaluria",
+          "nome": "Cristalúria e dor articular"
+        },
+        {
+          "id": "sangue-folato",
+          "nome": "Anemia pela sulfa"
+        },
+        {
+          "id": "kernicterus-revisao",
+          "nome": "Kernicterus"
+        },
+        {
+          "id": "meia-vida-seguranca",
+          "nome": "Meia-vida e segurança"
+        },
+        {
+          "id": "formas-sulfa",
+          "nome": "Vias e formas das sulfas"
+        },
+        {
+          "id": "indicacao-principal",
+          "nome": "Onde a sulfa é lembrada primeiro"
+        },
+        {
+          "id": "indicacao-alternativa",
+          "nome": "Onde a sulfa é alternativa"
+        },
+        {
+          "id": "legionella-fonte",
+          "nome": "De onde vem a Legionella"
+        },
+        {
+          "id": "legionella-trat",
+          "nome": "Tratar a legionelose"
+        },
+        {
+          "id": "pneumocystis-prof",
+          "nome": "Profilaxia do Pneumocystis"
+        },
+        {
+          "id": "toxo-trat",
+          "nome": "Toxoplasmose"
+        },
+        {
+          "id": "interacao-nefro",
+          "nome": "Somar nefrotoxicidade"
+        },
+        {
+          "id": "interacao-cyp",
+          "nome": "Inibição de CYP2C8 e CYP2C9"
+        },
+        {
+          "id": "interacao-albumina",
+          "nome": "Deslocamento da albumina"
+        },
+        {
+          "id": "checklist-sulfa",
+          "nome": "Conferência antes da sulfa"
+        }
+      ],
+      "testes": [
+        {
+          "id": "t1",
+          "conceito": "sulfa-dhps",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t2",
+          "conceito": "via-folato",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t3",
+          "conceito": "sulfa-dhps",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t4",
+          "conceito": "alvos-comparados",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t5",
+          "conceito": "trimetoprima-dhfr",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t6",
+          "conceito": "sinergismo-sequencial",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t7",
+          "conceito": "trimetoprima-dhfr",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t8",
+          "conceito": "cotrimoxazol",
+          "nivel": 3,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t9",
+          "conceito": "espectro-sulfa",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t10",
+          "conceito": "resistencia-sulfa",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t11",
+          "conceito": "espectro-sulfa",
+          "nivel": 3,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t12",
+          "conceito": "sjs-net",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t13",
+          "conceito": "sjs-net",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t14",
+          "conceito": "hipersens-pele",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t15",
+          "conceito": "efeito-caracteristico",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t16",
+          "conceito": "cristaluria",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t17",
+          "conceito": "sangue-folato",
+          "nivel": 3,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t18",
+          "conceito": "kernicterus-revisao",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t19",
+          "conceito": "meia-vida-seguranca",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t20",
+          "conceito": "meia-vida-seguranca",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t21",
+          "conceito": "formas-sulfa",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t22",
+          "conceito": "indicacao-principal",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t23",
+          "conceito": "indicacao-alternativa",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t24",
+          "conceito": "indicacao-principal",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t25",
+          "conceito": "legionella-fonte",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t26",
+          "conceito": "legionella-trat",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t27",
+          "conceito": "legionella-trat",
+          "nivel": 3,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t28",
+          "conceito": "pneumocystis-prof",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t29",
+          "conceito": "toxo-trat",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t30",
+          "conceito": "toxo-trat",
+          "nivel": 3,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t31",
+          "conceito": "interacao-cyp",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t32",
+          "conceito": "interacao-albumina",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t33",
+          "conceito": "interacao-cyp",
+          "nivel": 3,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t34",
+          "conceito": "interacao-nefro",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t35",
+          "conceito": "checklist-sulfa",
+          "nivel": 3,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t36",
+          "conceito": "checklist-sulfa",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t37",
+          "conceito": "checklist-sulfa",
+          "nivel": 1,
           "correta": 0,
           "n_alt": 4
         }
