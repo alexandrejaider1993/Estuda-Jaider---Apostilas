@@ -58,7 +58,7 @@
     document.documentElement.dataset.admin = "1";
   }
 
-  let catalogo = { apostilas: [], organizacao_padrao: { pastas: {}, apostilas: {} }, aparencia_padrao: {} };
+  let catalogo = { apostilas: [], organizacao_padrao: { pastas: {}, apostilas: {} }, aparencia_padrao: {}, titulos_padrao: {} };
   let indiceBusca = {};
   let prontoPromise = null;
   let dirProjetoHandle = null; // FileSystemDirectoryHandle da pasta Apostilas-Vercel no PC do Admin
@@ -71,6 +71,7 @@
     organizacao: null,      // { pastas: {...}, apostilas: {...} }
     aparencia: {},          // { "apost:id": { cor, capa, atualizado_em } }
     capas_custom: {},       // { "hash.gif": "data:image/gif;base64,..." }
+    titulos: {},            // { pasta: "Novo título" }
     progresso: {},          // { pasta: { atualizado_em, texto } }
     posicao: {},            // { pasta: { atualizado_em, hash, titulo, pct, y } }
     anotacoes: {},          // { pasta: { atualizado_em, itens: { id: {...} } } }
@@ -330,10 +331,18 @@
     metas.sort((a, b) => String(b.data_aula || "").localeCompare(String(a.data_aula || "")));
 
     const orgLimpa = lerOrganizacaoLimpa();
+    const titulosLimpos = {};
+    const pastasAtivas = new Set(metas.map(m => m.pasta));
+    for (const [k, v] of Object.entries(estado.titulos || {})) {
+      if (pastasAtivas.has(k) && typeof v === "string" && v.trim()) {
+        titulosLimpos[k] = v.trim();
+      }
+    }
     const novoCatalogo = {
       apostilas: metas,
       organizacao_padrao: orgLimpa,
       aparencia_padrao: aparenciaLimpa,
+      titulos_padrao: titulosLimpos,
     };
 
     const novoIndice = Object.assign({}, indiceBusca);
@@ -346,6 +355,11 @@
         titulo: (imp.ficha && imp.ficha.titulo) || pasta,
         secoes: imp.secoes || [],
       };
+    }
+    for (const m of metas) {
+      if (novoIndice[m.pasta]) {
+        novoIndice[m.pasta].titulo = m.titulo;
+      }
     }
     for (const exc of Object.keys(estado.excluidas || {})) {
       delete novoIndice[exc];
@@ -477,6 +491,17 @@
           }
         }
       }
+      if (!estado.titulos || typeof estado.titulos !== "object") estado.titulos = {};
+      const temTitulosAdminSalvos = (Number(estado.org_em) || 0) > 0 && Object.keys(estado.titulos).length > 0;
+      if (!temTitulosAdminSalvos && !ehAdmin()) {
+        estado.titulos = JSON.parse(JSON.stringify(catalogo.titulos_padrao || {}));
+      } else {
+        for (const [k, v] of Object.entries(catalogo.titulos_padrao || {})) {
+          if (!(k in estado.titulos)) {
+            estado.titulos[k] = v;
+          }
+        }
+      }
       sincronizarChavesLocaisComEstado();
       salvarEstadoLocal(false);
       await tentarRestaurarPastaProjeto();
@@ -569,16 +594,20 @@
   // ------------------------------------------------------------------ Listagem, Pastas e Busca
   function listarMetadadosApostilas() {
     const mapa = new Map();
+    const tituloCustom = (pasta, padrao) => {
+      const t = estado.titulos && estado.titulos[pasta];
+      return (typeof t === "string" && t.trim()) ? t.trim() : padrao;
+    };
     for (const a of (catalogo.apostilas || [])) {
       if (estado.excluidas && estado.excluidas[a.pasta]) continue;
-      mapa.set(a.pasta, a);
+      mapa.set(a.pasta, Object.assign({}, a, { titulo: tituloCustom(a.pasta, a.titulo) }));
     }
     for (const [pasta, imp] of Object.entries(apostilasImportadas)) {
       if (estado.excluidas && estado.excluidas[pasta]) continue;
       const f = imp.ficha || {};
       mapa.set(pasta, {
         pasta,
-        titulo: f.titulo || pasta,
+        titulo: tituloCustom(pasta, f.titulo || pasta),
         subtitulo: f.subtitulo || "",
         disciplina: f.disciplina || "",
         periodo: f.periodo || "",
@@ -945,7 +974,7 @@
     }
 
     // 5. Rotas de uma apostila específica: /api/interativos/<pasta>/<acao>
-    const mAp = /^\/api\/interativos\/([^/]+)\/(progresso|posicao|anotacoes|dominio|recomecar|excluir)$/.exec(path);
+    const mAp = /^\/api\/interativos\/([^/]+)\/(progresso|posicao|anotacoes|dominio|recomecar|excluir|renomear)$/.exec(path);
     if (mAp) {
       const pasta = decodeURIComponent(mAp[1]);
       const acao = mAp[2];
@@ -1034,11 +1063,34 @@
         return respostaJson({ ok: true, arquivos_apagados: 1, chave_local: chave });
       }
 
+      if (acao === "renomear" && metodo === "POST") {
+        if (!ehAdmin()) return respostaJson({ detail: "Apenas o administrador pode renomear apostilas." }, 403);
+        if (!meta) return respostaJson({ detail: "Apostila não encontrada." }, 404);
+        const b = await lerBodyJson();
+        const titulo = String(b.titulo ?? b.nome ?? "").replace(/\s+/g, " ").trim().slice(0, 120);
+        if (!titulo) return respostaJson({ detail: "Dê um nome para a apostila." }, 400);
+        if (!estado.titulos || typeof estado.titulos !== "object") estado.titulos = {};
+        estado.titulos[pasta] = titulo;
+        if (apostilasImportadas[pasta]) {
+          if (!apostilasImportadas[pasta].ficha) apostilasImportadas[pasta].ficha = {};
+          apostilasImportadas[pasta].ficha.titulo = titulo;
+          await idbSalvarApostila(apostilasImportadas[pasta]);
+        }
+        const itemCat = (catalogo.apostilas || []).find(x => x.pasta === pasta);
+        if (itemCat) itemCat.titulo = titulo;
+        if (indiceBusca && indiceBusca[pasta]) indiceBusca[pasta].titulo = titulo;
+        estado.org_em = Date.now() / 1000;
+        salvarEstadoLocal();
+        autoSalvarPastaPCSeConectada();
+        return respostaJson({ ok: true, pasta, titulo });
+      }
+
       if (acao === "excluir" && metodo === "POST") {
         if (!ehAdmin()) return respostaJson({ detail: "Apenas o administrador pode excluir apostilas." }, 403);
         delete estado.progresso[pasta];
         delete estado.posicao[pasta];
         delete estado.anotacoes[pasta];
+        if (estado.titulos) delete estado.titulos[pasta];
         if (estado.organizacao && estado.organizacao.apostilas) {
           delete estado.organizacao.apostilas[pasta];
         }
@@ -1447,6 +1499,9 @@
       if ((Number(remoto.org_em) || 0) > (Number(local.org_em) || 0) && remoto.organizacao) {
         local.organizacao = JSON.parse(JSON.stringify(remoto.organizacao));
         local.org_em = Number(remoto.org_em);
+        if (remoto.titulos && typeof remoto.titulos === "object") {
+          local.titulos = Object.assign({}, local.titulos || {}, remoto.titulos);
+        }
         mudouLocal = true;
       }
       if (remoto.capas_custom && typeof remoto.capas_custom === "object") {

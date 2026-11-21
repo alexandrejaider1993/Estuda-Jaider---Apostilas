@@ -405,7 +405,7 @@
       fundo.className = "ia-dlg-fundo";
       fundo.innerHTML = `<div class="ia-dlg" role="dialog" aria-modal="true" aria-labelledby="iaDlgT">
         <h2 id="iaDlgT">${esc(titulo)}</h2>${texto ? `<p>${esc(texto)}</p>` : ""}
-        ${campo !== null ? `<input class="campo ia-dlg-campo" value="${esc(campo)}" maxlength="80" aria-label="${esc(titulo)}">` : ""}
+        ${campo !== null ? `<input class="campo ia-dlg-campo" value="${esc(campo)}" maxlength="120" aria-label="${esc(titulo)}">` : ""}
         <div class="ia-dlg-acoes"><button type="button" class="botao botao--secundario" data-r="0">Cancelar</button>
         <button type="button" class="botao ${perigo ? "ia-dlg-perigo" : "botao--primario"}" data-r="1">${esc(sim)}</button></div></div>`;
       const fim = v => { fundo.remove(); document.removeEventListener("keydown", tecla, true); resolve(v); };
@@ -477,6 +477,23 @@
     if (!nome || nome === org.pastas[id].nome) return;
     try { org = await api(`/api/interativos-org/pastas/${encodeURIComponent(id)}/renomear`, { nome }); desenhar(); }
     catch (e) { toast(e.message, "erro", 4500); }
+  }
+  async function renomearApostila(pasta) {
+    const a = lista.find(x => x.pasta === pasta);
+    if (!a) return;
+    const atual = a.titulo || a.pasta;
+    const titulo = await caixa({ titulo: "Renomear apostila", campo: atual, sim: "Renomear" });
+    if (!titulo || titulo === atual) return;
+    try {
+      await api(`/api/interativos/${encodeURIComponent(pasta)}/renomear`, { titulo });
+      a.titulo = titulo;
+      if (aberta && aberta.pasta === pasta) {
+        aberta.titulo = titulo;
+        if ($("iaTituloAberta")) $("iaTituloAberta").textContent = titulo;
+      }
+      toast(`Apostila renomeada para "${titulo}".`);
+      desenhar();
+    } catch (e) { toast(e.message, "erro", 4500); }
   }
   async function excluir(id) {
     const p = org.pastas[id], cima = p.pai ? org.pastas[p.pai].nome : "Apostilas";
@@ -605,10 +622,13 @@
             { t: "Recomeçar do zero", perigo: true, f: () => recomecar(apAlvo) },
           ];
           if (modoAdmin) {
-            opcoesApostila.splice(1, 0, {
-              t: "Personalizar (cor e capa)",
-              f: () => window.PastaVisual && PastaVisual.editar("doc:" + oQue.apostila, (apAlvo || {}).titulo || oQue.apostila, (apAlvo || {}).capa || ""),
-            });
+            opcoesApostila.splice(1, 0,
+              { t: "Renomear", f: () => renomearApostila(oQue.apostila) },
+              {
+                t: "Personalizar (cor e capa)",
+                f: () => window.PastaVisual && PastaVisual.editar("doc:" + oQue.apostila, (apAlvo || {}).titulo || oQue.apostila, (apAlvo || {}).capa || ""),
+              }
+            );
             opcoesApostila.push(
               { t: "Mover para…", f: () => menu(b, destinos(oQue)) },
               { t: "Excluir apostila", perigo: true, f: () => excluirApostila(oQue.apostila) }

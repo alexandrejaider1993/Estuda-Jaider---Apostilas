@@ -116,6 +116,7 @@ def main():
         "apostilas": {},
     }
     aparencia_padrao = catalogo_atual.get("aparencia_padrao") or {}
+    titulos_padrao = catalogo_atual.get("titulos_padrao") or {}
 
     apostilas = []
     indice_busca = {}
@@ -162,7 +163,12 @@ def main():
             if isinstance(t, dict) and t.get("id") and t.get("conceito")
         ]
 
-        titulo = f.get("titulo") or pasta.name
+        titulo_custom = titulos_padrao.get(pasta.name)
+        titulo = (
+            titulo_custom.strip()
+            if isinstance(titulo_custom, str) and titulo_custom.strip()
+            else (f.get("titulo") or pasta.name)
+        )
         apostilas.append({
             "pasta": pasta.name,
             "titulo": titulo,
@@ -188,10 +194,18 @@ def main():
 
     apostilas.sort(key=lambda a: a["data_aula"] or "", reverse=True)
 
+    pastas_existentes = {a["pasta"] for a in apostilas}
+    titulos_limpos = {
+        k: v.strip()
+        for k, v in titulos_padrao.items()
+        if k in pastas_existentes and isinstance(v, str) and v.strip()
+    }
+
     saida_catalogo = {
         "apostilas": apostilas,
         "organizacao_padrao": org_padrao,
         "aparencia_padrao": aparencia_padrao,
+        "titulos_padrao": titulos_limpos,
     }
 
     (RAIZ / "catalogo.json").write_text(
