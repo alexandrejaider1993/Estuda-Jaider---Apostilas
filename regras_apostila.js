@@ -5,9 +5,55 @@
  * Regra 1 — Responder: clicar numa alternativa só MARCA; a correção vem no botão "Responder".
  *   Vale para testes ("Teste você"), microtestes, erros (er-*) e revisão (rv), e radios com data-obj.
  *   Se o site já trouxer a versão antiga embutida (<script id="ej-responder">), a guarda __ejResp evita duplicar.
+ * Regra 2 — "Teoria antes de responder" (Engenharia reversa) vem minimizado por padrão.
+ * Regra 3 — "Gabarito comentado, não oficial": cada alternativa / item (A), B), I), II) ou quebra de linha) em sua própria linha.
  */
 (function () {
   if (window.__ejRegras) return; window.__ejRegras = 1;
+
+  function minimizarTeoriaAntes() {
+    document.querySelectorAll('details').forEach(function (d) {
+      if (d.dataset.ejTeoria) return;
+      var s = d.querySelector('summary');
+      if (s && /Teoria antes de responder/i.test(s.textContent)) {
+        d.dataset.ejTeoria = '1';
+        d.removeAttribute('open');
+      }
+    });
+  }
+
+  function organizarGabarito() {
+    document.querySelectorAll('.cx.t-caiu').forEach(function (cx) {
+      var r = cx.querySelector('p.r');
+      if (!r || !/gabarito/i.test(r.textContent)) return;
+      cx.querySelectorAll('p:not(.r):not([data-ej-gab])').forEach(function (p) {
+        p.dataset.ejGab = '1';
+        var html = p.innerHTML;
+        var marcado = html
+          .replace(/\r?\n+/g, '<br>')
+          .replace(/([.;:?!)]|<\/(?:b|strong)>)\s+((?:<(?:b|strong)>)?(?:[A-E]|I{1,3}|IV|V)\)\s)/g, '$1<br>$2');
+        if (marcado === html) return;
+        var partes = marcado.split('<br>').map(function (s) { return s.trim(); }).filter(Boolean);
+        if (partes.length < 2) return;
+        var frag = document.createDocumentFragment();
+        partes.forEach(function (parte) {
+          var np = document.createElement('p');
+          np.dataset.ejGab = '1';
+          np.style.textAlign = 'left';
+          np.innerHTML = parte;
+          frag.appendChild(np);
+        });
+        p.replaceWith(frag);
+      });
+    });
+  }
+
+  function aplicarRegras() {
+    minimizarTeoriaAntes();
+    organizarGabarito();
+  }
+  aplicarRegras();
+  new MutationObserver(aplicarRegras).observe(document.documentElement, { childList: true, subtree: true });
 
   if (!window.__ejResp) {
     window.__ejResp = 1;

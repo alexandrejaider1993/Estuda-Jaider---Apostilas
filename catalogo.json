@@ -12,7 +12,7 @@
       "contagem": {},
       "url": "/interativos/antimicrobianos-1a/index.html",
       "capa": "",
-      "modificado": 1795198487,
+      "modificado": 1795218665,
       "chave_local": "farmaco-antimicrobianos-1a",
       "conceitos": [
         {
@@ -628,6 +628,223 @@
       ]
     },
     {
+      "pasta": "Antimicrobianos_Volume_1",
+      "titulo": "Antimicrobianos · Volume 1 | Estuda Jaider",
+      "subtitulo": "",
+      "disciplina": "",
+      "periodo": "",
+      "prova": "",
+      "data_aula": "",
+      "capitulos": [],
+      "contagem": {},
+      "url": "/interativos/Antimicrobianos_Volume_1/index.html",
+      "capa": "",
+      "modificado": 1795277218,
+      "chave_local": "estuda-jaider-antimicrobianos-v1",
+      "conceitos": [
+        {
+          "id": "b11-conceito",
+          "nome": "Espectro, agente provável e local da infecção"
+        },
+        {
+          "id": "b12-conceito",
+          "nome": "Origem da infecção e exposição prévia"
+        },
+        {
+          "id": "b13-conceito",
+          "nome": "Exposição, CIM e dose de ataque"
+        },
+        {
+          "id": "b14-conceito",
+          "nome": "Dispensação, adesão e reavaliação"
+        },
+        {
+          "id": "b15-conceito",
+          "nome": "Associações, sinergismo e profilaxia"
+        },
+        {
+          "id": "b16-conceito",
+          "nome": "Segurança e características do paciente"
+        },
+        {
+          "id": "b21-conceito",
+          "nome": "Antimicrobiano, antibiótico, antissepsia e desinfecção"
+        },
+        {
+          "id": "b22-conceito",
+          "nome": "Efeito bactericida e bacteriostático"
+        },
+        {
+          "id": "b23-conceito",
+          "nome": "História e expansão das famílias"
+        },
+        {
+          "id": "b24-conceito",
+          "nome": "Famílias definidas pela estrutura química"
+        },
+        {
+          "id": "b25-conceito",
+          "nome": "Organizar por espectro, origem, efeito e alvo"
+        },
+        {
+          "id": "b26-conceito",
+          "nome": "Eficácia, microbioma e custos"
+        },
+        {
+          "id": "b31-conceito",
+          "nome": "Resistência natural e adquirida"
+        },
+        {
+          "id": "b32-conceito",
+          "nome": "Quatro mecanismos de resistência"
+        },
+        {
+          "id": "b33-conceito",
+          "nome": "Escolha racional e reavaliação"
+        },
+        {
+          "id": "b34-conceito",
+          "nome": "Dose, via e duração"
+        },
+        {
+          "id": "b35-conceito",
+          "nome": "Gram-positivos, Gram-negativos e acesso ao alvo"
+        },
+        {
+          "id": "b36-conceito",
+          "nome": "Preservar antimicrobianos e interpretar evidências"
+        }
+      ],
+      "testes": [
+        {
+          "id": "t1",
+          "conceito": "b11-conceito",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t2",
+          "conceito": "b12-conceito",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t3",
+          "conceito": "b13-conceito",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t4",
+          "conceito": "b14-conceito",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t5",
+          "conceito": "b15-conceito",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t6",
+          "conceito": "b16-conceito",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t7",
+          "conceito": "b21-conceito",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t8",
+          "conceito": "b22-conceito",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t9",
+          "conceito": "b23-conceito",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t10",
+          "conceito": "b24-conceito",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t11",
+          "conceito": "b25-conceito",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t12",
+          "conceito": "b26-conceito",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t13",
+          "conceito": "b31-conceito",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t14",
+          "conceito": "b32-conceito",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t15",
+          "conceito": "b33-conceito",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t16",
+          "conceito": "b34-conceito",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t17",
+          "conceito": "b35-conceito",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t18",
+          "conceito": "b36-conceito",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        }
+      ]
+    },
+    {
       "pasta": "patologias-do-utero-2-1a",
       "titulo": "Patologias do Útero 2 · 1A",
       "subtitulo": "",
@@ -639,7 +856,7 @@
       "contagem": {},
       "url": "/interativos/patologias-do-utero-2-1a/index.html",
       "capa": "",
-      "modificado": 1795101587,
+      "modificado": 1795218666,
       "chave_local": "utero2-1a-v6",
       "conceitos": [
         {
@@ -1127,7 +1344,7 @@
       "contagem": {},
       "url": "/interativos/patologias-do-utero-2-1b/index.html",
       "capa": "",
-      "modificado": 1795101588,
+      "modificado": 1795218668,
       "chave_local": "utero2-1b-v6",
       "conceitos": [
         {

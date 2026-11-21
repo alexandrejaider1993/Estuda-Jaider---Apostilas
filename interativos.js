@@ -769,7 +769,7 @@
     // Animações por passos com pergunta que libera o próximo (padrão v6.3): web/anim_apostila.js
     if (!q.contentWindow.ejAnim) { const an = doc.createElement("script"); an.src = "/anim_apostila.js?v=1"; doc.head.append(an); }
     // Regras universais (ex.: marcar a alternativa e só corrigir no botão "Responder"): regras_apostila.js
-    if (!q.contentWindow.__ejRegras) { const rg = doc.createElement("script"); rg.src = "/regras_apostila.js?v=2"; doc.head.append(rg); }
+    if (!q.contentWindow.__ejRegras) { const rg = doc.createElement("script"); rg.src = "/regras_apostila.js?v=4"; doc.head.append(rg); }
     injetarNav(q, doc);
     const s = doc.createElement("script");
     s.src = "/trilho_apostila.js?v=8";
@@ -835,7 +835,7 @@
     if (q.contentWindow.ejNav) return;
     const a = aberta, pedido = pedidoAbrir; pedidoAbrir = null;
     const s = doc.createElement("script");
-    s.src = "/nav_apostila.js?v=5";
+    s.src = "/nav_apostila.js?v=6";
     s.onload = async () => {
       if (!a || aberta !== a) return;
       let posicao = a.posicao || null;
