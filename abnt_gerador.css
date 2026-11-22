@@ -247,6 +247,43 @@ html[data-dispositivo="celular"] #geradorAbnt.container {
 }
 
 /* Métricas do Markdown */
+.abnt-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 8px;
+  padding: 6px;
+  border-radius: 9px;
+  background: var(--cor-superficie-2);
+  border: 1px solid var(--cor-fio);
+}
+.abnt-tb-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  padding: 0 9px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--cor-tinta);
+  font: 500 12px/1 var(--fonte-ui);
+  cursor: pointer;
+  transition: background-color 120ms var(--ease-out), border-color 120ms var(--ease-out);
+}
+.abnt-tb-btn:hover {
+  background: var(--cor-superficie);
+  border-color: var(--cor-fio);
+  color: var(--cor-veia);
+}
+.abnt-tb-sep {
+  width: 1px;
+  height: 18px;
+  background: var(--cor-fio);
+  align-self: center;
+  margin: 0 2px;
+}
+
 .abnt-stats {
   display: flex;
   flex-wrap: wrap;
@@ -497,10 +534,50 @@ html[data-dispositivo="celular"] #geradorAbnt.container {
   line-height: 1.15;
   text-align: justify;
 }
-.abnt-folha ul {
+.abnt-folha ul,
+.abnt-folha ol {
   margin: 8px 0 12px;
   padding-left: 1.5cm;
   text-align: justify;
+}
+.abnt-folha p.abnt-folha__sem-recuo {
+  text-indent: 0;
+  line-height: 1.15;
+  margin-bottom: 10px;
+}
+.abnt-folha__pre-tit {
+  text-align: center !important;
+  text-indent: 0 !important;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin: 0 0 18px !important;
+}
+.abnt-folha table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 14px 0;
+  font-size: 13.5px;
+  line-height: 1.25;
+}
+.abnt-folha th,
+.abnt-folha td {
+  padding: 6px 8px;
+  text-align: left;
+  border-top: 1px solid #000;
+  border-bottom: 1px solid #000;
+}
+.abnt-folha th {
+  font-weight: 700;
+  border-top: 1.5px solid #000;
+  border-bottom: 1px solid #000;
+}
+.abnt-folha__sumario-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  text-indent: 0 !important;
+  margin: 0 0 4px !important;
+  line-height: 1.35;
 }
 .abnt-folha__ref-tit {
   text-align: center !important;
