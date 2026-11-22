@@ -37,11 +37,36 @@
   const IC_TESOURA = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>';
   const IC_ESQ = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>';
   const IC_DIR = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>';
+  const IC_SETA_DIR = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>';
+  const IC_VOLTAR = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>';
+  const IC_FASM = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>';
+  const IC_RESIDENCIA = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3"/><path d="M8 15v1a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6v-4"/><circle cx="20" cy="10" r="2"/></svg>';
+
+  const BANCOS_INFO = {
+    fasm: {
+      id: "fasm",
+      titulo: "FASM",
+      tituloPagina: "Banco de Questões · FASM",
+      desc: "Questões de provas antigas, simulados e testes de fixação das apostilas da graduação.",
+      cta: "Acessar FASM",
+      icone: IC_FASM,
+    },
+    residencia: {
+      id: "residencia",
+      titulo: "Residência Médica",
+      tituloPagina: "Banco de Questões · Residência Médica",
+      desc: "Questões comentadas de provas de Residência Médica organizadas por grande área e banca.",
+      cta: "Acessar Residência Médica",
+      icone: IC_RESIDENCIA,
+    },
+  };
 
   // Estado em memória do módulo
   let montado = false;
   let carregando = false;
-  let todasQuestoes = [];
+  let bancoAtual = null;         // null (tela dos 2 cards) | "fasm" | "residencia"
+  let questoesCarregadas = [];   // todas as questões do JSON
+  let todasQuestoes = [];        // questões filtradas pelo bancoAtual
   let filtradas = [];
   let historico = {};            // { uid: { status, escolha, tentativas, acertos, erros, favorita, riscadas } }
   let selecaoTemp = {};          // { uid: indiceAlternativa } (antes de clicar Responder)
@@ -89,8 +114,14 @@
     }
   }
 
+  function normalizarBanco(q) {
+    const raw = norm(q && (q.banco || q.categoria || q.origem || ""));
+    if (raw.includes("residencia")) return "residencia";
+    return "fasm";
+  }
+
   async function carregarBanco() {
-    if (todasQuestoes.length || carregando) return;
+    if (questoesCarregadas.length || carregando) return;
     carregando = true;
     try {
       if (window.EJStorageDrive && window.EJStorageDrive.inicializar) {
@@ -100,8 +131,9 @@
       if (!r.ok) throw new Error("Não foi possível carregar banco_questoes.json");
       const d = await r.json();
       const lista = Array.isArray(d.questoes) ? d.questoes : [];
-      todasQuestoes = lista.map(q => {
+      questoesCarregadas = lista.map(q => {
         const disc = resolverDisciplinaLive(q);
+        const banco = normalizarBanco(q);
         const textoBusca = norm([
           q.enunciado,
           (q.itens || []).join(" "),
@@ -111,7 +143,7 @@
           q.apostila,
           disc,
         ].join(" "));
-        return Object.assign({}, q, { disciplina: disc, _busca: textoBusca });
+        return Object.assign({}, q, { disciplina: disc, _banco: banco, _busca: textoBusca });
       });
     } catch (e) {
       console.error("[Banco de Questões]", e);
@@ -191,61 +223,114 @@
     if (!sec || montado) return;
     montado = true;
 
+    const cardsHtml = ["fasm", "residencia"].map(id => {
+      const info = BANCOS_INFO[id];
+      return `
+        <button type="button" class="bq-hub-card bq-hub-card--${id}" data-selecionar-banco="${id}">
+          <div class="bq-hub-card__topo">
+            <span class="bq-hub-card__icon" aria-hidden="true">${info.icone}</span>
+            <span class="bq-hub-card__pill" id="bqHubPill-${id}">Carregando...</span>
+          </div>
+          <h2 class="bq-hub-card__tit">${esc(info.titulo)}</h2>
+          <p class="bq-hub-card__desc">${esc(info.desc)}</p>
+          <span class="bq-hub-card__cta">
+            <span>${esc(info.cta)}</span>
+            ${IC_SETA_DIR}
+          </span>
+        </button>
+      `;
+    }).join("");
+
     sec.innerHTML = `
-      <div class="bq-head">
-        <div>
-          <h1 class="bq-head__tit">Banco de Questões</h1>
-          <p class="bq-head__sub" id="bqSubtitulo">Carregando questões das apostilas...</p>
+      <div id="bqSelecao" class="bq-hub">
+        <div class="bq-hub__head">
+          <span class="bq-hub__eyebrow">Banco de Questões</span>
+          <h1 class="bq-hub__tit">Escolha o Banco de Questões</h1>
+          <p class="bq-hub__sub">Selecione uma das opções abaixo para começar a resolver questões.</p>
         </div>
-        <div class="bq-modos" role="group" aria-label="Modo de visualização">
-          <button type="button" class="bq-modo-btn" data-modo="foco" aria-pressed="true">${IC_FOCO}<span>Uma por vez</span></button>
-          <button type="button" class="bq-modo-btn" data-modo="lista" aria-pressed="false">${IC_LISTA}<span>Lista</span></button>
-        </div>
-      </div>
-
-      <div class="bq-stats" id="bqStats"></div>
-
-      <div class="bq-filtros">
-        <div class="bq-filtros-linha">
-          <div class="bq-campo">
-            <label for="bqBusca">Buscar por palavra-chave</label>
-            <input type="search" id="bqBusca" class="bq-input" placeholder="Enunciado, tema, fármaco, conceito..." autocomplete="off">
-          </div>
-          <div class="bq-campo">
-            <label for="bqDisc">Matéria / Pasta</label>
-            <select id="bqDisc" class="bq-select"><option value="">Todas as matérias</option></select>
-          </div>
-          <div class="bq-campo">
-            <label for="bqApostila">Apostila</label>
-            <select id="bqApostila" class="bq-select"><option value="">Todas as apostilas</option></select>
-          </div>
-          <div class="bq-campo">
-            <label for="bqTipo">Tipo</label>
-            <select id="bqTipo" class="bq-select">
-              <option value="todas">Todos os tipos</option>
-              <option value="prova">Provas &amp; Simulados</option>
-              <option value="teste">Testes de Fixação</option>
-              <option value="discursiva">Discursivas</option>
-            </select>
-          </div>
-        </div>
-        <div class="bq-filtros-chips-row">
-          <div class="bq-chips" id="bqStatusChips" role="group" aria-label="Filtrar por status">
-            <button type="button" class="bq-chip" data-status="todas" aria-pressed="true">Todas</button>
-            <button type="button" class="bq-chip" data-status="nao_resolvidas" aria-pressed="false">Não resolvidas</button>
-            <button type="button" class="bq-chip bq-chip--erro" data-status="erradas" aria-pressed="false">Caderno de Erros</button>
-            <button type="button" class="bq-chip" data-status="acertadas" aria-pressed="false">Acertadas</button>
-            <button type="button" class="bq-chip bq-chip--fav" data-status="favoritas" aria-pressed="false">Favoritas</button>
-          </div>
-          <div class="bq-filtros-acoes">
-            <button type="button" class="bq-btn-sec" id="bqBtnEmbaralhar" title="Embaralhar ordem das questões filtradas">${IC_SHUFFLE}<span>Embaralhar</span></button>
-            <button type="button" class="bq-btn-sec" id="bqBtnLimpar" title="Limpar todos os filtros">${IC_LIMPAR}<span>Limpar</span></button>
-          </div>
+        <div class="bq-hub__grid">
+          ${cardsHtml}
         </div>
       </div>
 
-      <div id="bqConteudo"></div>
+      <div id="bqBancoView" hidden>
+        <div class="bq-voltar-row">
+          <button type="button" class="bq-btn-voltar" id="bqBtnVoltarSelecao">
+            ${IC_VOLTAR}
+            <span>Trocar banco</span>
+          </button>
+        </div>
+
+        <div class="bq-head">
+          <div>
+            <h1 class="bq-head__tit" id="bqTituloPagina">Banco de Questões</h1>
+            <p class="bq-head__sub" id="bqSubtitulo">Carregando questões...</p>
+          </div>
+          <div class="bq-modos" id="bqModos" role="group" aria-label="Modo de visualização">
+            <button type="button" class="bq-modo-btn" data-modo="foco" aria-pressed="true">${IC_FOCO}<span>Uma por vez</span></button>
+            <button type="button" class="bq-modo-btn" data-modo="lista" aria-pressed="false">${IC_LISTA}<span>Lista</span></button>
+          </div>
+        </div>
+
+        <div class="bq-stats" id="bqStats"></div>
+
+        <div class="bq-filtros" id="bqFiltros">
+          <div class="bq-filtros-linha">
+            <div class="bq-campo">
+              <label for="bqBusca">Buscar por palavra-chave</label>
+              <input type="search" id="bqBusca" class="bq-input" placeholder="Enunciado, tema, fármaco, conceito..." autocomplete="off">
+            </div>
+            <div class="bq-campo">
+              <label for="bqDisc">Matéria / Pasta</label>
+              <select id="bqDisc" class="bq-select"><option value="">Todas as matérias</option></select>
+            </div>
+            <div class="bq-campo">
+              <label for="bqApostila">Apostila</label>
+              <select id="bqApostila" class="bq-select"><option value="">Todas as apostilas</option></select>
+            </div>
+            <div class="bq-campo">
+              <label for="bqTipo">Tipo</label>
+              <select id="bqTipo" class="bq-select">
+                <option value="todas">Todos os tipos</option>
+                <option value="prova">Provas &amp; Simulados</option>
+                <option value="teste">Testes de Fixação</option>
+                <option value="discursiva">Discursivas</option>
+              </select>
+            </div>
+          </div>
+          <div class="bq-filtros-chips-row">
+            <div class="bq-chips" id="bqStatusChips" role="group" aria-label="Filtrar por status">
+              <button type="button" class="bq-chip" data-status="todas" aria-pressed="true">Todas</button>
+              <button type="button" class="bq-chip" data-status="nao_resolvidas" aria-pressed="false">Não resolvidas</button>
+              <button type="button" class="bq-chip bq-chip--erro" data-status="erradas" aria-pressed="false">Caderno de Erros</button>
+              <button type="button" class="bq-chip" data-status="acertadas" aria-pressed="false">Acertadas</button>
+              <button type="button" class="bq-chip bq-chip--fav" data-status="favoritas" aria-pressed="false">Favoritas</button>
+            </div>
+            <div class="bq-filtros-acoes">
+              <button type="button" class="bq-btn-sec" id="bqBtnEmbaralhar" title="Embaralhar ordem das questões filtradas">${IC_SHUFFLE}<span>Embaralhar</span></button>
+              <button type="button" class="bq-btn-sec" id="bqBtnLimpar" title="Limpar todos os filtros">${IC_LIMPAR}<span>Limpar</span></button>
+            </div>
+          </div>
+        </div>
+
+        <div id="bqConteudo"></div>
+      </div>
     `;
+
+    // Eventos dos Cards de Seleção (FASM / Residência Médica)
+    sec.querySelectorAll("[data-selecionar-banco]").forEach(card => {
+      card.addEventListener("click", () => {
+        selecionarBanco(card.dataset.selecionarBanco);
+      });
+    });
+
+    const btnVoltar = document.getElementById("bqBtnVoltarSelecao");
+    if (btnVoltar) {
+      btnVoltar.addEventListener("click", () => {
+        mostrarSelecao();
+        rolarTopo();
+      });
+    }
 
     // Eventos dos controles de modo
     sec.querySelectorAll(".bq-modo-btn").forEach(btn => {
@@ -299,6 +384,102 @@
 
     // Atalhos de teclado no modo Foco
     document.addEventListener("keydown", aoTeclar);
+  }
+
+  function renderHubContadores() {
+    const qtdFasm = questoesCarregadas.filter(q => q._banco === "fasm").length;
+    const qtdRes = questoesCarregadas.filter(q => q._banco === "residencia").length;
+    const pillFasm = document.getElementById("bqHubPill-fasm");
+    const pillRes = document.getElementById("bqHubPill-residencia");
+    if (pillFasm) {
+      pillFasm.textContent = qtdFasm === 1 ? "1 questão" : `${qtdFasm} questões`;
+    }
+    if (pillRes) {
+      pillRes.textContent = qtdRes > 0
+        ? (qtdRes === 1 ? "1 questão" : `${qtdRes} questões`)
+        : "Em breve";
+    }
+  }
+
+  function mostrarSelecao() {
+    bancoAtual = null;
+    const elSel = document.getElementById("bqSelecao");
+    const elView = document.getElementById("bqBancoView");
+    if (elSel) elSel.hidden = false;
+    if (elView) elView.hidden = true;
+    renderHubContadores();
+  }
+
+  async function selecionarBanco(id) {
+    const chave = id === "residencia" ? "residencia" : "fasm";
+    const info = BANCOS_INFO[chave];
+    bancoAtual = chave;
+
+    const elSel = document.getElementById("bqSelecao");
+    const elView = document.getElementById("bqBancoView");
+    const elTit = document.getElementById("bqTituloPagina");
+    if (elSel) elSel.hidden = true;
+    if (elView) elView.hidden = false;
+    if (elTit) elTit.textContent = info.tituloPagina;
+
+    await carregarBanco();
+    atualizarHistorico();
+
+    todasQuestoes = questoesCarregadas.filter(q => q._banco === chave);
+
+    // Resetar filtros ao trocar de banco
+    filtros.busca = "";
+    filtros.disciplina = "";
+    filtros.apostila = "";
+    filtros.tipo = "todas";
+    filtros.status = "todas";
+    filtros.indiceFoco = 0;
+    filtros.paginaLista = 1;
+    const elB = document.getElementById("bqBusca");
+    const elD = document.getElementById("bqDisc");
+    const elA = document.getElementById("bqApostila");
+    const elT = document.getElementById("bqTipo");
+    if (elB) elB.value = "";
+    if (elD) elD.value = "";
+    if (elA) elA.value = "";
+    if (elT) elT.value = "todas";
+    document.querySelectorAll("#bqStatusChips .bq-chip").forEach(b => {
+      b.setAttribute("aria-pressed", b.dataset.status === "todas" ? "true" : "false");
+    });
+
+    const temQuestoes = todasQuestoes.length > 0;
+    const elStats = document.getElementById("bqStats");
+    const elFiltros = document.getElementById("bqFiltros");
+    const elModos = document.getElementById("bqModos");
+    if (elStats) elStats.hidden = !temQuestoes;
+    if (elFiltros) elFiltros.hidden = !temQuestoes;
+    if (elModos) elModos.hidden = !temQuestoes;
+
+    if (!temQuestoes) {
+      const sub = document.getElementById("bqSubtitulo");
+      if (sub) sub.textContent = "Nenhuma questão cadastrada neste banco ainda.";
+      const cx = document.getElementById("bqConteudo");
+      if (cx) {
+        cx.innerHTML = `
+          <div class="bq-vazio bq-vazio--em-breve">
+            <div class="bq-vazio__icon" aria-hidden="true">${info.icone}</div>
+            <h3>Banco de ${esc(info.titulo)} em breve</h3>
+            <p>As questões de ${esc(info.titulo)} ainda estão sendo preparadas e aparecerão aqui automaticamente assim que forem adicionadas.</p>
+            <button type="button" class="bq-btn-prim" id="bqBtnVazioVoltar">Voltar para seleção</button>
+          </div>
+        `;
+        const btnV = document.getElementById("bqBtnVazioVoltar");
+        if (btnV) btnV.addEventListener("click", () => { mostrarSelecao(); rolarTopo(); });
+      }
+      rolarTopo();
+      return;
+    }
+
+    popularSelects();
+    aplicarFiltros(false);
+    renderStats();
+    renderConteudo();
+    rolarTopo();
   }
 
   function definirFiltroStatus(st) {
@@ -728,7 +909,7 @@
 
   function aoTeclar(e) {
     const sec = document.getElementById(SEC_ID);
-    if (!sec || sec.hidden || filtros.modo !== "foco" || !filtradas.length) return;
+    if (!sec || sec.hidden || !bancoAtual || filtros.modo !== "foco" || !filtradas.length) return;
     const tag = (document.activeElement && document.activeElement.tagName || "").toUpperCase();
     if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
     if (e.ctrlKey || e.metaKey || e.altKey) return;
@@ -765,24 +946,22 @@
 
   async function abrir() {
     montarEstruturaBase();
+    mostrarSelecao();
     await carregarBanco();
     atualizarHistorico();
-    popularSelects();
-    aplicarFiltros(true);
-    renderStats();
-    renderConteudo();
+    renderHubContadores();
   }
 
   // Atualiza automaticamente quando o Google Drive terminar de sincronizar
   window.addEventListener("ej-banco-questoes-sync", () => {
     const sec = document.getElementById(SEC_ID);
-    if (!montado || !todasQuestoes.length) return;
+    if (!montado || !questoesCarregadas.length) return;
     atualizarHistorico();
-    if (sec && !sec.hidden) {
+    if (sec && !sec.hidden && bancoAtual && todasQuestoes.length) {
       renderStats();
       renderConteudo();
     }
   });
 
-  window.EJBancoQuestoes = { abrir };
+  window.EJBancoQuestoes = { abrir, selecionarBanco, mostrarSelecao };
 })();

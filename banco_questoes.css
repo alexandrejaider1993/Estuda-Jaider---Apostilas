@@ -20,6 +20,180 @@
   --bq-acerto-fundo: #122e20;
 }
 
+/* Tela inicial de seleção (FASM / Residência Médica) */
+.bq-hub {
+  padding: 20px 0 36px;
+}
+
+.bq-hub__head {
+  margin-bottom: 28px;
+}
+
+.bq-hub__eyebrow {
+  display: inline-block;
+  font: 600 11.5px/1.2 var(--fonte-ui);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--cor-suave);
+  margin-bottom: 8px;
+}
+
+.bq-hub__tit {
+  margin: 0 0 8px;
+  font: 600 30px/1.18 var(--fonte-titulo);
+  letter-spacing: -0.025em;
+  color: var(--cor-tinta);
+}
+
+.bq-hub__sub {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--cor-suave);
+}
+
+.bq-hub__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.bq-hub-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  gap: 14px;
+  padding: 26px 26px 24px;
+  border-radius: 18px;
+  border: 1px solid var(--cor-fio);
+  background: var(--cor-superficie);
+  color: var(--cor-tinta);
+  font: inherit;
+  cursor: pointer;
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.bq-hub-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--cor-borda-forte, var(--cor-veia));
+  box-shadow: 0 14px 32px rgba(0, 0, 0, .09);
+}
+
+.bq-hub-card:focus-visible {
+  outline: 2.5px solid var(--cor-veia);
+  outline-offset: 2px;
+}
+
+.bq-hub-card__topo {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.bq-hub-card__icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  background: var(--cor-veia-fundo);
+  color: var(--cor-veia);
+}
+
+.bq-hub-card--residencia .bq-hub-card__icon {
+  background: var(--cor-professora-fundo);
+  color: var(--cor-professora);
+}
+
+.bq-hub-card__icon svg {
+  width: 26px;
+  height: 26px;
+}
+
+.bq-hub-card__pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font: 600 11.5px/1.2 var(--fonte-ui);
+  background: var(--cor-superficie-2);
+  border: 1px solid var(--cor-fio);
+  color: var(--cor-suave);
+}
+
+.bq-hub-card__tit {
+  margin: 0;
+  font: 600 22px/1.22 var(--fonte-titulo);
+  letter-spacing: -0.015em;
+  color: var(--cor-tinta);
+}
+
+.bq-hub-card__desc {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--cor-suave);
+  flex: 1;
+}
+
+.bq-hub-card__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  font: 600 13.5px/1 var(--fonte-ui);
+  color: var(--cor-veia);
+}
+
+.bq-hub-card--residencia .bq-hub-card__cta {
+  color: var(--cor-professora);
+}
+
+.bq-hub-card__cta svg {
+  width: 15px;
+  height: 15px;
+  transition: transform 160ms ease;
+}
+
+.bq-hub-card:hover .bq-hub-card__cta svg {
+  transform: translateX(3px);
+}
+
+/* Botão Voltar para seleção */
+.bq-voltar-row {
+  margin-bottom: 12px;
+}
+
+.bq-btn-voltar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px 0 9px;
+  border-radius: 8px;
+  border: 1px solid var(--cor-fio);
+  background: var(--cor-superficie);
+  color: var(--cor-suave);
+  font: 500 13px/1 var(--fonte-ui);
+  cursor: pointer;
+  transition: background 140ms, border-color 140ms, color 140ms;
+}
+
+.bq-btn-voltar svg {
+  width: 15px;
+  height: 15px;
+}
+
+.bq-btn-voltar:hover {
+  background: var(--cor-superficie-2);
+  border-color: var(--cor-borda-forte);
+  color: var(--cor-tinta);
+}
+
 /* Cabeçalho + KPIs */
 .bq-head {
   display: flex;
@@ -715,6 +889,28 @@
   font-size: 13.5px;
 }
 
+.bq-vazio--em-breve {
+  max-width: 540px;
+  margin: 24px auto 0;
+  padding: 48px 28px;
+}
+
+.bq-vazio__icon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 16px;
+  border-radius: 15px;
+  display: grid;
+  place-items: center;
+  background: var(--cor-professora-fundo);
+  color: var(--cor-professora);
+}
+
+.bq-vazio__icon svg {
+  width: 28px;
+  height: 28px;
+}
+
 .bq-atalhos-dica {
   margin-top: 12px;
   text-align: center;
@@ -738,6 +934,22 @@
   }
   .bq-filtros-linha {
     grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 680px) {
+  .bq-hub {
+    padding: 8px 0 24px;
+  }
+  .bq-hub__tit {
+    font-size: 24px;
+  }
+  .bq-hub__grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .bq-hub-card {
+    padding: 22px 20px;
   }
 }
 
