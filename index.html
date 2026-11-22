@@ -504,7 +504,7 @@
     box-sizing: border-box !important;
   }
   .home-hub__inner {
-    width: min(1060px, 100%);
+    width: min(901px, 85%);
     margin: 0 auto;
   }
   .home-hub__head {
@@ -533,7 +533,7 @@
   .home-hub__grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 16px;
+    gap: 14px;
   }
   .home-card-wrap {
     position: relative;
@@ -638,18 +638,18 @@
     z-index: 2;
     margin: 0;
     padding: 0 20px;
-    font: 600 clamp(24px, 2.6vw, 32px)/1.12 var(--fonte-titulo);
+    font: 600 clamp(20px, 2.2vw, 27px)/1.12 var(--fonte-titulo);
     letter-spacing: -0.025em;
     color: #ffffff;
     text-shadow: 0 2px 18px rgba(0, 0, 0, 0.36);
   }
   .home-card__seta {
     position: absolute;
-    right: 16px;
-    bottom: 16px;
+    right: 14px;
+    bottom: 14px;
     z-index: 2;
-    width: 44px;
-    height: 44px;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
     display: grid;
     place-items: center;
@@ -672,8 +672,8 @@
     color: #ffffff;
   }
   .home-card__seta svg {
-    width: 19px;
-    height: 19px;
+    width: 16px;
+    height: 16px;
     transition: transform 200ms var(--ease-out);
   }
   .home-card:hover .home-card__seta {
@@ -686,6 +686,9 @@
     #homeHub.container {
       padding: 20px 16px 32px !important;
       align-items: flex-start;
+    }
+    .home-hub__inner {
+      width: 100%;
     }
     .home-hub__grid {
       grid-template-columns: 1fr;
