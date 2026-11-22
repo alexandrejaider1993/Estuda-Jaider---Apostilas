@@ -41,11 +41,16 @@
   const IC_VOLTAR = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>';
   const IC_FASM = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>';
   const IC_RESIDENCIA = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3"/><path d="M8 15v1a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6v-4"/><circle cx="20" cy="10" r="2"/></svg>';
+  const IC_IMAGEM = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>';
+  const IC_SALVAR_PC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>';
+
+  const ehAdmin = () => !!(window.EJStorageDrive && window.EJStorageDrive.ehAdmin && window.EJStorageDrive.ehAdmin());
 
   const BANCOS_INFO = {
     fasm: {
       id: "fasm",
       arquivo: "/banco_questoes.json",
+      chaveCapa: "bq:fasm",
       titulo: "FASM",
       tituloPagina: "Banco de Questões · FASM",
       desc: "Questões de provas antigas, simulados e testes de fixação das apostilas da graduação.",
@@ -55,6 +60,7 @@
     residencia: {
       id: "residencia",
       arquivo: "/banco_questoes_residencia.json",
+      chaveCapa: "bq:residencia",
       titulo: "Residência Médica",
       tituloPagina: "Banco de Questões · Residência Médica",
       desc: "Questões comentadas de provas de Residência Médica organizadas por grande área e banca.",
@@ -70,6 +76,7 @@
   const questoesPorBanco = { fasm: [], residencia: [] };
   const bancoCarregado = { fasm: false, residencia: false };
   const promessaCarga = { fasm: null, residencia: null };
+  const capasHub = { fasm: "", residencia: "" };
   let todasQuestoes = [];        // questões do bancoAtual
   let filtradas = [];
   let historico = {};            // { uid: { status, escolha, tentativas, acertos, erros, favorita, riscadas } }
@@ -253,6 +260,158 @@
     toast("Ordem das questões embaralhada!");
   }
 
+  function resolverSrcCapa(capa) {
+    if (!capa || typeof capa !== "string") return "";
+    if (capa.startsWith("data:") || capa.startsWith("/") || /^https?:\/\//i.test(capa)) return capa;
+    return `/capas_pastas/${encodeURIComponent(capa)}`;
+  }
+
+  async function carregarCapasHub() {
+    try {
+      const r = await fetch("/api/pastas-aparencia", { cache: "no-store" });
+      if (!r.ok) return;
+      const d = await r.json();
+      const pastas = (d && d.pastas) || {};
+      ["fasm", "residencia"].forEach(id => {
+        const ap = pastas[BANCOS_INFO[id].chaveCapa];
+        capasHub[id] = (ap && !ap.sem_capa && ap.capa) ? resolverSrcCapa(ap.capa) : "";
+      });
+    } catch (e) {}
+  }
+
+  function prepararImagemCapa(arquivo) {
+    return new Promise((ok, err) => {
+      if (!arquivo || !/^image\//i.test(arquivo.type || "")) {
+        return err(new Error("Selecione um arquivo de imagem (JPG, PNG, WEBP ou GIF)."));
+      }
+      if (/^image\/gif$/i.test(arquivo.type)) {
+        return ok({ blob: arquivo, nome: "capa.gif" });
+      }
+      const url = URL.createObjectURL(arquivo);
+      const im = new Image();
+      im.onload = () => {
+        try {
+          const maxLado = 1200;
+          const escF = Math.min(1, maxLado / Math.max(im.naturalWidth || 1, im.naturalHeight || 1));
+          const w = Math.max(1, Math.round((im.naturalWidth || 1) * escF));
+          const h = Math.max(1, Math.round((im.naturalHeight || 1) * escF));
+          const cv = document.createElement("canvas");
+          cv.width = w;
+          cv.height = h;
+          cv.getContext("2d").drawImage(im, 0, 0, w, h);
+          cv.toBlob(blob => {
+            URL.revokeObjectURL(url);
+            if (!blob) return err(new Error("Não foi possível processar a imagem."));
+            ok({ blob, nome: "capa.webp" });
+          }, "image/webp", 0.88);
+        } catch (ex) {
+          URL.revokeObjectURL(url);
+          err(ex);
+        }
+      };
+      im.onerror = () => {
+        URL.revokeObjectURL(url);
+        err(new Error("Não foi possível ler a imagem selecionada."));
+      };
+      im.src = url;
+    });
+  }
+
+  async function enviarCapaHub(id, arquivo) {
+    if (!ehAdmin()) {
+      toast("Ative o modo Admin no topo para alterar as capas.", "erro", 3200);
+      return;
+    }
+    const info = BANCOS_INFO[id];
+    if (!info) return;
+    try {
+      const prep = await prepararImagemCapa(arquivo);
+      const fd = new FormData();
+      fd.append("chave", info.chaveCapa);
+      fd.append("cor", "");
+      fd.append("arquivo", prep.blob, prep.nome);
+      const r = await fetch("/api/pastas-aparencia/capa", { method: "POST", body: fd });
+      if (!r.ok) throw new Error("Falha ao salvar capa.");
+      const d = await r.json();
+      capasHub[id] = resolverSrcCapa(d && d.aparencia && d.aparencia.capa);
+      renderCapasHub();
+      const conectado = window.EJStorageDrive && window.EJStorageDrive.temPastaPCConectada && window.EJStorageDrive.temPastaPCConectada();
+      toast(
+        conectado
+          ? `Capa de ${info.titulo} atualizada e salva na pasta do PC!`
+          : `Capa de ${info.titulo} atualizada! Clique em "Salvar na pasta do PC" para publicar no site.`,
+        "sucesso",
+        3800
+      );
+    } catch (e) {
+      console.error("[Banco de Questões · Capa]", e);
+      toast(e.message || "Erro ao anexar imagem de capa.", "erro", 3600);
+    }
+  }
+
+  async function removerCapaHub(id) {
+    if (!ehAdmin()) return;
+    const info = BANCOS_INFO[id];
+    if (!info) return;
+    try {
+      const r = await fetch("/api/pastas-aparencia", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chave: info.chaveCapa, remover_capa: true }),
+      });
+      if (!r.ok) throw new Error("Falha ao remover capa.");
+      capasHub[id] = "";
+      renderCapasHub();
+      toast(`Capa de ${info.titulo} removida.`);
+    } catch (e) {
+      toast("Erro ao remover capa.", "erro", 3200);
+    }
+  }
+
+  function renderCapasHub() {
+    const modoAdmin = ehAdmin();
+    const btnSalvarPC = document.getElementById("bqBtnSalvarPC");
+    if (btnSalvarPC) {
+      btnSalvarPC.hidden = !modoAdmin;
+      const conectado = window.EJStorageDrive && window.EJStorageDrive.temPastaPCConectada && window.EJStorageDrive.temPastaPCConectada();
+      const txt = btnSalvarPC.querySelector("span");
+      if (txt) txt.textContent = conectado ? "Pasta do PC conectada" : "Salvar na pasta do PC";
+    }
+
+    ["fasm", "residencia"].forEach(id => {
+      const box = document.getElementById(`bqHubCapa-${id}`);
+      if (!box) return;
+      const info = BANCOS_INFO[id];
+      const src = capasHub[id];
+      box.classList.toggle("bq-hub-card__capa--com-img", !!src);
+
+      const acoesAdmin = modoAdmin ? `
+        <div class="bq-hub-card__admin-acoes">
+          <button type="button" class="bq-hub-capa-btn" data-capa-upload="${id}" title="${src ? "Trocar imagem de capa" : "Anexar imagem de capa"}">
+            ${IC_IMAGEM}<span>${src ? "Trocar capa" : "Anexar capa"}</span>
+          </button>
+          ${src ? `
+            <button type="button" class="bq-hub-capa-btn bq-hub-capa-btn--rem" data-capa-remover="${id}" title="Remover imagem de capa">
+              ${IC_LIMPAR}
+            </button>
+          ` : ""}
+        </div>
+      ` : "";
+
+      if (src) {
+        box.innerHTML = `
+          <img class="bq-hub-card__img" src="${esc(src)}" alt="Capa ${esc(info.titulo)}" loading="lazy">
+          ${acoesAdmin}
+        `;
+      } else {
+        box.innerHTML = `
+          <span class="bq-hub-card__icon" aria-hidden="true">${info.icone}</span>
+          ${acoesAdmin}
+        `;
+      }
+    });
+  }
+
   function montarEstruturaBase() {
     const sec = document.getElementById(SEC_ID);
     if (!sec || montado) return;
@@ -261,31 +420,41 @@
     const cardsHtml = ["fasm", "residencia"].map(id => {
       const info = BANCOS_INFO[id];
       return `
-        <button type="button" class="bq-hub-card bq-hub-card--${id}" data-selecionar-banco="${id}">
-          <div class="bq-hub-card__topo">
+        <div role="button" tabindex="0" class="bq-hub-card bq-hub-card--${id}" data-selecionar-banco="${id}">
+          <div class="bq-hub-card__capa" id="bqHubCapa-${id}">
             <span class="bq-hub-card__icon" aria-hidden="true">${info.icone}</span>
-            <span class="bq-hub-card__pill" id="bqHubPill-${id}">Carregando...</span>
           </div>
-          <h2 class="bq-hub-card__tit">${esc(info.titulo)}</h2>
-          <p class="bq-hub-card__desc">${esc(info.desc)}</p>
-          <span class="bq-hub-card__cta">
-            <span>${esc(info.cta)}</span>
-            ${IC_SETA_DIR}
-          </span>
-        </button>
+          <div class="bq-hub-card__corpo">
+            <div class="bq-hub-card__topo">
+              <h2 class="bq-hub-card__tit">${esc(info.titulo)}</h2>
+              <span class="bq-hub-card__pill" id="bqHubPill-${id}">Carregando...</span>
+            </div>
+            <p class="bq-hub-card__desc">${esc(info.desc)}</p>
+            <span class="bq-hub-card__cta">
+              <span>${esc(info.cta)}</span>
+              ${IC_SETA_DIR}
+            </span>
+          </div>
+        </div>
       `;
     }).join("");
 
     sec.innerHTML = `
       <div id="bqSelecao" class="bq-hub">
-        <div class="bq-hub__head">
-          <span class="bq-hub__eyebrow">Banco de Questões</span>
-          <h1 class="bq-hub__tit">Escolha o Banco de Questões</h1>
-          <p class="bq-hub__sub">Selecione uma das opções abaixo para começar a resolver questões.</p>
+        <div class="bq-hub__head-row">
+          <div class="bq-hub__head">
+            <span class="bq-hub__eyebrow">Banco de Questões</span>
+            <h1 class="bq-hub__tit">Escolha o Banco de Questões</h1>
+            <p class="bq-hub__sub">Selecione uma das opções abaixo para começar a resolver questões.</p>
+          </div>
+          <button type="button" class="bq-btn-sec bq-btn-salvar-pc" id="bqBtnSalvarPC" hidden title="Grava as capas dos cards direto na pasta do seu PC (capas_pastas/ e catalogo.json)">
+            ${IC_SALVAR_PC}<span>Salvar na pasta do PC</span>
+          </button>
         </div>
         <div class="bq-hub__grid">
           ${cardsHtml}
         </div>
+        <input type="file" id="bqInputCapa" accept="image/jpeg,image/png,image/webp,image/gif" hidden>
       </div>
 
       <div id="bqBancoView" hidden>
@@ -352,12 +521,82 @@
       </div>
     `;
 
-    // Eventos dos Cards de Seleção (FASM / Residência Médica)
+    // Eventos dos Cards de Seleção (FASM / Residência Médica) + upload/remoção de capa (Admin)
+    let bancoAlvoCapa = null;
+    const inpCapa = document.getElementById("bqInputCapa");
+    if (inpCapa) {
+      inpCapa.addEventListener("change", () => {
+        const f = inpCapa.files && inpCapa.files[0];
+        const idAlvo = bancoAlvoCapa;
+        inpCapa.value = "";
+        bancoAlvoCapa = null;
+        if (f && idAlvo) enviarCapaHub(idAlvo, f);
+      });
+    }
+
     sec.querySelectorAll("[data-selecionar-banco]").forEach(card => {
-      card.addEventListener("click", () => {
-        selecionarBanco(card.dataset.selecionarBanco);
+      const idBanco = card.dataset.selecionarBanco;
+
+      card.addEventListener("click", e => {
+        const btnUp = e.target.closest("[data-capa-upload]");
+        if (btnUp) {
+          e.stopPropagation();
+          bancoAlvoCapa = btnUp.dataset.capaUpload;
+          if (inpCapa) inpCapa.click();
+          return;
+        }
+        const btnRem = e.target.closest("[data-capa-remover]");
+        if (btnRem) {
+          e.stopPropagation();
+          removerCapaHub(btnRem.dataset.capaRemover);
+          return;
+        }
+        selecionarBanco(idBanco);
+      });
+
+      card.addEventListener("keydown", e => {
+        if (e.target !== card) return;
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          selecionarBanco(idBanco);
+        }
+      });
+
+      // Arrastar e soltar imagem direto sobre o card (modo Admin)
+      card.addEventListener("dragover", e => {
+        if (!ehAdmin()) return;
+        e.preventDefault();
+        card.classList.add("bq-hub-card--solta");
+      });
+      card.addEventListener("dragleave", () => {
+        card.classList.remove("bq-hub-card--solta");
+      });
+      card.addEventListener("drop", e => {
+        card.classList.remove("bq-hub-card--solta");
+        if (!ehAdmin()) return;
+        const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+        if (f && /^image\//i.test(f.type || "")) {
+          e.preventDefault();
+          enviarCapaHub(idBanco, f);
+        }
       });
     });
+
+    const btnSalvarPC = document.getElementById("bqBtnSalvarPC");
+    if (btnSalvarPC) {
+      btnSalvarPC.addEventListener("click", async () => {
+        if (!window.EJStorageDrive || !window.EJStorageDrive.salvarNaPastaDoPC) return;
+        try {
+          await window.EJStorageDrive.salvarNaPastaDoPC(true);
+          renderCapasHub();
+          toast("Capas gravadas na pasta do PC! Rode atualizar.bat para publicar.", "sucesso", 4200);
+        } catch (e) {
+          if (e && e.name !== "AbortError") {
+            toast(e.message || "Erro ao salvar na pasta do PC.", "erro", 4000);
+          }
+        }
+      });
+    }
 
     const btnVoltar = document.getElementById("bqBtnVoltarSelecao");
     if (btnVoltar) {
@@ -989,10 +1228,16 @@
   async function abrir() {
     montarEstruturaBase();
     mostrarSelecao();
-    await carregarBanco();
+    renderCapasHub();
+    await Promise.all([carregarBanco(), carregarCapasHub()]);
     atualizarHistorico();
     renderHubContadores();
+    renderCapasHub();
   }
+
+  window.addEventListener("ej-admin-mudou", () => {
+    if (montado) renderCapasHub();
+  });
 
   // Atualiza automaticamente quando o Google Drive terminar de sincronizar
   window.addEventListener("ej-banco-questoes-sync", () => {
