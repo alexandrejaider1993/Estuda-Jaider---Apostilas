@@ -5,19 +5,19 @@
 (function () {
   "use strict";
 
-  const STORAGE_KEY = "ej_abnt_rascunho_v1";
+  const STORAGE_KEY = "ej_abnt_rascunho_v2";
   const DOCX_SRC = "assets/docx.umd.js";
 
   const DEFAULTS = {
-    instituicao: "Faculdade Santa Marcelina - FASM",
-    curso: "Curso de Medicina | Disciplina de Gestão em Saúde",
-    autores: "Alexandre Jaider, Gabriela Nascimento, Sara Andrade, Sophia Andreoni",
-    titulo: "QUESTÕES JURÍDICAS E CONFLITOS COM O CÓDIGO DE ÉTICA MÉDICA",
-    subtitulo: "Fundamentos, esferas de responsabilidade e gestão de riscos",
-    orientador: "Prof. Dr. Gustavo Oliveira",
-    nota: "Trabalho Acadêmico apresentado à disciplina de Gestão em Saúde do Curso de Medicina da FASM, como requisito parcial para obtenção de nota regimental.",
-    cidade: "São Paulo - SP",
-    ano: "2026",
+    instituicao: "",
+    curso: "",
+    autores: "",
+    titulo: "",
+    subtitulo: "",
+    orientador: "",
+    nota: "",
+    cidade: "",
+    ano: "",
     fonte: "Times New Roman"
   };
 
@@ -686,7 +686,7 @@ KFOURI NETO, Miguel. **Responsabilidade civil do médico**. 11. ed. São Paulo: 
           </div>
           <div class="abnt-hero__acoes">
             <button type="button" class="abnt-btn-mini" id="abntBtnExemplo">Carregar exemplo ABNT</button>
-            <button type="button" class="abnt-btn-mini" id="abntBtnReset">Restaurar padrão</button>
+            <button type="button" class="abnt-btn-mini" id="abntBtnReset">Limpar campos</button>
           </div>
         </div>
 
@@ -701,39 +701,39 @@ KFOURI NETO, Miguel. **Responsabilidade civil do médico**. 11. ed. São Paulo: 
               <div class="abnt-form-grid">
                 <div class="abnt-field abnt-field--full">
                   <label class="abnt-label" for="abntInstituicao">Instituição</label>
-                  <input class="abnt-input" id="abntInstituicao" value="${esc(val("instituicao"))}">
+                  <input class="abnt-input" id="abntInstituicao" placeholder="Ex.: Nome da Faculdade ou Universidade" value="${esc(val("instituicao"))}">
                 </div>
                 <div class="abnt-field abnt-field--full">
                   <label class="abnt-label" for="abntCurso">Curso / Disciplina</label>
-                  <input class="abnt-input" id="abntCurso" value="${esc(val("curso"))}">
+                  <input class="abnt-input" id="abntCurso" placeholder="Ex.: Curso de Medicina | Disciplina" value="${esc(val("curso"))}">
                 </div>
                 <div class="abnt-field abnt-field--full">
                   <label class="abnt-label" for="abntAutores">Autor(es)</label>
-                  <input class="abnt-input" id="abntAutores" value="${esc(val("autores"))}">
+                  <input class="abnt-input" id="abntAutores" placeholder="Ex.: Nome Completo do Autor" value="${esc(val("autores"))}">
                 </div>
                 <div class="abnt-field abnt-field--full">
                   <label class="abnt-label" for="abntTitulo">Título</label>
-                  <input class="abnt-input" id="abntTitulo" value="${esc(val("titulo"))}">
+                  <input class="abnt-input" id="abntTitulo" placeholder="Ex.: TÍTULO DO TRABALHO" value="${esc(val("titulo"))}">
                 </div>
                 <div class="abnt-field abnt-field--full">
                   <label class="abnt-label" for="abntSubtitulo">Subtítulo (opcional)</label>
-                  <input class="abnt-input" id="abntSubtitulo" value="${esc(val("subtitulo"))}">
+                  <input class="abnt-input" id="abntSubtitulo" placeholder="Subtítulo do trabalho (se houver)" value="${esc(val("subtitulo"))}">
                 </div>
                 <div class="abnt-field abnt-field--full">
                   <label class="abnt-label" for="abntOrientador">Orientador</label>
-                  <input class="abnt-input" id="abntOrientador" value="${esc(val("orientador"))}">
+                  <input class="abnt-input" id="abntOrientador" placeholder="Ex.: Prof. Dr. Nome do Orientador" value="${esc(val("orientador"))}">
                 </div>
                 <div class="abnt-field abnt-field--full">
                   <label class="abnt-label" for="abntNota">Nota de Apresentação (Folha de Rosto)</label>
-                  <textarea class="abnt-textarea" id="abntNota" rows="3">${esc(val("nota"))}</textarea>
+                  <textarea class="abnt-textarea" id="abntNota" rows="3" placeholder="Ex.: Trabalho Acadêmico apresentado à disciplina..., como requisito parcial para...">${esc(val("nota"))}</textarea>
                 </div>
                 <div class="abnt-field">
                   <label class="abnt-label" for="abntCidade">Cidade - UF</label>
-                  <input class="abnt-input" id="abntCidade" value="${esc(val("cidade"))}">
+                  <input class="abnt-input" id="abntCidade" placeholder="Ex.: São Paulo - SP" value="${esc(val("cidade"))}">
                 </div>
                 <div class="abnt-field">
                   <label class="abnt-label" for="abntAno">Ano</label>
-                  <input class="abnt-input" id="abntAno" value="${esc(val("ano"))}">
+                  <input class="abnt-input" id="abntAno" placeholder="Ex.: 2026" value="${esc(val("ano"))}">
                 </div>
               </div>
             </section>
@@ -939,18 +939,18 @@ KFOURI NETO, Miguel. **Responsabilidade civil do médico**. 11. ed. São Paulo: 
     };
 
     $("abntBtnReset").onclick = () => {
-      $("abntInstituicao").value = DEFAULTS.instituicao;
-      $("abntCurso").value = DEFAULTS.curso;
-      $("abntAutores").value = DEFAULTS.autores;
-      $("abntTitulo").value = DEFAULTS.titulo;
-      $("abntSubtitulo").value = DEFAULTS.subtitulo;
-      $("abntOrientador").value = DEFAULTS.orientador;
-      $("abntNota").value = DEFAULTS.nota;
-      $("abntCidade").value = DEFAULTS.cidade;
-      $("abntAno").value = DEFAULTS.ano;
+      $("abntInstituicao").value = "";
+      $("abntCurso").value = "";
+      $("abntAutores").value = "";
+      $("abntTitulo").value = "";
+      $("abntSubtitulo").value = "";
+      $("abntOrientador").value = "";
+      $("abntNota").value = "";
+      $("abntCidade").value = "";
+      $("abntAno").value = "";
       $("abntFonte").value = DEFAULTS.fonte;
       persistir();
-      toast("Metadados restaurados para o padrão.");
+      toast("Campos de metadados limpos.");
     };
 
     // 1. VALIDAR ESTRUTURA

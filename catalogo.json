@@ -2414,6 +2414,296 @@
           "n_alt": 4
         }
       ]
+    },
+    {
+      "pasta": "quinolonas-sulfonamidas-polimixinas-metronidazol",
+      "titulo": "Quinolonas, sulfonamidas, polimixinas e metronidazol",
+      "subtitulo": "",
+      "disciplina": "",
+      "periodo": "",
+      "prova": "",
+      "data_aula": "",
+      "capitulos": [],
+      "contagem": {},
+      "url": "/interativos/quinolonas-sulfonamidas-polimixinas-metronidazol/index.html",
+      "capa": "",
+      "modificado": 1795307943,
+      "chave_local": "quinolonas-sulfonamidas-polimixinas-metronidazol",
+      "conceitos": [
+        {
+          "id": "quinolonas-mecanismo",
+          "nome": "Inibição da DNA girase e topoisomerase IV"
+        },
+        {
+          "id": "quinolonas-geracoes-tecido",
+          "nome": "Gerações (1ª a 4ª) e afinidade tecidual"
+        },
+        {
+          "id": "quinolonas-quelacao-pk",
+          "nome": "Absorção oral, quelação e inibição do CYP450"
+        },
+        {
+          "id": "quinolonas-toxicidade-res",
+          "nome": "Tendinopatia, efeitos no SNC, resistência e restrição"
+        },
+        {
+          "id": "folato-sequencial",
+          "nome": "Bloqueio sequencial da síntese de folato"
+        },
+        {
+          "id": "sulfas-indicacoes-pk",
+          "nome": "Classificação, farmacocinética e indicações do cotrimoxazol"
+        },
+        {
+          "id": "sulfas-kernicterus-sjs",
+          "nome": "Kernicterus, Síndrome de Stevens-Johnson e cristalúria"
+        },
+        {
+          "id": "sulfas-hemato-interacoes",
+          "nome": "Toxicidade hematológica (folato e G6PD) e interações medicamentosas"
+        },
+        {
+          "id": "polimixinas-mecanismo",
+          "nome": "Ação detergente sobre LPS, Ca2+ e Mg2+ na membrana"
+        },
+        {
+          "id": "polimixinas-espectro-be",
+          "nome": "Espectro Gram- MDR, intrinsecamente resistentes e Poli B vs. E"
+        },
+        {
+          "id": "polimixinas-toxicidade-reserva",
+          "nome": "Nefrotoxicidade, neurotoxicidade e status de droga de reserva"
+        },
+        {
+          "id": "metronidazol-espectro-mec",
+          "nome": "Mecanismo por radicais livres e espectro (anaeróbios e protozoários)"
+        },
+        {
+          "id": "metronidazol-dissulfiram",
+          "nome": "Efeito dissulfiram com álcool e ajuste hepático"
+        }
+      ],
+      "testes": [
+        {
+          "id": "t1",
+          "conceito": "quinolonas-mecanismo",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t2",
+          "conceito": "quinolonas-geracoes-tecido",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t3",
+          "conceito": "quinolonas-quelacao-pk",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t4",
+          "conceito": "quinolonas-toxicidade-res",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t5",
+          "conceito": "folato-sequencial",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t6",
+          "conceito": "sulfas-indicacoes-pk",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t7",
+          "conceito": "sulfas-kernicterus-sjs",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t8",
+          "conceito": "sulfas-hemato-interacoes",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t9",
+          "conceito": "polimixinas-mecanismo",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t10",
+          "conceito": "polimixinas-espectro-be",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t11",
+          "conceito": "polimixinas-toxicidade-reserva",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t12",
+          "conceito": "polimixinas-toxicidade-reserva",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t13",
+          "conceito": "metronidazol-espectro-mec",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t14",
+          "conceito": "metronidazol-dissulfiram",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        }
+      ]
+    },
+    {
+      "pasta": "tetraciclinas-macrolideos-e-outros-inibidores-da",
+      "titulo": "Tetraciclinas, macrolídeos e outros inibidores da síntese proteica",
+      "subtitulo": "",
+      "disciplina": "Farmacoterapia",
+      "periodo": "",
+      "prova": "",
+      "data_aula": "",
+      "capitulos": [],
+      "contagem": {},
+      "url": "/interativos/tetraciclinas-macrolideos-e-outros-inibidores-da/index.html",
+      "capa": "",
+      "modificado": 1795307912,
+      "chave_local": "tetraciclinas-macrolideos-e-outros-inibidores-da",
+      "conceitos": [
+        {
+          "id": "alvos",
+          "nome": "Mapa dos alvos"
+        },
+        {
+          "id": "associacoes",
+          "nome": "Associações e resistência"
+        },
+        {
+          "id": "tetra-uso",
+          "nome": "Atividade e usos"
+        },
+        {
+          "id": "tetra-seguranca",
+          "nome": "Absorção e segurança"
+        },
+        {
+          "id": "macro-uso",
+          "nome": "Mecanismo e cobertura"
+        },
+        {
+          "id": "macro-risco",
+          "nome": "Interações e segurança"
+        },
+        {
+          "id": "outros-uso",
+          "nome": "Alvo e seleção"
+        },
+        {
+          "id": "outros-risco",
+          "nome": "Toxicidades distintivas"
+        }
+      ],
+      "testes": [
+        {
+          "id": "t1",
+          "conceito": "alvos",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t2",
+          "conceito": "associacoes",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t3",
+          "conceito": "associacoes",
+          "nivel": 3,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t4",
+          "conceito": "tetra-seguranca",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t5",
+          "conceito": "tetra-seguranca",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t6",
+          "conceito": "macro-uso",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t7",
+          "conceito": "macro-risco",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t8",
+          "conceito": "macro-risco",
+          "nivel": 3,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t9",
+          "conceito": "outros-risco",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t10",
+          "conceito": "outros-risco",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        }
+      ]
     }
   ],
   "organizacao_padrao": {
