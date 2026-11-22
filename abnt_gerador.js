@@ -1,6 +1,6 @@
 /* ==========================================================================
    Gerador ABNT 2026 — Módulo Web Completo (Estuda Jaider)
-   Port fiel + melhorias web do Gerador ABNT Python (docx, PDF, Revisão IA Groq)
+   100% local no navegador (Word .docx, PDF A4 e Pré-visualização ABNT)
    ========================================================================== */
 (function () {
   "use strict";
@@ -18,8 +18,7 @@
     nota: "Trabalho Acadêmico apresentado à disciplina de Gestão em Saúde do Curso de Medicina da FASM, como requisito parcial para obtenção de nota regimental.",
     cidade: "São Paulo - SP",
     ano: "2026",
-    fonte: "Times New Roman",
-    modeloIA: "llama-3.3-70b-versatile"
+    fonte: "Times New Roman"
   };
 
   const EXEMPLO_MD = `# RESUMO
@@ -254,48 +253,6 @@ KFOURI NETO, Miguel. **Responsabilidade civil do médico**. 11. ed. São Paulo: 
         temGatilhoExplicito
       }
     };
-  }
-
-  /* ================= API GROQ (REVISÃO POR IA) ================= */
-  async function revisarComGroq(texto, apiKey, modelo) {
-    const url = "https://api.groq.com/openai/v1/chat/completions";
-    const systemPrompt =
-      "Você é um revisor acadêmico especialista em ABNT NBR 6023:2025. Sua tarefa é REVISAR o texto fornecido: " +
-      "1. Corrija erros de ortografia, gramática e coesão. " +
-      "2. Certifique-se de que a nomenclatura médica e anatômica está correta. " +
-      "3. Se houver uma seção de # REFERÊNCIAS, formate as citações no padrão NBR 6023:2025. " +
-      "4. MANTENHA rigorosamente a estrutura Markdown original (os #, ##, >, -, **, *, etc). " +
-      "5. RETORNE APENAS O TEXTO CORRIGIDO, sem mensagens introdutórias.";
-
-    const resp = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${apiKey}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        model: modelo || DEFAULTS.modeloIA,
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: texto }
-        ],
-        temperature: 0.2
-      })
-    });
-
-    if (!resp.ok) {
-      let detalhe = `HTTP ${resp.status}`;
-      try {
-        const errJson = await resp.json();
-        if (errJson?.error?.message) detalhe = errJson.error.message;
-      } catch (e) {}
-      throw new Error(`Erro na API Groq: ${detalhe}`);
-    }
-
-    const data = await resp.json();
-    const content = data?.choices?.[0]?.message?.content;
-    if (!content) throw new Error("A API Groq retornou uma resposta vazia.");
-    return content;
   }
 
   /* ================= GERADOR DE WORD (.DOCX) ================= */
@@ -724,7 +681,7 @@ KFOURI NETO, Miguel. **Responsabilidade civil do médico**. 11. ed. São Paulo: 
         <div class="abnt-hero">
           <div>
             <span class="abnt-badge">ABNT NBR 14724 · NBR 6023:2025</span>
-            <h1 class="abnt-hero__tit">Formatador e Revisor IA (Padrão ABNT)</h1>
+            <h1 class="abnt-hero__tit">Gerador e Formatador ABNT</h1>
             <p class="abnt-hero__sub">Transforme seu texto em Markdown em um trabalho acadêmico completo com capa, folha de rosto, margens oficiais (3×3×2×2 cm), paginação a partir da introdução e referências ordenadas.</p>
           </div>
           <div class="abnt-hero__acoes">
@@ -734,47 +691,12 @@ KFOURI NETO, Miguel. **Responsabilidade civil do médico**. 11. ed. São Paulo: 
         </div>
 
         <div class="abnt-grid">
-          <!-- COLUNA ESQUERDA: IA + METADADOS -->
+          <!-- COLUNA ESQUERDA: METADADOS -->
           <div class="abnt-col">
-            <!-- 1. REVISÃO POR IA -->
+            <!-- 1. METADADOS DO TRABALHO -->
             <section class="abnt-card">
               <div class="abnt-card__head">
-                <h2 class="abnt-card__tit"><span class="abnt-card__num">1</span> Revisão Inteligente por IA (Opcional)</h2>
-              </div>
-              <p class="abnt-card__desc">Deseja que a IA corrija ortografia, gramática, coesão, nomenclatura médica e formate as referências (NBR 6023:2025) antes de gerar? Sua chave Groq <b>nunca é salva</b>.</p>
-
-              <label class="abnt-check">
-                <input type="checkbox" id="abntChkIA">
-                <span>Ativar Revisão por IA no momento da geração</span>
-              </label>
-
-              <div class="abnt-ia-box" id="abntBoxIA" hidden>
-                <div class="abnt-field">
-                  <label class="abnt-label" for="abntApiKey">
-                    <span>API Key (Groq)</span>
-                    <a href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer">Obter chave gratuita ↗</a>
-                  </label>
-                  <div class="abnt-key-wrap">
-                    <input class="abnt-input" type="password" id="abntApiKey" placeholder="gsk_..." autocomplete="off">
-                    <button type="button" class="abnt-key-eye" id="abntBtnVerKey" title="Mostrar/ocultar chave">
-                      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>
-                    </button>
-                  </div>
-                </div>
-                <div class="abnt-field">
-                  <label class="abnt-label" for="abntModeloIA">Modelo Groq</label>
-                  <select class="abnt-select" id="abntModeloIA">
-                    <option value="llama-3.3-70b-versatile">Llama 3.3 70B Versatile (Recomendado)</option>
-                    <option value="llama-3.1-8b-instant">Llama 3.1 8B Instant (Mais rápido)</option>
-                  </select>
-                </div>
-              </div>
-            </section>
-
-            <!-- 2. METADADOS DO TRABALHO -->
-            <section class="abnt-card">
-              <div class="abnt-card__head">
-                <h2 class="abnt-card__tit"><span class="abnt-card__num">2</span> Metadados do Trabalho (Capa e Folha de Rosto)</h2>
+                <h2 class="abnt-card__tit"><span class="abnt-card__num">1</span> Metadados do Trabalho (Capa e Folha de Rosto)</h2>
               </div>
               <div class="abnt-form-grid">
                 <div class="abnt-field abnt-field--full">
@@ -819,10 +741,10 @@ KFOURI NETO, Miguel. **Responsabilidade civil do médico**. 11. ed. São Paulo: 
 
           <!-- COLUNA DIREITA: MARKDOWN + CONFIGURAÇÕES E GERAÇÃO -->
           <div class="abnt-col">
-            <!-- 3. ARQUIVO / CONTEÚDO MARKDOWN -->
+            <!-- 2. ARQUIVO / CONTEÚDO MARKDOWN -->
             <section class="abnt-card">
               <div class="abnt-card__head">
-                <h2 class="abnt-card__tit"><span class="abnt-card__num">3</span> Conteúdo do Trabalho (.md ou texto)</h2>
+                <h2 class="abnt-card__tit"><span class="abnt-card__num">2</span> Conteúdo do Trabalho (.md ou texto)</h2>
                 <button type="button" class="abnt-btn-mini" id="abntBtnLimparMd">Limpar texto</button>
               </div>
 
@@ -852,10 +774,10 @@ KFOURI NETO, Miguel. **Responsabilidade civil do médico**. 11. ed. São Paulo: 
               </details>
             </section>
 
-            <!-- 4. CONFIGURAÇÕES E GERAÇÃO -->
+            <!-- 3. CONFIGURAÇÕES E GERAÇÃO -->
             <section class="abnt-card">
               <div class="abnt-card__head">
-                <h2 class="abnt-card__tit"><span class="abnt-card__num">4</span> Configurações e Exportação</h2>
+                <h2 class="abnt-card__tit"><span class="abnt-card__num">3</span> Configurações e Exportação</h2>
               </div>
 
               <div class="abnt-form-grid">
@@ -900,7 +822,6 @@ KFOURI NETO, Miguel. **Responsabilidade civil do médico**. 11. ed. São Paulo: 
 
     const $ = id => document.getElementById(id);
     $("abntFonte").value = val("fonte");
-    $("abntModeloIA").value = val("modeloIA");
 
     function coletarMetadados() {
       return {
@@ -913,8 +834,7 @@ KFOURI NETO, Miguel. **Responsabilidade civil do médico**. 11. ed. São Paulo: 
         nota: $("abntNota").value.trim(),
         cidade: $("abntCidade").value.trim(),
         ano: $("abntAno").value.trim(),
-        fonte: $("abntFonte").value,
-        modeloIA: $("abntModeloIA").value
+        fonte: $("abntFonte").value
       };
     }
 
@@ -940,21 +860,11 @@ KFOURI NETO, Miguel. **Responsabilidade civil do médico**. 11. ed. São Paulo: 
       `;
     }
 
-    // Toggle IA
-    $("abntChkIA").onchange = () => {
-      $("abntBoxIA").hidden = !$("abntChkIA").checked;
-    };
-    $("abntBtnVerKey").onclick = () => {
-      const inp = $("abntApiKey");
-      inp.type = inp.type === "password" ? "text" : "password";
-      inp.focus();
-    };
-
-    // Auto-save rascunho (sem API key)
+    // Auto-save rascunho local
     [
       "abntInstituicao", "abntCurso", "abntAutores", "abntTitulo",
       "abntSubtitulo", "abntOrientador", "abntNota", "abntCidade",
-      "abntAno", "abntFonte", "abntModeloIA", "abntMdTexto"
+      "abntAno", "abntFonte", "abntMdTexto"
     ].forEach(id => {
       $(id).addEventListener("input", () => {
         persistir();
@@ -1105,14 +1015,6 @@ KFOURI NETO, Miguel. **Responsabilidade civil do médico**. 11. ed. São Paulo: 
         return;
       }
 
-      const usarIA = $("abntChkIA").checked;
-      const apiKey = $("abntApiKey").value.trim();
-      if (usarIA && !apiKey) {
-        toast("Para usar a Revisão por IA, insira sua API Key da Groq!", "erro");
-        $("abntApiKey").focus();
-        return;
-      }
-
       const btnGerar = $("abntBtnGerar");
       const btnValidar = $("abntBtnValidar");
       btnGerar.disabled = true;
@@ -1120,25 +1022,15 @@ KFOURI NETO, Miguel. **Responsabilidade civil do médico**. 11. ed. São Paulo: 
 
       try {
         const meta = coletarMetadados();
-        let mdProcessado = mdOriginal;
 
-        if (usarIA) {
-          atualizarStatus("Fase 1: Enviando texto para a IA revisar (Groq)...", 12);
-          mdProcessado = await revisarComGroq(mdOriginal, apiKey, meta.modeloIA);
-          $("abntApiKey").value = ""; // limpa imediatamente da memória da tela
-          $("abntMdTexto").value = mdProcessado;
-          persistir();
-          atualizarMetricas();
-        }
-
-        atualizarStatus("Fase 2: Estruturando Capa, Folha de Rosto e Seções ABNT...", 35);
-        const parsed = parseMarkdownABNT(mdProcessado);
+        atualizarStatus("Fase 1: Estruturando Capa, Folha de Rosto e Seções ABNT...", 25);
+        const parsed = parseMarkdownABNT(mdOriginal);
 
         if (gerarWord) {
-          atualizarStatus("Fase 3: Construindo documento Word (.docx) padrão ABNT...", 60);
+          atualizarStatus("Fase 2: Construindo documento Word (.docx) padrão ABNT...", 55);
           const blob = await construirDocxBlob(meta, parsed);
 
-          atualizarStatus("Fase 4: Preparando download do arquivo Word...", 85);
+          atualizarStatus("Fase 3: Preparando download do arquivo Word...", 85);
           const slug = (meta.titulo || "Trabalho_ABNT_Final")
             .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
             .replace(/[^a-zA-Z0-9]+/g, "_").replace(/^_|_$/g, "").slice(0, 48) || "Trabalho_ABNT_Final";
@@ -1153,7 +1045,7 @@ KFOURI NETO, Miguel. **Responsabilidade civil do médico**. 11. ed. São Paulo: 
         }
 
         if (gerarPdf) {
-          atualizarStatus("Fase 5: Abrindo impressão A4 para salvar em PDF...", 94);
+          atualizarStatus("Abrindo impressão A4 para salvar em PDF...", 94);
           exportarPdfViaImpressao(meta, parsed);
         }
 

@@ -189,33 +189,6 @@ html[data-dispositivo="celular"] #geradorAbnt.container {
   tab-size: 2;
 }
 
-/* Campo API Key com botão olho */
-.abnt-key-wrap {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-.abnt-key-wrap .abnt-input {
-  padding-right: 40px;
-}
-.abnt-key-eye {
-  position: absolute;
-  right: 6px;
-  border: 0;
-  background: transparent;
-  color: var(--cor-suave);
-  width: 30px;
-  height: 30px;
-  border-radius: 6px;
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-}
-.abnt-key-eye:hover {
-  background: var(--cor-fio);
-  color: var(--cor-tinta);
-}
-
 /* Checkbox / Toggle */
 .abnt-check {
   display: inline-flex;
@@ -232,17 +205,6 @@ html[data-dispositivo="celular"] #geradorAbnt.container {
   accent-color: var(--cor-veia);
   cursor: pointer;
   margin: 0;
-}
-
-.abnt-ia-box {
-  margin-top: 12px;
-  padding: 14px;
-  border-radius: 10px;
-  background: var(--cor-superficie-2);
-  border: 1px solid var(--cor-fio);
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
 }
 
 /* Dropzone Markdown */
