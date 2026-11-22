@@ -1,6 +1,6 @@
 /* ==========================================================================
    Gerador ABNT 2026 — Módulo Web Completo (Estuda Jaider)
-   100% local no navegador (Word .docx, PDF A4 e Pré-visualização ABNT)
+   100% local no navegador (Word .docx e Pré-visualização ABNT)
    Conforme ABNT NBR 14724, NBR 6023:2025, NBR 6024, NBR 6027 e NBR 6028
    ========================================================================== */
 (function () {
@@ -802,174 +802,6 @@ KFOURI NETO, Miguel. **Responsabilidade civil do médico**. 11. ed. São Paulo: 
     return `<p class="abnt-folha__pre-tit">SUMÁRIO</p>${linhas.join("")}`;
   }
 
-  function exportarPdfViaImpressao(meta, parsed) {
-    const fonteCss = meta.fonte === "Arial" ? "Arial, Helvetica, sans-serif" : '"Times New Roman", Times, Georgia, serif';
-    const autoresHtml = extrairAutores(meta.autores).map(a => `<div class="upper">${esc(a)}</div>`).join("");
-
-    const temSumarioManual = parsed.preTextuais.some(b => b.tipo === "titulo_pre" && (b.texto === "SUMÁRIO" || b.texto === "SUMARIO"));
-    const sumarioHtml = (meta.incluirSumario && !temSumarioManual && parsed.sumarioItens.length > 0)
-      ? `<section class="abnt-pre abnt-pb">${gerarSumarioHtml(parsed)}</section>`
-      : "";
-
-    const preHtml = parsed.preTextuais.length
-      ? `<section class="abnt-pre abnt-pb">${blocosParaHtml(parsed.preTextuais)}</section>`
-      : "";
-
-    const refHtml = parsed.referencias.length
-      ? `<div class="abnt-pb"></div>
-         <p class="ref-tit">REFERÊNCIAS</p>
-         ${parsed.referencias.map(r => `<p class="ref-item">${inlineParaHtml(r)}</p>`).join("")}`
-      : "";
-
-    const corpoHtml = (parsed.textuais.length || parsed.referencias.length)
-      ? `<section class="abnt-textual abnt-corpo">${blocosParaHtml(parsed.textuais)}${refHtml}</section>`
-      : "";
-
-    const docHtml = `<!doctype html>
-<html lang="pt-BR">
-<head>
-<meta charset="utf-8">
-<title>${esc(meta.titulo || "Trabalho ABNT")}</title>
-<style>
-  @page {
-    size: A4;
-    margin: 3cm 2cm 2cm 3cm;
-  }
-  @page textual {
-    size: A4;
-    margin: 3cm 2cm 2cm 3cm;
-    @top-right {
-      content: counter(page);
-      font-family: ${fonteCss};
-      font-size: 10pt;
-      vertical-align: bottom;
-      padding-bottom: 0.5cm;
-    }
-  }
-  * { box-sizing: border-box; }
-  html, body {
-    margin: 0;
-    padding: 0;
-    background: #fff;
-    color: #000;
-    font-family: ${fonteCss};
-    font-size: 12pt;
-    line-height: 1.5;
-  }
-  .pagina-capa, .pagina-rosto {
-    min-height: 24.5cm;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    text-align: center;
-    page-break-after: always;
-    break-after: page;
-  }
-  .pagina-rosto { counter-reset: page 1; }
-  .centro { text-align: center; }
-  .bold { font-weight: 700; }
-  .upper { text-transform: uppercase; }
-  .nota-rosto {
-    margin-left: 8cm;
-    text-align: justify;
-    font-size: 10pt;
-    line-height: 1.15;
-  }
-  .nota-rosto p { margin: 0 0 12pt; text-indent: 0; }
-  .abnt-pb { page-break-before: always; break-before: page; }
-  .abnt-pb-before { page-break-before: always; break-before: page; }
-  .abnt-textual { page: textual; page-break-before: always; break-before: page; }
-  .abnt-folha__pre-tit { text-align: center; font-weight: 700; text-transform: uppercase; margin: 0 0 18pt; text-indent: 0; }
-  .abnt-folha__sem-recuo { text-indent: 0 !important; line-height: 1.15; margin: 0 0 10pt; text-align: justify; }
-  .abnt-folha__sumario-item { text-indent: 0 !important; margin: 0 0 4pt; line-height: 1.5; }
-  .abnt-corpo h1 { font-size: 12pt; font-weight: 700; text-transform: uppercase; margin: 12pt 0 12pt; text-align: left; }
-  .abnt-corpo h2 { font-size: 12pt; font-weight: 400; text-transform: uppercase; margin: 12pt 0 12pt; text-align: left; }
-  .abnt-corpo h3 { font-size: 12pt; font-weight: 700; margin: 12pt 0 12pt; text-align: left; }
-  .abnt-corpo p { margin: 0; text-align: justify; text-indent: 1.25cm; }
-  .abnt-corpo blockquote { margin: 12pt 0 12pt 4cm; font-size: 10pt; line-height: 1.05; text-align: justify; }
-  .abnt-corpo ul, .abnt-corpo ol { margin: 6pt 0 10pt; padding-left: 1.5cm; text-align: justify; }
-  table { width: 100%; border-collapse: collapse; margin: 12pt 0; font-size: 10pt; line-height: 1.15; }
-  th, td { padding: 5pt 6pt; text-align: left; border-top: 1px solid #000; border-bottom: 1px solid #000; }
-  th { font-weight: 700; border-top: 1.5px solid #000; }
-  .ref-tit { text-align: center; font-weight: 700; text-transform: uppercase; margin: 0 0 18pt; text-indent: 0; }
-  .ref-item { text-align: left; text-indent: 0 !important; line-height: 1.05; margin: 0 0 12pt !important; }
-</style>
-</head>
-<body>
-  <section class="pagina-capa">
-    <div class="centro">
-      <div class="bold upper">${esc(meta.instituicao)}</div>
-      <div class="bold upper">${esc(meta.curso)}</div>
-      <div style="margin-top: 2.5cm">${autoresHtml}</div>
-    </div>
-    <div class="centro">
-      <div class="bold upper">${esc(meta.titulo)}</div>
-      ${meta.subtitulo ? `<div>${esc(meta.subtitulo)}</div>` : ""}
-    </div>
-    <div class="centro">
-      <div>${esc(meta.cidade)}</div>
-      <div>${esc(meta.ano)}</div>
-    </div>
-  </section>
-
-  <section class="pagina-rosto">
-    <div class="centro">${autoresHtml}</div>
-    <div class="centro">
-      <div class="bold upper">${esc(meta.titulo)}</div>
-      ${meta.subtitulo ? `<div>${esc(meta.subtitulo)}</div>` : ""}
-    </div>
-    <div class="nota-rosto">
-      ${meta.nota ? `<p>${esc(meta.nota)}</p>` : ""}
-      ${meta.orientador ? `<p>Orientador: ${esc(meta.orientador)}</p>` : ""}
-    </div>
-    <div class="centro">
-      <div>${esc(meta.cidade)}</div>
-      <div>${esc(meta.ano)}</div>
-    </div>
-  </section>
-
-  ${preHtml}
-  ${sumarioHtml}
-  ${corpoHtml}
-</body>
-</html>`;
-
-    const iframe = document.createElement("iframe");
-    iframe.style.position = "fixed";
-    iframe.style.right = "0";
-    iframe.style.bottom = "0";
-    iframe.style.width = "0";
-    iframe.style.height = "0";
-    iframe.style.border = "0";
-    document.body.appendChild(iframe);
-
-    let removido = false;
-    const limpar = () => {
-      if (removido) return;
-      removido = true;
-      iframe.remove();
-    };
-
-    const win = iframe.contentWindow;
-    const doc = win.document;
-    doc.open();
-    doc.write(docHtml);
-    doc.close();
-
-    win.addEventListener("afterprint", limpar, { once: true });
-    setTimeout(limpar, 60000); // fallback seguro de 60s
-
-    setTimeout(() => {
-      try {
-        win.focus();
-        win.print();
-      } catch (e) {
-        limpar();
-        toast("Não foi possível abrir a janela de impressão/PDF.", "erro");
-      }
-    }, 350);
-  }
-
   /* ================= INTERFACE DO GERADOR ABNT ================= */
   let montado = false;
   let nomeArquivoAtual = "";
@@ -1117,7 +949,7 @@ KFOURI NETO, Miguel. **Responsabilidade civil do médico**. 11. ed. São Paulo: 
                   <li><code>## 1.1 Subtítulo</code> — Seção secundária (MAIÚSCULA sem negrito)</li>
                   <li><code>### 1.1.1 Detalhe</code> — Seção terciária (Título em negrito)</li>
                   <li><code>&gt; Citação longa...</code> — Recuo 4 cm, fonte 10pt, espaçamento simples</li>
-                  <li><code>**negrito**</code> e <code>*itálico*</code> — Formatação inline preservada no Word e PDF</li>
+                  <li><code>**negrito**</code> e <code>*itálico*</code> — Formatação inline preservada no Word</li>
                   <li><code>- Item</code> ou <code>1. Item</code> — Listas com marcadores ou numeradas</li>
                   <li><code>| Coluna 1 | Coluna 2 |</code> — Tabelas no padrão ABNT (bordas horizontais limpas)</li>
                   <li><code>---</code> — Quebra de página manual</li>
@@ -1140,18 +972,10 @@ KFOURI NETO, Miguel. **Responsabilidade civil do médico**. 11. ed. São Paulo: 
                     <option value="Arial">Arial</option>
                   </select>
                 </div>
-                <div class="abnt-field" style="justify-content:center;gap:8px;padding-top:10px">
+                <div class="abnt-field" style="justify-content:center;gap:8px;padding-top:16px">
                   <label class="abnt-check">
                     <input type="checkbox" id="abntChkSumario" ${val("incluirSumario") ? "checked" : ""}>
                     <span>Incluir Sumário automático</span>
-                  </label>
-                  <label class="abnt-check">
-                    <input type="checkbox" id="abntChkWord" checked>
-                    <span>Gerar Word (.docx)</span>
-                  </label>
-                  <label class="abnt-check">
-                    <input type="checkbox" id="abntChkPdf">
-                    <span>Gerar PDF (.pdf / Impressão A4)</span>
                   </label>
                 </div>
               </div>
@@ -1166,7 +990,7 @@ KFOURI NETO, Miguel. **Responsabilidade civil do médico**. 11. ed. São Paulo: 
               <div class="abnt-acoes-linha">
                 <button type="button" class="botao botao--secundario" id="abntBtnValidar">Validar estrutura</button>
                 <button type="button" class="botao botao--secundario" id="abntBtnPreview">Pré-visualizar ABNT</button>
-                <button type="button" class="botao botao--primario abnt-btn-gerar" id="abntBtnGerar">Gerar Documento ABNT</button>
+                <button type="button" class="botao botao--primario abnt-btn-gerar" id="abntBtnGerar">Gerar Word ABNT (.docx)</button>
               </div>
 
               <div class="abnt-validacao" id="abntValidacaoBox" hidden></div>
@@ -1416,17 +1240,11 @@ KFOURI NETO, Miguel. **Responsabilidade civil do médico**. 11. ed. São Paulo: 
       abrirModalPreview(meta, parsed);
     };
 
-    // 3. GERAR DOCUMENTO ABNT
+    // 3. GERAR DOCUMENTO ABNT (.docx)
     $("abntBtnGerar").onclick = async () => {
       const mdOriginal = $("abntMdTexto").value.trim();
       if (!mdOriginal) {
         toast("Selecione um arquivo Markdown ou cole seu texto primeiro!", "erro");
-        return;
-      }
-      const gerarWord = $("abntChkWord").checked;
-      const gerarPdf = $("abntChkPdf").checked;
-      if (!gerarWord && !gerarPdf) {
-        toast("Marque ao menos um formato de saída (Word ou PDF)!", "erro");
         return;
       }
 
@@ -1441,31 +1259,24 @@ KFOURI NETO, Miguel. **Responsabilidade civil do médico**. 11. ed. São Paulo: 
         atualizarStatus("Fase 1: Estruturando Capa, Folha de Rosto e Seções ABNT...", 25);
         const parsed = parseMarkdownABNT(mdOriginal);
 
-        if (gerarWord) {
-          atualizarStatus("Fase 2: Construindo documento Word (.docx) padrão ABNT...", 55);
-          const blob = await construirDocxBlob(meta, parsed);
+        atualizarStatus("Fase 2: Construindo documento Word (.docx) padrão ABNT...", 60);
+        const blob = await construirDocxBlob(meta, parsed);
 
-          atualizarStatus("Fase 3: Preparando download do arquivo Word...", 85);
-          const slug = (meta.titulo || "Trabalho_ABNT_Final")
-            .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-            .replace(/[^a-zA-Z0-9]+/g, "_").replace(/^_|_$/g, "").slice(0, 48) || "Trabalho_ABNT_Final";
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.href = url;
-          a.download = `${slug}_ABNT.docx`;
-          document.body.appendChild(a);
-          a.click();
-          a.remove();
-          setTimeout(() => URL.revokeObjectURL(url), 3000);
-        }
+        atualizarStatus("Fase 3: Preparando download do arquivo Word...", 90);
+        const slug = (meta.titulo || "Trabalho_ABNT_Final")
+          .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+          .replace(/[^a-zA-Z0-9]+/g, "_").replace(/^_|_$/g, "").slice(0, 48) || "Trabalho_ABNT_Final";
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${slug}_ABNT.docx`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 3000);
 
-        if (gerarPdf) {
-          atualizarStatus("Abrindo impressão A4 para salvar em PDF...", 94);
-          exportarPdfViaImpressao(meta, parsed);
-        }
-
-        atualizarStatus("Concluído! Documento ABNT gerado com sucesso.", 100);
-        toast("Documento ABNT gerado com sucesso!");
+        atualizarStatus("Concluído! Documento Word ABNT gerado com sucesso.", 100);
+        toast("Documento Word ABNT gerado com sucesso!");
       } catch (e) {
         atualizarStatus(`Erro: ${e.message || e}`, 0);
         toast(e.message || "Ocorreu um erro ao gerar o documento.", "erro", 5000);
@@ -1517,7 +1328,6 @@ KFOURI NETO, Miguel. **Responsabilidade civil do médico**. 11. ed. São Paulo: 
         <div class="abnt-preview-topo">
           <h3>Pré-visualização ABNT (${esc(meta.fonte)} · Margens 3×3×2×2 cm · Capa fora da contagem)</h3>
           <div style="display:flex;gap:8px">
-            <button type="button" class="botao botao--primario" data-acao="pdf" style="padding:7px 14px;font-size:13px">Salvar como PDF</button>
             <button type="button" class="botao botao--secundario" data-acao="fechar" style="padding:7px 14px;font-size:13px">Fechar</button>
           </div>
         </div>
@@ -1571,7 +1381,6 @@ KFOURI NETO, Miguel. **Responsabilidade civil do médico**. 11. ed. São Paulo: 
     }
     fundo.addEventListener("mousedown", e => { if (e.target === fundo) fechar(); });
     fundo.querySelector('[data-acao="fechar"]').onclick = fechar;
-    fundo.querySelector('[data-acao="pdf"]').onclick = () => exportarPdfViaImpressao(meta, parsed);
     document.addEventListener("keydown", onEsc);
 
     document.body.appendChild(fundo);

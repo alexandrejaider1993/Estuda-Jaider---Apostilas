@@ -490,6 +490,137 @@
   }
   .conta-modal details { margin-top: 12px; font-size: 12.5px; color: var(--cor-suave); }
   .conta-modal summary { cursor: pointer; font-weight: 600; color: var(--cor-tinta); }
+
+  /* Página Home (Hub com 2 cards) */
+  #homeHub.container {
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 36px 30px 44px !important;
+    min-height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box !important;
+  }
+  .home-hub__inner {
+    width: min(860px, 100%);
+    margin: 0 auto;
+  }
+  .home-hub__head {
+    margin-bottom: 28px;
+  }
+  .home-hub__eyebrow {
+    display: inline-block;
+    font: 600 11.5px/1.2 var(--fonte-ui);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--cor-suave);
+    margin-bottom: 8px;
+  }
+  .home-hub__tit {
+    margin: 0 0 8px;
+    font: 600 30px/1.18 var(--fonte-titulo);
+    letter-spacing: -0.025em;
+    color: var(--cor-tinta);
+  }
+  .home-hub__sub {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--cor-suave);
+  }
+  .home-hub__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+  .home-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    gap: 14px;
+    padding: 28px 26px 24px;
+    border-radius: 18px;
+    border: 1px solid var(--cor-fio);
+    background: var(--cor-superficie);
+    color: var(--cor-tinta);
+    font: inherit;
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, .04);
+    transition: transform 180ms var(--ease-out), box-shadow 180ms var(--ease-out), border-color 180ms var(--ease-out);
+  }
+  .home-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--cor-borda-forte, var(--cor-veia));
+    box-shadow: 0 14px 32px rgba(0, 0, 0, .09);
+  }
+  .home-card:focus-visible {
+    outline: 2.5px solid var(--cor-veia);
+    outline-offset: 2px;
+  }
+  .home-card__icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    display: grid;
+    place-items: center;
+    background: var(--cor-veia-fundo);
+    color: var(--cor-veia);
+  }
+  .home-card--abnt .home-card__icon {
+    background: var(--cor-prova-fundo);
+    color: var(--cor-prova);
+  }
+  .home-card__icon svg {
+    width: 26px;
+    height: 26px;
+  }
+  .home-card__tit {
+    margin: 0;
+    font: 600 20px/1.25 var(--fonte-titulo);
+    letter-spacing: -0.015em;
+    color: var(--cor-tinta);
+  }
+  .home-card__desc {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--cor-suave);
+    flex: 1;
+  }
+  .home-card__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+    font: 600 13.5px/1 var(--fonte-ui);
+    color: var(--cor-veia);
+  }
+  .home-card--abnt .home-card__cta {
+    color: var(--cor-prova);
+  }
+  .home-card__cta svg {
+    width: 15px;
+    height: 15px;
+    transition: transform 160ms var(--ease-out);
+  }
+  .home-card:hover .home-card__cta svg {
+    transform: translateX(3px);
+  }
+  @media (max-width: 720px) {
+    #homeHub.container {
+      padding: 20px 16px 32px !important;
+      align-items: flex-start;
+    }
+    .home-hub__grid {
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+    .home-hub__tit { font-size: 24px; }
+    .home-card { padding: 22px 20px; }
+  }
 </style>
 </head>
 <body>
@@ -512,13 +643,17 @@
         <span>estuda Jaider</span>
       </button>
       <nav class="shell-nav-pills" aria-label="Ferramentas do sistema" role="tablist">
-        <button type="button" class="shell-nav-pill" id="btnNavApostilas" role="tab" aria-selected="true" title="Apostilas Interativas">
+        <button type="button" class="shell-nav-pill" id="btnNavHome" role="tab" aria-selected="true" title="Página inicial">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span>Início</span>
+        </button>
+        <button type="button" class="shell-nav-pill" id="btnNavApostilas" role="tab" aria-selected="false" title="Apostilas Interativas">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/></svg>
           <span>Apostilas</span>
         </button>
-        <button type="button" class="shell-nav-pill" id="btnNavAbnt" role="tab" aria-selected="false" title="Gerador e Formatador Padrão ABNT">
+        <button type="button" class="shell-nav-pill" id="btnNavAbnt" role="tab" aria-selected="false" title="Colocar na ABNT">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
-          <span><span class="nav-lbl-longo">Gerador </span>ABNT</span>
+          <span>ABNT</span>
         </button>
       </nav>
     </div>
@@ -543,9 +678,43 @@
     </div>
   </header>
 
-  <!-- ================= ÁREA DE TRABALHO (APOSTILAS INTERATIVAS + GERADOR ABNT) ================= -->
+  <!-- ================= ÁREA DE TRABALHO (HOME + APOSTILAS + GERADOR ABNT) ================= -->
   <div class="app-workspace-shell">
-    <main id="interativos" data-pagina class="container"></main>
+    <section id="homeHub" data-pagina class="container">
+      <div class="home-hub__inner">
+        <div class="home-hub__head">
+          <span class="home-hub__eyebrow">estuda Jaider</span>
+          <h1 class="home-hub__tit" id="homeSaudacao">O que você quer fazer agora?</h1>
+          <p class="home-hub__sub">Escolha uma das ferramentas abaixo para começar seus estudos ou formatar seu trabalho acadêmico.</p>
+        </div>
+        <div class="home-hub__grid">
+          <button type="button" class="home-card home-card--apostilas" id="btnHomeApostilas">
+            <span class="home-card__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/></svg>
+            </span>
+            <h2 class="home-card__tit">Acessar Apostilas</h2>
+            <p class="home-card__desc">Abra suas apostilas interativas com estojo completo, busca global, pastas personalizadas e progresso salvo no Google Drive.</p>
+            <span class="home-card__cta">
+              <span>Abrir apostilas</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </span>
+          </button>
+
+          <button type="button" class="home-card home-card--abnt" id="btnHomeAbnt">
+            <span class="home-card__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+            </span>
+            <h2 class="home-card__tit">Colocar na ABNT</h2>
+            <p class="home-card__desc">Transforme seu texto em Markdown em um arquivo Word (.docx) formatado nas normas ABNT com capa, folha de rosto, sumário e referências.</p>
+            <span class="home-card__cta">
+              <span>Abrir formatador</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </span>
+          </button>
+        </div>
+      </div>
+    </section>
+    <main id="interativos" data-pagina class="container" hidden></main>
     <section id="geradorAbnt" data-pagina class="container" hidden></section>
   </div>
 
@@ -558,7 +727,7 @@
   <script src="pasta_visual.js?v=5"></script>
   <script src="login_eleven.js?v=5"></script>
   <script src="interativos.js?v=9"></script>
-  <script src="abnt_gerador.js?v=4"></script>
+  <script src="abnt_gerador.js?v=5"></script>
   <script>
     (function () {
       "use strict";
@@ -673,40 +842,61 @@
 
       $("btnEntrarGoogle").onclick = acionarLoginGoogle;
 
-      // Navegação entre Apostilas Interativas e Gerador ABNT
+      // Navegação entre Home, Apostilas Interativas e Colocar na ABNT
       function alternarAbaPrincipal(aba) {
-        const ehAbnt = aba === "abnt";
+        const alvo = aba === "abnt" ? "abnt" : aba === "apostilas" ? "apostilas" : "home";
+        const elHome = $("homeHub");
         const elInterativos = $("interativos");
         const elAbnt = $("geradorAbnt");
+        const btnHm = $("btnNavHome");
         const btnAp = $("btnNavApostilas");
         const btnAb = $("btnNavAbnt");
-        if (elInterativos) elInterativos.hidden = ehAbnt;
-        if (elAbnt) elAbnt.hidden = !ehAbnt;
-        if (btnAp) btnAp.setAttribute("aria-selected", ehAbnt ? "false" : "true");
-        if (btnAb) btnAb.setAttribute("aria-selected", ehAbnt ? "true" : "false");
-        if (ehAbnt && window.EJGeradorABNT) {
+
+        if (elHome) elHome.hidden = alvo !== "home";
+        if (elInterativos) elInterativos.hidden = alvo !== "apostilas";
+        if (elAbnt) elAbnt.hidden = alvo !== "abnt";
+
+        if (btnHm) btnHm.setAttribute("aria-selected", alvo === "home" ? "true" : "false");
+        if (btnAp) btnAp.setAttribute("aria-selected", alvo === "apostilas" ? "true" : "false");
+        if (btnAb) btnAb.setAttribute("aria-selected", alvo === "abnt" ? "true" : "false");
+
+        if (alvo === "abnt" && window.EJGeradorABNT) {
           window.EJGeradorABNT.abrir();
+        } else if (alvo === "apostilas" && window.interativos) {
+          window.interativos.carregar();
         }
+
         const shell = document.querySelector(".app-workspace-shell");
         if (shell) shell.scrollTo({ top: 0, behavior: "smooth" });
         try {
-          if (ehAbnt && location.hash !== "#abnt") history.replaceState(null, "", "#abnt");
-          else if (!ehAbnt && location.hash === "#abnt") history.replaceState(null, "", location.pathname + location.search);
+          const hashAlvo = alvo === "abnt" ? "#abnt" : alvo === "apostilas" ? "#apostilas" : "";
+          if (hashAlvo && location.hash !== hashAlvo) history.replaceState(null, "", hashAlvo);
+          else if (!hashAlvo && (location.hash === "#abnt" || location.hash === "#apostilas")) {
+            history.replaceState(null, "", location.pathname + location.search);
+          }
         } catch (e) {}
       }
       window.alternarAbaPrincipal = alternarAbaPrincipal;
 
+      if ($("btnNavHome")) $("btnNavHome").onclick = () => {
+        if (window.interativos) window.interativos.fechar();
+        alternarAbaPrincipal("home");
+      };
       if ($("btnNavApostilas")) $("btnNavApostilas").onclick = () => alternarAbaPrincipal("apostilas");
       if ($("btnNavAbnt")) $("btnNavAbnt").onclick = () => alternarAbaPrincipal("abnt");
+      if ($("btnHomeApostilas")) $("btnHomeApostilas").onclick = () => alternarAbaPrincipal("apostilas");
+      if ($("btnHomeAbnt")) $("btnHomeAbnt").onclick = () => alternarAbaPrincipal("abnt");
+
       if (location.hash === "#abnt") alternarAbaPrincipal("abnt");
+      else if (location.hash === "#apostilas") alternarAbaPrincipal("apostilas");
+      else alternarAbaPrincipal("home");
 
       $("btnMarcaInicio").onclick = () => {
-        alternarAbaPrincipal("apostilas");
         if (window.interativos) window.interativos.fechar();
         if (temSessaoGoogleAtiva()) {
           telaBV.hidden = true;
           try { sessionStorage.setItem("ej_bv_entrou", "1"); } catch (e) {}
-          window.scrollTo({ top: 0, behavior: "smooth" });
+          alternarAbaPrincipal("home");
         } else {
           mostrarBoasVindas();
         }
@@ -734,9 +924,13 @@
             : det.status === "erro" ? "Erro no Drive"
             : "Salvo no Drive";
           txt.innerHTML = `<b>${esc(primeiroNome)}</b> <span class="conta-sub" style="color:var(--cor-suave)">· ${esc(estadoTxt)}</span>`;
+          const saud = $("homeSaudacao");
+          if (saud) saud.textContent = `Olá, ${primeiroNome}. O que você quer fazer agora?`;
         } else {
           foto.hidden = true;
           txt.textContent = "Entrar com Google";
+          const saud = $("homeSaudacao");
+          if (saud) saud.textContent = "O que você quer fazer agora?";
         }
       }
       window.addEventListener("ej-sync-status", e => desenharStatusConta(e.detail));
