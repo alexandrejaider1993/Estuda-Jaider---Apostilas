@@ -1893,9 +1893,64 @@
       : (catalogo.organizacao_padrao || { pastas: {}, apostilas: {} });
   }
 
+  const HOME_CARDS_IDS = ["apostilas", "questoes", "abnt"];
+
+  function resolverUrlCapaHome(valor) {
+    if (!valor || typeof valor !== "string") return "";
+    if (valor.startsWith("data:") || valor.startsWith("http://") || valor.startsWith("https://") || valor.startsWith("/") || valor.startsWith("assets/")) {
+      return valor;
+    }
+    if (estado.capas_custom && estado.capas_custom[valor]) {
+      return estado.capas_custom[valor];
+    }
+    return `capas_pastas/${encodeURIComponent(valor)}`;
+  }
+
+  function obterCapasHome() {
+    const out = {};
+    for (const id of HOME_CARDS_IDS) {
+      const chave = "home:" + id;
+      const ap = (estado.aparencia && estado.aparencia[chave]) || (catalogo.aparencia_padrao && catalogo.aparencia_padrao[chave]) || null;
+      out[id] = (ap && ap.capa) ? resolverUrlCapaHome(ap.capa) : "";
+    }
+    return out;
+  }
+
+  function salvarCapaHome(cardId, dataUrl) {
+    if (!ehAdmin()) throw new Error("Ative o Modo Administrador para alterar a imagem.");
+    if (!HOME_CARDS_IDS.includes(cardId)) throw new Error("Card inválido.");
+    if (!dataUrl || typeof dataUrl !== "string") throw new Error("Imagem inválida.");
+    if (!estado.aparencia || typeof estado.aparencia !== "object") estado.aparencia = {};
+    estado.aparencia["home:" + cardId] = {
+      capa: dataUrl,
+      atualizado_em: Date.now() / 1000,
+    };
+    salvarEstadoLocal(true);
+    window.dispatchEvent(new CustomEvent("ej-home-capas-mudou", { detail: obterCapasHome() }));
+    autoSalvarPastaPCSeConectada();
+    return obterCapasHome();
+  }
+
+  function restaurarCapaHome(cardId) {
+    if (!ehAdmin()) throw new Error("Ative o Modo Administrador para restaurar a imagem.");
+    if (!HOME_CARDS_IDS.includes(cardId)) throw new Error("Card inválido.");
+    const chave = "home:" + cardId;
+    if (estado.aparencia && chave in estado.aparencia) {
+      delete estado.aparencia[chave];
+    }
+    if (catalogo.aparencia_padrao && chave in catalogo.aparencia_padrao) {
+      delete catalogo.aparencia_padrao[chave];
+    }
+    salvarEstadoLocal(true);
+    window.dispatchEvent(new CustomEvent("ej-home-capas-mudou", { detail: obterCapasHome() }));
+    autoSalvarPastaPCSeConectada();
+    return obterCapasHome();
+  }
+
   // Inicializa logo ao carregar o script
   inicializar().then(() => {
     notificarStatusUI();
+    window.dispatchEvent(new CustomEvent("ej-home-capas-mudou", { detail: obterCapasHome() }));
     if (tokenAcesso) {
       sincronizarComDriveAgora();
     }
@@ -1921,6 +1976,9 @@
     obterEstadoBancoQuestoes,
     salvarItemBancoQuestao,
     obterOrganizacaoAtual,
+    obterCapasHome,
+    salvarCapaHome,
+    restaurarCapaHome,
     temPastaPCConectada: () => !!dirProjetoHandle,
     nomePastaPCConectada: () => (dirProjetoHandle ? dirProjetoHandle.name : ""),
     obterStatus: () => ({

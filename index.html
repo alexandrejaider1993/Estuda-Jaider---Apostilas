@@ -535,8 +535,12 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 16px;
   }
+  .home-card-wrap {
+    position: relative;
+  }
   .home-card {
     position: relative;
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -552,6 +556,50 @@
     cursor: pointer;
     box-shadow: 0 4px 20px rgba(0, 0, 0, .08);
     transition: transform 220ms var(--ease-out), box-shadow 220ms var(--ease-out);
+  }
+  .home-card__admin-bar {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 4;
+    display: none;
+    align-items: center;
+    gap: 6px;
+  }
+  html[data-admin="1"] .home-card__admin-bar {
+    display: flex;
+  }
+  .home-card__admin-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 32px;
+    padding: 0 10px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    background: rgba(15, 15, 18, 0.72);
+    color: #ffffff;
+    font: 600 12px/1 var(--fonte-ui);
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
+    transition: background-color 160ms var(--ease-out), transform 160ms var(--ease-out), border-color 160ms var(--ease-out);
+  }
+  .home-card__admin-btn:hover {
+    background: rgba(15, 15, 18, 0.92);
+    border-color: rgba(255, 255, 255, 0.42);
+    transform: translateY(-1px);
+  }
+  .home-card__admin-btn--icon {
+    width: 32px;
+    padding: 0;
+    justify-content: center;
+  }
+  .home-card__admin-btn svg {
+    width: 14px;
+    height: 14px;
+    flex: none;
   }
   .home-card::after {
     content: "";
@@ -720,30 +768,64 @@
           <p class="home-hub__sub">Escolha uma das ferramentas abaixo para começar seus estudos ou formatar seu trabalho acadêmico.</p>
         </div>
         <div class="home-hub__grid">
-          <button type="button" class="home-card home-card--apostilas" id="btnHomeApostilas" aria-label="Acessar Apostilas">
-            <img class="home-card__bg" src="assets/home/card-apostilas.jpg" alt="" loading="eager" decoding="async">
-            <h2 class="home-card__tit">Apostilas</h2>
-            <span class="home-card__seta" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-            </span>
-          </button>
+          <div class="home-card-wrap" data-home-card="apostilas">
+            <button type="button" class="home-card home-card--apostilas" id="btnHomeApostilas" aria-label="Acessar Apostilas">
+              <img class="home-card__bg" data-home-bg="apostilas" data-default-src="assets/home/card-apostilas.jpg?v=2" src="assets/home/card-apostilas.jpg?v=2" alt="" loading="eager" decoding="async">
+              <h2 class="home-card__tit">Apostilas</h2>
+              <span class="home-card__seta" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              </span>
+            </button>
+            <div class="home-card__admin-bar">
+              <button type="button" class="home-card__admin-btn" data-home-trocar="apostilas" title="Trocar imagem do card Apostilas">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                <span>Trocar imagem</span>
+              </button>
+              <button type="button" class="home-card__admin-btn home-card__admin-btn--icon" data-home-restaurar="apostilas" title="Restaurar imagem padrão" hidden>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+              </button>
+            </div>
+          </div>
 
-          <button type="button" class="home-card home-card--questoes" id="btnHomeQuestoes" aria-label="Banco de Questões">
-            <img class="home-card__bg" src="assets/home/card-questoes.jpg" alt="" loading="eager" decoding="async">
-            <h2 class="home-card__tit">Questões</h2>
-            <span class="home-card__seta" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-            </span>
-          </button>
+          <div class="home-card-wrap" data-home-card="questoes">
+            <button type="button" class="home-card home-card--questoes" id="btnHomeQuestoes" aria-label="Banco de Questões">
+              <img class="home-card__bg" data-home-bg="questoes" data-default-src="assets/home/card-questoes.jpg" src="assets/home/card-questoes.jpg" alt="" loading="eager" decoding="async">
+              <h2 class="home-card__tit">Questões</h2>
+              <span class="home-card__seta" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              </span>
+            </button>
+            <div class="home-card__admin-bar">
+              <button type="button" class="home-card__admin-btn" data-home-trocar="questoes" title="Trocar imagem do card Questões">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                <span>Trocar imagem</span>
+              </button>
+              <button type="button" class="home-card__admin-btn home-card__admin-btn--icon" data-home-restaurar="questoes" title="Restaurar imagem padrão" hidden>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+              </button>
+            </div>
+          </div>
 
-          <button type="button" class="home-card home-card--abnt" id="btnHomeAbnt" aria-label="Colocar na ABNT">
-            <img class="home-card__bg" src="assets/home/card-abnt.jpg" alt="" loading="eager" decoding="async">
-            <h2 class="home-card__tit">ABNT</h2>
-            <span class="home-card__seta" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-            </span>
-          </button>
+          <div class="home-card-wrap" data-home-card="abnt">
+            <button type="button" class="home-card home-card--abnt" id="btnHomeAbnt" aria-label="Colocar na ABNT">
+              <img class="home-card__bg" data-home-bg="abnt" data-default-src="assets/home/card-abnt.jpg" src="assets/home/card-abnt.jpg" alt="" loading="eager" decoding="async">
+              <h2 class="home-card__tit">ABNT</h2>
+              <span class="home-card__seta" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              </span>
+            </button>
+            <div class="home-card__admin-bar">
+              <button type="button" class="home-card__admin-btn" data-home-trocar="abnt" title="Trocar imagem do card ABNT">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                <span>Trocar imagem</span>
+              </button>
+              <button type="button" class="home-card__admin-btn home-card__admin-btn--icon" data-home-restaurar="abnt" title="Restaurar imagem padrão" hidden>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+              </button>
+            </div>
+          </div>
         </div>
+        <input type="file" id="inputCapaHome" accept="image/*" hidden>
       </div>
     </section>
     <main id="interativos" data-pagina class="container" hidden></main>
@@ -756,7 +838,7 @@
   <!-- Scripts do Sistema -->
   <script src="marca_texto.js?v=2"></script>
   <script src="faixa_preenchida.js?v=2"></script>
-  <script src="storage_drive.js?v=11"></script>
+  <script src="storage_drive.js?v=12"></script>
   <script src="pasta_visual.js?v=5"></script>
   <script src="login_eleven.js?v=5"></script>
   <script src="interativos.js?v=10"></script>
@@ -937,6 +1019,121 @@
       if ($("btnHomeApostilas")) $("btnHomeApostilas").onclick = () => alternarAbaPrincipal("apostilas");
       if ($("btnHomeQuestoes")) $("btnHomeQuestoes").onclick = () => alternarAbaPrincipal("questoes");
       if ($("btnHomeAbnt")) $("btnHomeAbnt").onclick = () => alternarAbaPrincipal("abnt");
+
+      // Personalização das imagens dos cards da Home no Modo Administrador
+      function aplicarCapasHome() {
+        const capas = (window.EJStorageDrive && window.EJStorageDrive.obterCapasHome)
+          ? window.EJStorageDrive.obterCapasHome()
+          : {};
+        document.querySelectorAll("img[data-home-bg]").forEach(img => {
+          const id = img.dataset.homeBg;
+          const customUrl = capas[id] || "";
+          const padrao = img.dataset.defaultSrc || img.getAttribute("src") || "";
+          img.src = customUrl || padrao;
+          const btnReset = document.querySelector(`[data-home-restaurar="${id}"]`);
+          if (btnReset) btnReset.hidden = !customUrl;
+        });
+      }
+
+      function otimizarImagemCapaHome(arquivo) {
+        return new Promise((resolve, reject) => {
+          if (!arquivo || !arquivo.type || !arquivo.type.startsWith("image/")) {
+            return reject(new Error("Selecione um arquivo de imagem válido (JPG, PNG, WebP ou GIF)."));
+          }
+          // Mantém GIFs animados sem passar pelo canvas
+          if (arquivo.type === "image/gif") {
+            const fr = new FileReader();
+            fr.onload = () => resolve(fr.result);
+            fr.onerror = () => reject(new Error("Não foi possível ler o GIF."));
+            fr.readAsDataURL(arquivo);
+            return;
+          }
+          const fr = new FileReader();
+          fr.onload = () => {
+            const img = new Image();
+            img.onload = () => {
+              const MAX = 1400;
+              let w = img.naturalWidth || img.width;
+              let h = img.naturalHeight || img.height;
+              if (w > MAX || h > MAX) {
+                const esc = Math.min(MAX / w, MAX / h);
+                w = Math.round(w * esc);
+                h = Math.round(h * esc);
+              }
+              const cv = document.createElement("canvas");
+              cv.width = w;
+              cv.height = h;
+              const ctx = cv.getContext("2d");
+              ctx.drawImage(img, 0, 0, w, h);
+              try {
+                const saida = cv.toDataURL("image/webp", 0.9);
+                resolve(saida.startsWith("data:image/webp") ? saida : cv.toDataURL("image/jpeg", 0.9));
+              } catch (e) {
+                resolve(fr.result);
+              }
+            };
+            img.onerror = () => reject(new Error("Não foi possível processar esta imagem."));
+            img.src = fr.result;
+          };
+          fr.onerror = () => reject(new Error("Não foi possível ler a imagem."));
+          fr.readAsDataURL(arquivo);
+        });
+      }
+
+      const inputCapaHome = $("inputCapaHome");
+      let cardAlvoCapa = "";
+      document.querySelectorAll("[data-home-trocar]").forEach(btn => {
+        btn.addEventListener("click", e => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (!window.EJStorageDrive || !window.EJStorageDrive.ehAdmin()) {
+            window.mostrarToast("Ative o Modo Administrador primeiro.", "erro");
+            return;
+          }
+          cardAlvoCapa = btn.dataset.homeTrocar || "";
+          if (inputCapaHome) {
+            inputCapaHome.value = "";
+            inputCapaHome.click();
+          }
+        });
+      });
+
+      document.querySelectorAll("[data-home-restaurar]").forEach(btn => {
+        btn.addEventListener("click", e => {
+          e.preventDefault();
+          e.stopPropagation();
+          const id = btn.dataset.homeRestaurar || "";
+          try {
+            window.EJStorageDrive.restaurarCapaHome(id);
+            aplicarCapasHome();
+            window.mostrarToast("Imagem padrão restaurada!");
+          } catch (err) {
+            window.mostrarToast(err.message || "Erro ao restaurar imagem.", "erro");
+          }
+        });
+      });
+
+      if (inputCapaHome) {
+        inputCapaHome.addEventListener("change", async () => {
+          const arq = inputCapaHome.files && inputCapaHome.files[0];
+          const alvo = cardAlvoCapa;
+          inputCapaHome.value = "";
+          if (!arq || !alvo) return;
+          try {
+            const dataUrl = await otimizarImagemCapaHome(arq);
+            window.EJStorageDrive.salvarCapaHome(alvo, dataUrl);
+            aplicarCapasHome();
+            const nomes = { apostilas: "Apostilas", questoes: "Questões", abnt: "ABNT" };
+            window.mostrarToast(`Imagem do card ${nomes[alvo] || alvo} atualizada!`);
+          } catch (err) {
+            window.mostrarToast(err.message || "Não foi possível trocar a imagem.", "erro", 4500);
+          }
+        });
+      }
+
+      window.addEventListener("ej-home-capas-mudou", aplicarCapasHome);
+      window.addEventListener("ej-admin-mudou", aplicarCapasHome);
+      aplicarCapasHome();
 
       if (location.hash === "#abnt") alternarAbaPrincipal("abnt");
       else if (location.hash === "#questoes") alternarAbaPrincipal("questoes");
