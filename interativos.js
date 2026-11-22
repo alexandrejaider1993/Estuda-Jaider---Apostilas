@@ -383,8 +383,9 @@
     desenhar();
   }
   const filhasDe = id => Object.entries(org.pastas).filter(([, p]) => (p.pai || null) === (id || null))
-    .sort((a, b) => a[1].nome.localeCompare(b[1].nome, "pt-BR", { numeric: true }));
-  const apostilasDe = id => lista.filter(a => (org.apostilas[a.pasta] || null) === (id || null));
+    .sort((a, b) => a[1].nome.localeCompare(b[1].nome, "pt-BR", { numeric: true, sensitivity: "base" }));
+  const apostilasDe = id => lista.filter(a => (org.apostilas[a.pasta] || null) === (id || null))
+    .sort((a, b) => String(a.titulo || a.pasta).localeCompare(String(b.titulo || b.pasta), "pt-BR", { numeric: true, sensitivity: "base" }));
   const caminhoAte = id => { const c = []; const vistos = new Set(); while (id && org.pastas[id] && !vistos.has(id)) { vistos.add(id); c.unshift(id); id = org.pastas[id].pai; } return c; };
   function totalDentro(id) {        // apostilas na pasta e nas de dentro
     let n = apostilasDe(id).length;
@@ -481,17 +482,51 @@
   async function renomearApostila(pasta) {
     const a = lista.find(x => x.pasta === pasta);
     if (!a) return;
-    const atual = a.titulo || a.pasta;
-    const titulo = await caixa({ titulo: "Renomear apostila", campo: atual, sim: "Renomear" });
-    if (!titulo || titulo === atual) return;
+    const atualTit = a.titulo || a.pasta;
+    const atualDisc = a.disciplina || "";
+    const res = await new Promise(resolve => {
+      const fundo = document.createElement("div");
+      fundo.className = "ia-dlg-fundo";
+      fundo.innerHTML = `<div class="ia-dlg" role="dialog" aria-modal="true" aria-labelledby="iaDlgT">
+        <h2 id="iaDlgT">Renomear apostila</h2>
+        <label style="display:block;font-size:12.5px;font-weight:600;color:var(--cor-suave);margin:6px 0 4px" for="iaEdTit">Nome da apostila</label>
+        <input id="iaEdTit" class="campo ia-dlg-campo" style="margin-top:0" value="${esc(atualTit)}" maxlength="120">
+        <label style="display:block;font-size:12.5px;font-weight:600;color:var(--cor-suave);margin:2px 0 4px" for="iaEdDisc">Etiqueta / disciplina (opcional)</label>
+        <div style="display:flex;gap:6px;align-items:center;margin:0 0 14px">
+          <input id="iaEdDisc" class="campo" style="flex:1;min-width:0" value="${esc(atualDisc)}" maxlength="60" placeholder="Ex.: Farmacoterapia (deixe vazio para remover)">
+          <button type="button" class="botao botao--secundario" data-limpar-disc title="Remover etiqueta">Limpar</button>
+        </div>
+        <div class="ia-dlg-acoes"><button type="button" class="botao botao--secundario" data-r="0">Cancelar</button>
+        <button type="button" class="botao botao--primario" data-r="1">Salvar</button></div></div>`;
+      const fim = v => { fundo.remove(); document.removeEventListener("keydown", tecla, true); resolve(v); };
+      const inpTit = fundo.querySelector("#iaEdTit");
+      const inpDisc = fundo.querySelector("#iaEdDisc");
+      const ok = () => {
+        const t = inpTit.value.trim();
+        if (!t) { inpTit.focus(); return; }
+        fim({ titulo: t, disciplina: inpDisc.value.trim() });
+      };
+      const tecla = e => { if (e.key === "Escape") { e.stopPropagation(); fim(null); } else if (e.key === "Enter" && (e.target === inpTit || e.target === inpDisc)) { e.preventDefault(); ok(); } };
+      fundo.querySelector("[data-limpar-disc]").onclick = () => { inpDisc.value = ""; inpDisc.focus(); };
+      fundo.querySelector('[data-r="0"]').onclick = () => fim(null);
+      fundo.querySelector('[data-r="1"]').onclick = ok;
+      fundo.addEventListener("mousedown", e => { if (e.target === fundo) fim(null); });
+      document.addEventListener("keydown", tecla, true);
+      document.body.append(fundo);
+      inpTit.focus();
+      inpTit.select();
+    });
+    if (!res || (res.titulo === atualTit && res.disciplina === atualDisc)) return;
     try {
-      await api(`/api/interativos/${encodeURIComponent(pasta)}/renomear`, { titulo });
-      a.titulo = titulo;
+      await api(`/api/interativos/${encodeURIComponent(pasta)}/renomear`, res);
+      a.titulo = res.titulo;
+      a.disciplina = res.disciplina;
       if (aberta && aberta.pasta === pasta) {
-        aberta.titulo = titulo;
-        if ($("iaTituloAberta")) $("iaTituloAberta").textContent = titulo;
+        aberta.titulo = res.titulo;
+        aberta.disciplina = res.disciplina;
+        if ($("iaTituloAberta")) $("iaTituloAberta").textContent = res.titulo;
       }
-      toast(`Apostila renomeada para "${titulo}".`);
+      toast(`Apostila atualizada!`);
       desenhar();
     } catch (e) { toast(e.message, "erro", 4500); }
   }
@@ -623,7 +658,7 @@
           ];
           if (modoAdmin) {
             opcoesApostila.splice(1, 0,
-              { t: "Renomear", f: () => renomearApostila(oQue.apostila) },
+              { t: "Renomear / etiqueta", f: () => renomearApostila(oQue.apostila) },
               {
                 t: "Personalizar (cor e capa)",
                 f: () => window.PastaVisual && PastaVisual.editar("doc:" + oQue.apostila, (apAlvo || {}).titulo || oQue.apostila, (apAlvo || {}).capa || ""),

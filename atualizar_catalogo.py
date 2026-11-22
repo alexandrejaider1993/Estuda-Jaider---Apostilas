@@ -232,6 +232,7 @@ def main():
     }
     aparencia_padrao = catalogo_atual.get("aparencia_padrao") or {}
     titulos_padrao = catalogo_atual.get("titulos_padrao") or {}
+    disciplinas_padrao = catalogo_atual.get("disciplinas_padrao") or {}
 
     apostilas = []
     indice_busca = {}
@@ -285,11 +286,15 @@ def main():
             if isinstance(titulo_custom, str) and titulo_custom.strip()
             else (f.get("titulo") or pasta.name)
         )
+        if pasta.name in disciplinas_padrao and isinstance(disciplinas_padrao[pasta.name], str):
+            disciplina = disciplinas_padrao[pasta.name].strip()
+        else:
+            disciplina = f.get("disciplina", "")
         apostilas.append({
             "pasta": pasta.name,
             "titulo": titulo,
             "subtitulo": f.get("subtitulo", ""),
-            "disciplina": f.get("disciplina", ""),
+            "disciplina": disciplina,
             "periodo": f.get("periodo", ""),
             "prova": f.get("prova", ""),
             "data_aula": f.get("data_aula", ""),
@@ -319,12 +324,18 @@ def main():
         for k, v in titulos_padrao.items()
         if k in pastas_existentes and isinstance(v, str) and v.strip()
     }
+    disciplinas_limpas = {
+        k: v.strip()
+        for k, v in disciplinas_padrao.items()
+        if k in pastas_existentes and isinstance(v, str)
+    }
 
     saida_catalogo = {
         "apostilas": apostilas,
         "organizacao_padrao": org_padrao,
         "aparencia_padrao": aparencia_padrao,
         "titulos_padrao": titulos_limpos,
+        "disciplinas_padrao": disciplinas_limpas,
     }
 
     (RAIZ / "catalogo.json").write_text(

@@ -58,7 +58,7 @@
     document.documentElement.dataset.admin = "1";
   }
 
-  let catalogo = { apostilas: [], organizacao_padrao: { pastas: {}, apostilas: {} }, aparencia_padrao: {}, titulos_padrao: {} };
+  let catalogo = { apostilas: [], organizacao_padrao: { pastas: {}, apostilas: {} }, aparencia_padrao: {}, titulos_padrao: {}, disciplinas_padrao: {} };
   let indiceBusca = {};
   let prontoPromise = null;
   let dirProjetoHandle = null; // FileSystemDirectoryHandle da pasta Apostilas-Vercel no PC do Admin
@@ -72,6 +72,7 @@
     aparencia: {},          // { "apost:id": { cor, capa, atualizado_em } }
     capas_custom: {},       // { "hash.gif": "data:image/gif;base64,..." }
     titulos: {},            // { pasta: "Novo título" }
+    disciplinas: {},        // { pasta: "Farmacoterapia" ou "" para remover }
     progresso: {},          // { pasta: { atualizado_em, texto } }
     posicao: {},            // { pasta: { atualizado_em, hash, titulo, pct, y } }
     anotacoes: {},          // { pasta: { atualizado_em, itens: { id: {...} } } }
@@ -329,14 +330,20 @@
       console.warn("Varredura de interativos/ no PC:", e);
     }
 
-    metas.sort((a, b) => String(b.data_aula || "").localeCompare(String(a.data_aula || "")));
+    metas.sort((a, b) => String(a.titulo || a.pasta).localeCompare(String(b.titulo || b.pasta), "pt-BR", { numeric: true, sensitivity: "base" }));
 
     const orgLimpa = lerOrganizacaoLimpa();
     const titulosLimpos = {};
+    const disciplinasLimpos = {};
     const pastasAtivas = new Set(metas.map(m => m.pasta));
     for (const [k, v] of Object.entries(estado.titulos || {})) {
       if (pastasAtivas.has(k) && typeof v === "string" && v.trim()) {
         titulosLimpos[k] = v.trim();
+      }
+    }
+    for (const [k, v] of Object.entries(estado.disciplinas || {})) {
+      if (pastasAtivas.has(k) && typeof v === "string") {
+        disciplinasLimpos[k] = v.trim();
       }
     }
     const novoCatalogo = {
@@ -344,6 +351,7 @@
       organizacao_padrao: orgLimpa,
       aparencia_padrao: aparenciaLimpa,
       titulos_padrao: titulosLimpos,
+      disciplinas_padrao: disciplinasLimpos,
     };
 
     const novoIndice = Object.assign({}, indiceBusca);
@@ -503,6 +511,17 @@
           }
         }
       }
+      if (!estado.disciplinas || typeof estado.disciplinas !== "object") estado.disciplinas = {};
+      const temDisciplinasAdminSalvas = (Number(estado.org_em) || 0) > 0 && Object.keys(estado.disciplinas).length > 0;
+      if (!temDisciplinasAdminSalvas && !ehAdmin()) {
+        estado.disciplinas = JSON.parse(JSON.stringify(catalogo.disciplinas_padrao || {}));
+      } else {
+        for (const [k, v] of Object.entries(catalogo.disciplinas_padrao || {})) {
+          if (!(k in estado.disciplinas)) {
+            estado.disciplinas[k] = v;
+          }
+        }
+      }
       sincronizarChavesLocaisComEstado();
       salvarEstadoLocal(false);
       await tentarRestaurarPastaProjeto();
@@ -599,9 +618,18 @@
       const t = estado.titulos && estado.titulos[pasta];
       return (typeof t === "string" && t.trim()) ? t.trim() : padrao;
     };
+    const disciplinaCustom = (pasta, padrao) => {
+      if (estado.disciplinas && Object.prototype.hasOwnProperty.call(estado.disciplinas, pasta)) {
+        return String(estado.disciplinas[pasta] || "").trim();
+      }
+      return padrao || "";
+    };
     for (const a of (catalogo.apostilas || [])) {
       if (estado.excluidas && estado.excluidas[a.pasta]) continue;
-      mapa.set(a.pasta, Object.assign({}, a, { titulo: tituloCustom(a.pasta, a.titulo) }));
+      mapa.set(a.pasta, Object.assign({}, a, {
+        titulo: tituloCustom(a.pasta, a.titulo),
+        disciplina: disciplinaCustom(a.pasta, a.disciplina),
+      }));
     }
     for (const [pasta, imp] of Object.entries(apostilasImportadas)) {
       if (estado.excluidas && estado.excluidas[pasta]) continue;
@@ -610,7 +638,7 @@
         pasta,
         titulo: tituloCustom(pasta, f.titulo || pasta),
         subtitulo: f.subtitulo || "",
-        disciplina: f.disciplina || "",
+        disciplina: disciplinaCustom(pasta, f.disciplina || ""),
         periodo: f.periodo || "",
         prova: f.prova || "",
         data_aula: f.data_aula || "",
@@ -654,7 +682,7 @@
         chave_local: a.chave_local || "",
       };
     });
-    saida.sort((a, b) => String(b.data_aula || "").localeCompare(String(a.data_aula || "")));
+    saida.sort((a, b) => String(a.titulo || a.pasta).localeCompare(String(b.titulo || b.pasta), "pt-BR", { numeric: true, sensitivity: "base" }));
     return saida;
   }
 
@@ -1070,20 +1098,30 @@
         const b = await lerBodyJson();
         const titulo = String(b.titulo ?? b.nome ?? "").replace(/\s+/g, " ").trim().slice(0, 120);
         if (!titulo) return respostaJson({ detail: "Dê um nome para a apostila." }, 400);
+        const temDisc = Object.prototype.hasOwnProperty.call(b, "disciplina");
+        const disciplina = temDisc ? String(b.disciplina ?? "").replace(/\s+/g, " ").trim().slice(0, 60) : (meta.disciplina || "");
         if (!estado.titulos || typeof estado.titulos !== "object") estado.titulos = {};
         estado.titulos[pasta] = titulo;
+        if (temDisc) {
+          if (!estado.disciplinas || typeof estado.disciplinas !== "object") estado.disciplinas = {};
+          estado.disciplinas[pasta] = disciplina;
+        }
         if (apostilasImportadas[pasta]) {
           if (!apostilasImportadas[pasta].ficha) apostilasImportadas[pasta].ficha = {};
           apostilasImportadas[pasta].ficha.titulo = titulo;
+          if (temDisc) apostilasImportadas[pasta].ficha.disciplina = disciplina;
           await idbSalvarApostila(apostilasImportadas[pasta]);
         }
         const itemCat = (catalogo.apostilas || []).find(x => x.pasta === pasta);
-        if (itemCat) itemCat.titulo = titulo;
+        if (itemCat) {
+          itemCat.titulo = titulo;
+          if (temDisc) itemCat.disciplina = disciplina;
+        }
         if (indiceBusca && indiceBusca[pasta]) indiceBusca[pasta].titulo = titulo;
         estado.org_em = Date.now() / 1000;
         salvarEstadoLocal();
         autoSalvarPastaPCSeConectada();
-        return respostaJson({ ok: true, pasta, titulo });
+        return respostaJson({ ok: true, pasta, titulo, disciplina });
       }
 
       if (acao === "excluir" && metodo === "POST") {
@@ -1092,6 +1130,7 @@
         delete estado.posicao[pasta];
         delete estado.anotacoes[pasta];
         if (estado.titulos) delete estado.titulos[pasta];
+        if (estado.disciplinas) delete estado.disciplinas[pasta];
         if (estado.organizacao && estado.organizacao.apostilas) {
           delete estado.organizacao.apostilas[pasta];
         }
@@ -1502,6 +1541,9 @@
         local.org_em = Number(remoto.org_em);
         if (remoto.titulos && typeof remoto.titulos === "object") {
           local.titulos = Object.assign({}, local.titulos || {}, remoto.titulos);
+        }
+        if (remoto.disciplinas && typeof remoto.disciplinas === "object") {
+          local.disciplinas = Object.assign({}, local.disciplinas || {}, remoto.disciplinas);
         }
         mudouLocal = true;
       }

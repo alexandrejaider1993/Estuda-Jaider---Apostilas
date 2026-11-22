@@ -40,6 +40,7 @@
 <link rel="stylesheet" href="animacoes.css?v=2">
 <link rel="stylesheet" href="skin-eleven.css?v=6">
 <link rel="stylesheet" href="abnt_gerador.css?v=4">
+<link rel="stylesheet" href="banco_questoes.css?v=1">
 <style>
   @font-face { font-family: "Inter"; font-style: normal; font-weight: 400; font-display: swap; src: url("fonts/Inter-Regular.woff2") format("woff2"); }
   @font-face { font-family: "Inter"; font-style: normal; font-weight: 600; font-display: swap; src: url("fonts/Inter-SemiBold.woff2") format("woff2"); }
@@ -503,7 +504,7 @@
     box-sizing: border-box !important;
   }
   .home-hub__inner {
-    width: min(860px, 100%);
+    width: min(1040px, 100%);
     margin: 0 auto;
   }
   .home-hub__head {
@@ -531,8 +532,8 @@
   }
   .home-hub__grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
   }
   .home-card {
     position: relative;
@@ -573,6 +574,10 @@
     background: var(--cor-prova-fundo);
     color: var(--cor-prova);
   }
+  .home-card--questoes .home-card__icon {
+    background: var(--cor-professora-fundo);
+    color: var(--cor-professora);
+  }
   .home-card__icon svg {
     width: 26px;
     height: 26px;
@@ -601,6 +606,9 @@
   .home-card--abnt .home-card__cta {
     color: var(--cor-prova);
   }
+  .home-card--questoes .home-card__cta {
+    color: var(--cor-professora);
+  }
   .home-card__cta svg {
     width: 15px;
     height: 15px;
@@ -609,7 +617,7 @@
   .home-card:hover .home-card__cta svg {
     transform: translateX(3px);
   }
-  @media (max-width: 720px) {
+  @media (max-width: 880px) {
     #homeHub.container {
       padding: 20px 16px 32px !important;
       align-items: flex-start;
@@ -650,6 +658,10 @@
         <button type="button" class="shell-nav-pill" id="btnNavApostilas" role="tab" aria-selected="false" title="Apostilas Interativas">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/></svg>
           <span>Apostilas</span>
+        </button>
+        <button type="button" class="shell-nav-pill" id="btnNavQuestoes" role="tab" aria-selected="false" title="Banco de Questões">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          <span>Questões</span>
         </button>
         <button type="button" class="shell-nav-pill" id="btnNavAbnt" role="tab" aria-selected="false" title="Colocar na ABNT">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
@@ -700,6 +712,18 @@
             </span>
           </button>
 
+          <button type="button" class="home-card home-card--questoes" id="btnHomeQuestoes">
+            <span class="home-card__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            </span>
+            <h2 class="home-card__tit">Banco de Questões</h2>
+            <p class="home-card__desc">Resolva questões de provas antigas e testes das apostilas com filtros por matéria, caderno de erros, favoritas e gabarito comentado.</p>
+            <span class="home-card__cta">
+              <span>Praticar questões</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </span>
+          </button>
+
           <button type="button" class="home-card home-card--abnt" id="btnHomeAbnt">
             <span class="home-card__icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
@@ -715,6 +739,7 @@
       </div>
     </section>
     <main id="interativos" data-pagina class="container" hidden></main>
+    <section id="bancoQuestoes" data-pagina class="container" hidden></section>
     <section id="geradorAbnt" data-pagina class="container" hidden></section>
   </div>
 
@@ -723,10 +748,11 @@
   <!-- Scripts do Sistema -->
   <script src="marca_texto.js?v=2"></script>
   <script src="faixa_preenchida.js?v=2"></script>
-  <script src="storage_drive.js?v=8"></script>
+  <script src="storage_drive.js?v=10"></script>
   <script src="pasta_visual.js?v=5"></script>
   <script src="login_eleven.js?v=5"></script>
-  <script src="interativos.js?v=9"></script>
+  <script src="interativos.js?v=10"></script>
+  <script src="banco_questoes.js?v=1"></script>
   <script src="abnt_gerador.js?v=7"></script>
   <script>
     (function () {
@@ -842,26 +868,35 @@
 
       $("btnEntrarGoogle").onclick = acionarLoginGoogle;
 
-      // Navegação entre Home, Apostilas Interativas e Colocar na ABNT
+      // Navegação entre Home, Apostilas Interativas, Banco de Questões e Colocar na ABNT
       function alternarAbaPrincipal(aba) {
-        const alvo = aba === "abnt" ? "abnt" : aba === "apostilas" ? "apostilas" : "home";
+        const alvo = aba === "abnt" ? "abnt"
+          : aba === "apostilas" ? "apostilas"
+          : aba === "questoes" ? "questoes"
+          : "home";
         const elHome = $("homeHub");
         const elInterativos = $("interativos");
+        const elQuestoes = $("bancoQuestoes");
         const elAbnt = $("geradorAbnt");
         const btnHm = $("btnNavHome");
         const btnAp = $("btnNavApostilas");
+        const btnQs = $("btnNavQuestoes");
         const btnAb = $("btnNavAbnt");
 
         if (elHome) elHome.hidden = alvo !== "home";
         if (elInterativos) elInterativos.hidden = alvo !== "apostilas";
+        if (elQuestoes) elQuestoes.hidden = alvo !== "questoes";
         if (elAbnt) elAbnt.hidden = alvo !== "abnt";
 
         if (btnHm) btnHm.setAttribute("aria-selected", alvo === "home" ? "true" : "false");
         if (btnAp) btnAp.setAttribute("aria-selected", alvo === "apostilas" ? "true" : "false");
+        if (btnQs) btnQs.setAttribute("aria-selected", alvo === "questoes" ? "true" : "false");
         if (btnAb) btnAb.setAttribute("aria-selected", alvo === "abnt" ? "true" : "false");
 
         if (alvo === "abnt" && window.EJGeradorABNT) {
           window.EJGeradorABNT.abrir();
+        } else if (alvo === "questoes" && window.EJBancoQuestoes) {
+          window.EJBancoQuestoes.abrir();
         } else if (alvo === "apostilas" && window.interativos) {
           window.interativos.carregar();
         }
@@ -869,9 +904,12 @@
         const shell = document.querySelector(".app-workspace-shell");
         if (shell) shell.scrollTo({ top: 0, behavior: "smooth" });
         try {
-          const hashAlvo = alvo === "abnt" ? "#abnt" : alvo === "apostilas" ? "#apostilas" : "";
+          const hashAlvo = alvo === "abnt" ? "#abnt"
+            : alvo === "apostilas" ? "#apostilas"
+            : alvo === "questoes" ? "#questoes"
+            : "";
           if (hashAlvo && location.hash !== hashAlvo) history.replaceState(null, "", hashAlvo);
-          else if (!hashAlvo && (location.hash === "#abnt" || location.hash === "#apostilas")) {
+          else if (!hashAlvo && (location.hash === "#abnt" || location.hash === "#apostilas" || location.hash === "#questoes")) {
             history.replaceState(null, "", location.pathname + location.search);
           }
         } catch (e) {}
@@ -883,11 +921,17 @@
         alternarAbaPrincipal("home");
       };
       if ($("btnNavApostilas")) $("btnNavApostilas").onclick = () => alternarAbaPrincipal("apostilas");
+      if ($("btnNavQuestoes")) $("btnNavQuestoes").onclick = () => {
+        if (window.interativos) window.interativos.fechar();
+        alternarAbaPrincipal("questoes");
+      };
       if ($("btnNavAbnt")) $("btnNavAbnt").onclick = () => alternarAbaPrincipal("abnt");
       if ($("btnHomeApostilas")) $("btnHomeApostilas").onclick = () => alternarAbaPrincipal("apostilas");
+      if ($("btnHomeQuestoes")) $("btnHomeQuestoes").onclick = () => alternarAbaPrincipal("questoes");
       if ($("btnHomeAbnt")) $("btnHomeAbnt").onclick = () => alternarAbaPrincipal("abnt");
 
       if (location.hash === "#abnt") alternarAbaPrincipal("abnt");
+      else if (location.hash === "#questoes") alternarAbaPrincipal("questoes");
       else if (location.hash === "#apostilas") alternarAbaPrincipal("apostilas");
       else alternarAbaPrincipal("home");
 
