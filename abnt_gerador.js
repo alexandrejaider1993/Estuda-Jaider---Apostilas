@@ -8,7 +8,10 @@
 
   const STORAGE_KEY = "ej_abnt_rascunho_v2";
   const DOCX_SRC = "assets/docx.umd.js";
-  const MAX_FILE_BYTES = 2 * 1024 * 1024; // 2 MB
+  const MAMMOTH_SRC = "assets/mammoth.browser.min.js";
+  const PDFJS_SRC = "assets/pdf.min.js";
+  const PDFJS_WORKER_SRC = "assets/pdf.worker.min.js";
+  const MAX_FILE_BYTES = 15 * 1024 * 1024; // 15 MB
 
   const DEFAULTS = {
     instituicao: "",
@@ -75,24 +78,221 @@ KFOURI NETO, Miguel. **Responsabilidade civil do médico**. 11. ed. São Paulo: 
   };
 
   let docxPromise = null;
-  function carregarDocxLib() {
-    if (window.docx) return Promise.resolve(window.docx);
-    if (docxPromise) return docxPromise;
-    docxPromise = new Promise((resolve, reject) => {
+  function carregarScript(src, checkFn, erroMsg) {
+    return new Promise((resolve, reject) => {
+      const existing = checkFn();
+      if (existing) return resolve(existing);
       const s = document.createElement("script");
-      s.src = DOCX_SRC;
+      s.src = src;
       s.async = true;
       s.onload = () => {
-        if (window.docx) resolve(window.docx);
-        else reject(new Error("Biblioteca DOCX carregada, mas objeto global não encontrado."));
+        const lib = checkFn();
+        if (lib) resolve(lib);
+        else reject(new Error(erroMsg));
       };
-      s.onerror = () => {
-        docxPromise = null;
-        reject(new Error("Não foi possível carregar a biblioteca geradora de Word (assets/docx.umd.js)."));
-      };
+      s.onerror = () => reject(new Error(erroMsg));
       document.head.appendChild(s);
     });
+  }
+
+  function carregarDocxLib() {
+    if (window.docx) return Promise.resolve(window.docx);
+    if (!docxPromise) {
+      docxPromise = carregarScript(DOCX_SRC, () => window.docx, "Não foi possível carregar a biblioteca geradora de Word (assets/docx.umd.js).")
+        .catch(e => { docxPromise = null; throw e; });
+    }
     return docxPromise;
+  }
+
+  let mammothPromise = null;
+  function carregarMammothLib() {
+    if (window.mammoth) return Promise.resolve(window.mammoth);
+    if (!mammothPromise) {
+      mammothPromise = carregarScript(MAMMOTH_SRC, () => window.mammoth, "Não foi possível carregar o leitor de Word (.docx).")
+        .catch(e => { mammothPromise = null; throw e; });
+    }
+    return mammothPromise;
+  }
+
+  let pdfjsPromise = null;
+  function carregarPdfJsLib() {
+    if (window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
+    if (!pdfjsPromise) {
+      pdfjsPromise = carregarScript(PDFJS_SRC, () => window.pdfjsLib, "Não foi possível carregar o leitor de PDF.")
+        .then(lib => {
+          if (lib.GlobalWorkerOptions) lib.GlobalWorkerOptions.workerSrc = PDFJS_WORKER_SRC;
+          return lib;
+        })
+        .catch(e => { pdfjsPromise = null; throw e; });
+    }
+    return pdfjsPromise;
+  }
+
+  /* ================= IMPORTAÇÃO DE .DOCX E .PDF PARA MARKDOWN ================= */
+  function inlineHtmlParaMd(node) {
+    if (node.nodeType === 3) return node.nodeValue || "";
+    if (node.nodeType !== 1) return "";
+    const tag = node.tagName.toLowerCase();
+    const inner = Array.from(node.childNodes).map(inlineHtmlParaMd).join("");
+    if (tag === "br") return "\n";
+    if (!inner.trim()) return inner;
+    if (tag === "strong" || tag === "b") return `**${inner.trim()}**`;
+    if (tag === "em" || tag === "i") return `*${inner.trim()}*`;
+    return inner;
+  }
+
+  function htmlParaMarkdown(html) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, "text/html");
+    const blocos = [];
+
+    function processarElemento(el) {
+      if (el.nodeType !== 1) return;
+      const tag = el.tagName.toLowerCase();
+
+      if (/^h[1-6]$/.test(tag)) {
+        const nivel = Math.min(Number(tag[1]), 3);
+        const txt = inlineHtmlParaMd(el).replace(/\s+/g, " ").trim();
+        if (txt) blocos.push(`${"#".repeat(nivel)} ${txt}`);
+        return;
+      }
+
+      if (tag === "p") {
+        const txt = inlineHtmlParaMd(el).replace(/\s+/g, " ").trim();
+        if (txt) blocos.push(txt);
+        return;
+      }
+
+      if (tag === "blockquote") {
+        const txt = inlineHtmlParaMd(el).replace(/\s+/g, " ").trim();
+        if (txt) blocos.push(`> ${txt}`);
+        return;
+      }
+
+      if (tag === "ul" || tag === "ol") {
+        const itens = Array.from(el.children).filter(c => c.tagName.toLowerCase() === "li");
+        const linhas = [];
+        itens.forEach((li, i) => {
+          const txt = inlineHtmlParaMd(li).replace(/\s+/g, " ").trim();
+          if (txt) linhas.push(tag === "ol" ? `${i + 1}. ${txt}` : `- ${txt}`);
+        });
+        if (linhas.length) blocos.push(linhas.join("\n"));
+        return;
+      }
+
+      if (tag === "table") {
+        const trs = Array.from(el.querySelectorAll("tr"));
+        if (!trs.length) return;
+        const matriz = trs.map(tr =>
+          Array.from(tr.children).map(td => inlineHtmlParaMd(td).replace(/\s+/g, " ").replace(/\|/g, "/").trim())
+        ).filter(r => r.some(Boolean));
+        if (!matriz.length) return;
+        const cols = Math.max(...matriz.map(r => r.length));
+        const padRow = r => "| " + Array.from({ length: cols }, (_, i) => r[i] || "").join(" | ") + " |";
+        const sep = "| " + Array.from({ length: cols }, () => "---").join(" | ") + " |";
+        const linhas = [padRow(matriz[0]), sep, ...matriz.slice(1).map(padRow)];
+        blocos.push(linhas.join("\n"));
+        return;
+      }
+
+      Array.from(el.children).forEach(processarElemento);
+    }
+
+    Array.from(doc.body.children).forEach(processarElemento);
+    return blocos.join("\n\n");
+  }
+
+  function normalizarTitulosExtraidos(texto) {
+    const titulosFixos = new Set(["RESUMO", "ABSTRACT", "SUMÁRIO", "SUMARIO", "REFERÊNCIAS", "REFERENCIAS", "INTRODUÇÃO", "INTRODUCAO", "CONCLUSÃO", "CONCLUSAO", "CONSIDERAÇÕES FINAIS", "CONSIDERACOES FINAIS"]);
+    return texto.split("\n").map(linha => {
+      const l = linha.trim();
+      if (!l || l.startsWith("#") || l.startsWith(">") || l.startsWith("|")) return linha;
+      const up = l.toUpperCase();
+      if (titulosFixos.has(up)) return `# ${up}`;
+      if (/^\d+\.\d+\.\d+\.?\s+\S/.test(l) && l.length <= 120) return `### ${l}`;
+      if (/^\d+\.\d+\.?\s+\S/.test(l) && l.length <= 120) return `## ${l}`;
+      if (/^\d+\.?\s+[A-ZÀ-Ü]{3,}/.test(l) && l.length <= 120) return `# ${l}`;
+      return linha;
+    }).join("\n");
+  }
+
+  async function extrairTextoDocx(file) {
+    const mammoth = await carregarMammothLib();
+    const arrayBuffer = await file.arrayBuffer();
+    const result = await mammoth.convertToHtml({ arrayBuffer });
+    const md = htmlParaMarkdown(result.value || "");
+    if (!md.trim()) {
+      throw new Error("Não foi possível extrair texto deste arquivo .docx.");
+    }
+    return normalizarTitulosExtraidos(md);
+  }
+
+  async function extrairTextoPdf(file, aoProgresso) {
+    const pdfjsLib = await carregarPdfJsLib();
+    const data = new Uint8Array(await file.arrayBuffer());
+    const pdf = await pdfjsLib.getDocument({ data }).promise;
+    const paginasMd = [];
+
+    for (let p = 1; p <= pdf.numPages; p++) {
+      if (aoProgresso) aoProgresso(p, pdf.numPages);
+      const page = await pdf.getPage(p);
+      const content = await page.getTextContent();
+
+      // Agrupa trechos por linha usando coordenada Y
+      const linhasMap = [];
+      for (const item of content.items || []) {
+        const str = String(item.str || "");
+        if (!str.trim()) continue;
+        const y = item.transform ? Math.round(item.transform[5]) : 0;
+        const x = item.transform ? item.transform[4] : 0;
+        let alvo = linhasMap.find(l => Math.abs(l.y - y) <= 3);
+        if (!alvo) {
+          alvo = { y, partes: [] };
+          linhasMap.push(alvo);
+        }
+        alvo.partes.push({ x, str });
+      }
+
+      linhasMap.sort((a, b) => b.y - a.y);
+      const linhasTexto = linhasMap.map(l => {
+        l.partes.sort((a, b) => a.x - b.x);
+        return l.partes.map(pt => pt.str).join(" ").replace(/\s+/g, " ").trim();
+      }).filter(Boolean);
+
+      // Reagrupa linhas contínuas em parágrafos (ignora número isolado de página no topo/rodapé)
+      const paragrafos = [];
+      let atual = "";
+      for (let i = 0; i < linhasTexto.length; i++) {
+        const ln = linhasTexto[i];
+        if ((i === 0 || i === linhasTexto.length - 1) && /^\d{1,4}$/.test(ln)) continue;
+
+        const pareceTitulo = /^(RESUMO|ABSTRACT|SUMÁRIO|SUMARIO|REFERÊNCIAS|REFERENCIAS|\d+(?:\.\d+)*\.?\s+[A-ZÀ-Ü])/.test(ln) && ln.length <= 120;
+        if (pareceTitulo) {
+          if (atual) { paragrafos.push(atual); atual = ""; }
+          paragrafos.push(ln);
+          continue;
+        }
+
+        if (!atual) {
+          atual = ln;
+        } else if (/[.!?:"»)]$/.test(atual) && /^[A-ZÀ-Ü0-9\-•*]/.test(ln)) {
+          paragrafos.push(atual);
+          atual = ln;
+        } else if (atual.endsWith("-")) {
+          atual = atual.slice(0, -1) + ln;
+        } else {
+          atual += " " + ln;
+        }
+      }
+      if (atual) paragrafos.push(atual);
+      if (paragrafos.length) paginasMd.push(paragrafos.join("\n\n"));
+    }
+
+    const textoFinal = paginasMd.join("\n\n").trim();
+    if (!textoFinal) {
+      throw new Error("Nenhum texto selecionável foi encontrado neste PDF (ele pode ser uma imagem escaneada).");
+    }
+    return normalizarTitulosExtraidos(textoFinal);
   }
 
   /* ================= PARSER INLINE (**negrito**, *itálico*, _itálico_) ================= */
@@ -908,16 +1108,16 @@ KFOURI NETO, Miguel. **Responsabilidade civil do médico**. 11. ed. São Paulo: 
 
           <!-- COLUNA DIREITA: MARKDOWN + CONFIGURAÇÕES E GERAÇÃO -->
           <div class="abnt-col">
-            <!-- 2. ARQUIVO / CONTEÚDO MARKDOWN -->
+            <!-- 2. ARQUIVO / CONTEÚDO DO TRABALHO -->
             <section class="abnt-card">
               <div class="abnt-card__head">
-                <h2 class="abnt-card__tit"><span class="abnt-card__num">2</span> Conteúdo do Trabalho (.md ou texto)</h2>
+                <h2 class="abnt-card__tit"><span class="abnt-card__num">2</span> Conteúdo do Trabalho (.docx, .pdf, .md ou .txt)</h2>
                 <button type="button" class="abnt-btn-mini" id="abntBtnLimparMd">Limpar texto</button>
               </div>
 
-              <div class="abnt-dropzone" id="abntDropzone" tabindex="0" role="button" aria-label="Selecionar arquivo Markdown ou texto">
-                <input type="file" id="abntFileInput" accept=".md,.txt,text/markdown,text/plain" hidden>
-                <p class="abnt-dropzone__tit">Clique para selecionar ou arraste seu arquivo .md / .txt</p>
+              <div class="abnt-dropzone" id="abntDropzone" tabindex="0" role="button" aria-label="Selecionar arquivo Word, PDF, Markdown ou texto">
+                <input type="file" id="abntFileInput" accept=".docx,.pdf,.md,.txt,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/pdf,text/markdown,text/plain" hidden>
+                <p class="abnt-dropzone__tit">Clique para selecionar ou arraste seu arquivo .docx, .pdf, .md ou .txt</p>
                 <p class="abnt-dropzone__sub">Ou cole e edite seu trabalho diretamente no editor abaixo</p>
                 <span class="abnt-dropzone__file" id="abntFileBadge" hidden></span>
               </div>
@@ -1080,37 +1280,54 @@ KFOURI NETO, Miguel. **Responsabilidade civil do médico**. 11. ed. São Paulo: 
       else if (acao === "refs") inserirNoEditor(ed, "\n# REFERÊNCIAS\n\n", "", "SOBRENOME, Nome. **Título da obra**. Cidade: Editora, 2026.");
     });
 
-    // Upload / Drag & Drop de .md / .txt com validação
+    // Upload / Drag & Drop de .docx, .pdf, .md e .txt com validação
     const dropzone = $("abntDropzone");
     const fileInput = $("abntFileInput");
     const fileBadge = $("abntFileBadge");
 
-    function lerArquivo(file) {
+    async function lerArquivo(file) {
       if (!file) return;
       const nomeLower = String(file.name || "").toLowerCase();
-      if (!nomeLower.endsWith(".md") && !nomeLower.endsWith(".txt") && !String(file.type || "").startsWith("text/")) {
-        toast("Formato não suportado. Selecione um arquivo .md ou .txt.", "erro", 4000);
+      const ehDocx = nomeLower.endsWith(".docx");
+      const ehPdf = nomeLower.endsWith(".pdf") || file.type === "application/pdf";
+      const ehTexto = nomeLower.endsWith(".md") || nomeLower.endsWith(".txt") || String(file.type || "").startsWith("text/");
+
+      if (!ehDocx && !ehPdf && !ehTexto) {
+        toast("Formato não suportado. Envie um arquivo .docx, .pdf, .md ou .txt.", "erro", 4200);
         return;
       }
       if (file.size > MAX_FILE_BYTES) {
-        toast("Arquivo muito grande (limite de 2 MB para texto Markdown).", "erro", 4000);
+        toast("Arquivo muito grande (limite de 15 MB).", "erro", 4000);
         return;
       }
-      const reader = new FileReader();
-      reader.onload = () => {
-        $("abntMdTexto").value = String(reader.result || "");
+
+      try {
+        let conteudo = "";
+        if (ehDocx) {
+          atualizarStatus(`Lendo arquivo Word (${file.name})...`, 35);
+          conteudo = await extrairTextoDocx(file);
+        } else if (ehPdf) {
+          atualizarStatus(`Lendo PDF (${file.name})...`, 15);
+          conteudo = await extrairTextoPdf(file, (pag, total) => {
+            const pct = Math.round(15 + (pag / Math.max(total, 1)) * 75);
+            atualizarStatus(`Extraindo texto do PDF (página ${pag} de ${total})...`, pct);
+          });
+        } else {
+          conteudo = await file.text();
+        }
+
+        $("abntMdTexto").value = conteudo;
         nomeArquivoAtual = file.name;
         fileBadge.textContent = `Arquivo carregado: ${file.name}`;
         fileBadge.hidden = false;
         persistir();
         atualizarMetricas();
-        atualizarStatus("Arquivo lido e carregado na memória com sucesso!", 0);
-        toast(`Arquivo "${file.name}" carregado!`);
-      };
-      reader.onerror = () => {
-        toast("Não foi possível ler o arquivo selecionado.", "erro");
-      };
-      reader.readAsText(file, "UTF-8");
+        atualizarStatus("Arquivo lido e carregado no editor! Confira a estrutura e gere na ABNT.", 100);
+        toast(`Arquivo "${file.name}" importado com sucesso!`);
+      } catch (e) {
+        atualizarStatus(`Erro ao ler arquivo: ${e.message || e}`, 0);
+        toast(e.message || "Não foi possível ler o arquivo selecionado.", "erro", 5000);
+      }
     }
 
     dropzone.onclick = () => fileInput.click();
