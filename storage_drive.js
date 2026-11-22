@@ -18,9 +18,9 @@
   const CHAVE_CLIENT_ID = "ej_google_client_id";
   const CHAVE_WEBHOOK_VAGAS = "ej_webhook_vagas_url";
   const CLIENT_ID_PADRAO = "363099555044-2v1qfhn1an7j46op8foien17mo139qfl.apps.googleusercontent.com";
-  // Cole aqui a URL do seu Google Apps Script (Web App) para controlar as 20 vagas e registrar a planilha de alunos:
+  // Cole aqui a URL do seu Google Apps Script (Web App) para controlar as 50 vagas e registrar a planilha de alunos:
   const URL_CONTROLE_VAGAS_PADRAO = "https://script.google.com/macros/s/AKfycbzO919V--CjwNYSWd6caoGtdtu6qGmca5RYjkeGwwzKY4nnCQdUTyIhgnHnqQP4-EOj/exec";
-  const LIMITE_VAGAS_PADRAO = 20;
+  const LIMITE_VAGAS_PADRAO = 50;
   const ARQUIVO_DRIVE = "estuda_jaider_apostilas_v1.json";
   const ESCOPOS_DRIVE = "https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email";
 
@@ -1371,7 +1371,7 @@
     } catch (e) {}
   }
 
-  // Verifica e registra o aluno na Planilha Google (Google Apps Script) com limite de 20 vagas
+  // Verifica e registra o aluno na Planilha Google (Google Apps Script) com limite de 50 vagas
   async function verificarVagaNaPlanilha(perfil) {
     const urlWebhook = obterUrlControleVagas();
     if (!urlWebhook) return { autorizado: true };
@@ -1474,7 +1474,7 @@
               }
             } catch (e) {}
 
-            // Verifica se o e-mail tem vaga na planilha (limite de 20 usuários ativos)
+            // Verifica se o e-mail tem vaga na planilha (limite de 50 usuários ativos)
             const checkVaga = await verificarVagaNaPlanilha(perfil);
             if (!checkVaga.autorizado) {
               try { window.google.accounts.oauth2.revoke(tokenAcesso, () => {}); } catch (e) {}

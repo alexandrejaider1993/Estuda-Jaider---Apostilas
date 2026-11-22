@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * ESTUDA JAIDER — CONTROLE DE 20 VAGAS E LISTA DE E-MAILS (GOOGLE SHEETS)
+ * ESTUDA JAIDER — CONTROLE DE 50 VAGAS E LISTA DE E-MAILS (GOOGLE SHEETS)
  * ============================================================================
  *
  * COMO ATIVAR NA SUA CONTA GOOGLE (leva 2 minutos):
@@ -28,14 +28,14 @@
  * - Coluna G: Total de logins
  *
  * DICAS DE CONTROLE DIRETO NA PLANILHA:
- * - Os primeiros 20 e-mails que fizerem login entram automaticamente como "ATIVO".
- * - Do 21º em diante, o sistema bloqueia a entrada ("As 20 vagas já foram preenchidas")
+ * - Os primeiros 50 e-mails que fizerem login entram automaticamente como "ATIVO".
+ * - Do 51º em diante, o sistema bloqueia a entrada ("As 50 vagas já foram preenchidas")
  *   e registra a tentativa na planilha com status "FILA_ESPERA" para você ver quem tentou!
  * - Se quiser liberar uma vaga para alguém da fila, basta mudar a coluna D (Status)
  *   de um aluno antigo para "BLOQUEADO" (ou apagar a linha dele) e mudar o novo para "ATIVO"!
  */
 
-const LIMITE_PADRAO = 20;
+const LIMITE_PADRAO = 50;
 
 function garantirCabecalho(sheet) {
   if (sheet.getLastRow() === 0) {
@@ -119,7 +119,7 @@ function doPost(e) {
         });
       }
 
-      // Se ele estava em FILA_ESPERA mas agora abriu uma vaga entre os 20 ativos:
+      // Se ele estava em FILA_ESPERA mas agora abriu uma vaga entre os ativos:
       if (statusUsuario === "FILA_ESPERA" && totalAtivos < limite) {
         totalAtivos++;
         sheet.getRange(linhaUsuario, 1).setValue(totalAtivos);
@@ -142,7 +142,7 @@ function doPost(e) {
       });
     }
 
-    // Caso 2: Usuário novo e ainda há vagas disponíveis (< 20 ativos)
+    // Caso 2: Usuário novo e ainda há vagas disponíveis (< limite)
     if (totalAtivos < limite) {
       const novaVaga = totalAtivos + 1;
       sheet.appendRow([
@@ -161,7 +161,7 @@ function doPost(e) {
       });
     }
 
-    // Caso 3: Usuário novo mas as 20 vagas já acabaram -> registra na fila de espera
+    // Caso 3: Usuário novo mas as vagas já acabaram -> registra na fila de espera
     sheet.appendRow([
       "-",
       email,
