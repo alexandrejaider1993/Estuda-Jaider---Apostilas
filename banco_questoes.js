@@ -45,6 +45,7 @@
   const BANCOS_INFO = {
     fasm: {
       id: "fasm",
+      arquivo: "/banco_questoes.json",
       titulo: "FASM",
       tituloPagina: "Banco de Questões · FASM",
       desc: "Questões de provas antigas, simulados e testes de fixação das apostilas da graduação.",
@@ -53,6 +54,7 @@
     },
     residencia: {
       id: "residencia",
+      arquivo: "/banco_questoes_residencia.json",
       titulo: "Residência Médica",
       tituloPagina: "Banco de Questões · Residência Médica",
       desc: "Questões comentadas de provas de Residência Médica organizadas por grande área e banca.",
@@ -63,10 +65,12 @@
 
   // Estado em memória do módulo
   let montado = false;
-  let carregando = false;
+  let driveInicializado = false;
   let bancoAtual = null;         // null (tela dos 2 cards) | "fasm" | "residencia"
-  let questoesCarregadas = [];   // todas as questões do JSON
-  let todasQuestoes = [];        // questões filtradas pelo bancoAtual
+  const questoesPorBanco = { fasm: [], residencia: [] };
+  const bancoCarregado = { fasm: false, residencia: false };
+  const promessaCarga = { fasm: null, residencia: null };
+  let todasQuestoes = [];        // questões do bancoAtual
   let filtradas = [];
   let historico = {};            // { uid: { status, escolha, tentativas, acertos, erros, favorita, riscadas } }
   let selecaoTemp = {};          // { uid: indiceAlternativa } (antes de clicar Responder)
@@ -114,42 +118,73 @@
     }
   }
 
-  function normalizarBanco(q) {
-    const raw = norm(q && (q.banco || q.categoria || q.origem || ""));
-    if (raw.includes("residencia")) return "residencia";
-    return "fasm";
+  async function carregarArquivoBanco(chave) {
+    if (bancoCarregado[chave]) return questoesPorBanco[chave];
+    if (promessaCarga[chave]) return promessaCarga[chave];
+
+    const info = BANCOS_INFO[chave];
+    promessaCarga[chave] = (async () => {
+      try {
+        if (!driveInicializado && window.EJStorageDrive && window.EJStorageDrive.inicializar) {
+          driveInicializado = true;
+          await window.EJStorageDrive.inicializar();
+        }
+        const r = await fetch(info.arquivo, { cache: "no-store" });
+        if (!r.ok) throw new Error(`Não foi possível carregar ${info.arquivo}`);
+        const d = await r.json();
+        const lista = Array.isArray(d) ? d : (Array.isArray(d && d.questoes) ? d.questoes : []);
+        questoesPorBanco[chave] = lista.map((q, idx) => {
+          const disc = chave === "fasm"
+            ? resolverDisciplinaLive(q)
+            : (q.disciplina || q.area || "Geral");
+          const uid = q.uid || `${chave}::${q.id || ("q" + (idx + 1))}`;
+          const formato = q.formato || (Array.isArray(q.alternativas) && q.alternativas.length ? "objetiva" : "discursiva");
+          const tipo = q.tipo || "prova";
+          const apostila = q.apostila || q.banca || "";
+          const textoBusca = norm([
+            q.enunciado,
+            (q.itens || []).join(" "),
+            (q.alternativas || []).join(" "),
+            q.ref,
+            q.banca,
+            q.ano,
+            q.conceito_nome,
+            apostila,
+            disc,
+          ].join(" "));
+          return Object.assign({}, q, {
+            uid,
+            formato,
+            tipo,
+            disciplina: disc,
+            apostila,
+            _banco: chave,
+            _busca: textoBusca,
+          });
+        });
+        bancoCarregado[chave] = true;
+      } catch (e) {
+        console.error(`[Banco de Questões · ${info.titulo}]`, e);
+        if (chave === "fasm") {
+          toast("Erro ao carregar o Banco de Questões.", "erro", 4000);
+        }
+      } finally {
+        promessaCarga[chave] = null;
+      }
+      return questoesPorBanco[chave];
+    })();
+
+    return promessaCarga[chave];
   }
 
-  async function carregarBanco() {
-    if (questoesCarregadas.length || carregando) return;
-    carregando = true;
-    try {
-      if (window.EJStorageDrive && window.EJStorageDrive.inicializar) {
-        await window.EJStorageDrive.inicializar();
-      }
-      const r = await fetch("/banco_questoes.json", { cache: "no-store" });
-      if (!r.ok) throw new Error("Não foi possível carregar banco_questoes.json");
-      const d = await r.json();
-      const lista = Array.isArray(d.questoes) ? d.questoes : [];
-      questoesCarregadas = lista.map(q => {
-        const disc = resolverDisciplinaLive(q);
-        const banco = normalizarBanco(q);
-        const textoBusca = norm([
-          q.enunciado,
-          (q.itens || []).join(" "),
-          (q.alternativas || []).join(" "),
-          q.ref,
-          q.conceito_nome,
-          q.apostila,
-          disc,
-        ].join(" "));
-        return Object.assign({}, q, { disciplina: disc, _banco: banco, _busca: textoBusca });
-      });
-    } catch (e) {
-      console.error("[Banco de Questões]", e);
-      toast("Erro ao carregar o Banco de Questões.", "erro", 4000);
-    } finally {
-      carregando = false;
+  async function carregarBanco(chave) {
+    if (chave) {
+      await carregarArquivoBanco(chave);
+    } else {
+      await Promise.all([
+        carregarArquivoBanco("fasm"),
+        carregarArquivoBanco("residencia"),
+      ]);
     }
   }
 
@@ -159,7 +194,7 @@
 
     filtradas = todasQuestoes.filter(q => {
       if (filtros.disciplina && q.disciplina !== filtros.disciplina) return false;
-      if (filtros.apostila && q.pasta !== filtros.apostila) return false;
+      if (filtros.apostila && (q.pasta || q.apostila) !== filtros.apostila) return false;
 
       if (filtros.tipo === "prova" && q.tipo !== "prova") return false;
       if (filtros.tipo === "teste" && q.tipo !== "teste") return false;
@@ -387,17 +422,19 @@
   }
 
   function renderHubContadores() {
-    const qtdFasm = questoesCarregadas.filter(q => q._banco === "fasm").length;
-    const qtdRes = questoesCarregadas.filter(q => q._banco === "residencia").length;
+    const qtdFasm = questoesPorBanco.fasm.length;
+    const qtdRes = questoesPorBanco.residencia.length;
     const pillFasm = document.getElementById("bqHubPill-fasm");
     const pillRes = document.getElementById("bqHubPill-residencia");
     if (pillFasm) {
-      pillFasm.textContent = qtdFasm === 1 ? "1 questão" : `${qtdFasm} questões`;
+      pillFasm.textContent = !bancoCarregado.fasm
+        ? "Carregando..."
+        : (qtdFasm === 1 ? "1 questão" : `${qtdFasm} questões`);
     }
     if (pillRes) {
-      pillRes.textContent = qtdRes > 0
-        ? (qtdRes === 1 ? "1 questão" : `${qtdRes} questões`)
-        : "Em breve";
+      pillRes.textContent = !bancoCarregado.residencia
+        ? "Carregando..."
+        : (qtdRes > 0 ? (qtdRes === 1 ? "1 questão" : `${qtdRes} questões`) : "Em breve");
     }
   }
 
@@ -422,10 +459,10 @@
     if (elView) elView.hidden = false;
     if (elTit) elTit.textContent = info.tituloPagina;
 
-    await carregarBanco();
+    await carregarBanco(chave);
     atualizarHistorico();
 
-    todasQuestoes = questoesCarregadas.filter(q => q._banco === chave);
+    todasQuestoes = questoesPorBanco[chave] || [];
 
     // Resetar filtros ao trocar de banco
     filtros.busca = "";
@@ -525,12 +562,15 @@
     const mapaAp = new Map();
     for (const q of todasQuestoes) {
       if (filtros.disciplina && q.disciplina !== filtros.disciplina) continue;
-      if (!mapaAp.has(q.pasta)) mapaAp.set(q.pasta, { titulo: q.apostila, n: 0 });
-      mapaAp.get(q.pasta).n++;
+      const chaveAp = q.pasta || q.apostila;
+      if (!chaveAp) continue;
+      if (!mapaAp.has(chaveAp)) mapaAp.set(chaveAp, { titulo: q.apostila || chaveAp, n: 0 });
+      mapaAp.get(chaveAp).n++;
     }
     const aps = Array.from(mapaAp.entries()).sort((a, b) => a[1].titulo.localeCompare(b[1].titulo, "pt-BR"));
-    selAp.innerHTML = `<option value="">Todas as apostilas (${aps.length})</option>` +
-      aps.map(([pasta, info]) => `<option value="${esc(pasta)}"${filtros.apostila === pasta ? " selected" : ""}>${esc(info.titulo)} (${info.n})</option>`).join("");
+    const rotuloAp = bancoAtual === "residencia" ? "Todas as bancas" : "Todas as apostilas";
+    selAp.innerHTML = `<option value="">${rotuloAp} (${aps.length})</option>` +
+      aps.map(([chaveAp, info]) => `<option value="${esc(chaveAp)}"${filtros.apostila === chaveAp ? " selected" : ""}>${esc(info.titulo)} (${info.n})</option>`).join("");
   }
 
   function renderStats() {
@@ -701,7 +741,7 @@
             <span class="bq-badge">#${numExibicao}</span>
             ${badgeTipo}
             <span class="bq-badge">${esc(q.disciplina)}</span>
-            <span class="bq-badge">${esc(q.apostila)}</span>
+            ${q.apostila ? `<span class="bq-badge">${esc(q.apostila)}</span>` : ""}
             ${q.conceito_nome ? `<span class="bq-badge">${esc(q.conceito_nome)}</span>` : ""}
             ${badgeStatus}
           </div>
@@ -709,9 +749,11 @@
             <button type="button" class="bq-icon-btn bq-icon-btn--fav" data-acao="favoritar" aria-pressed="${h.favorita ? "true" : "false"}" title="${h.favorita ? "Remover das favoritas" : "Salvar nas favoritas"}">
               ${h.favorita ? IC_ESTRELA_CHEIA : IC_ESTRELA}
             </button>
-            <button type="button" class="bq-icon-btn" data-acao="abrir-apostila" title="Abrir seção correspondente na apostila">
-              ${IC_LIVRO}<span>Apostila</span>
-            </button>
+            ${q.pasta ? `
+              <button type="button" class="bq-icon-btn" data-acao="abrir-apostila" title="Abrir seção correspondente na apostila">
+                ${IC_LIVRO}<span>Apostila</span>
+              </button>
+            ` : ""}
           </div>
         </div>
         ${q.ref ? `<div class="bq-ref">${esc(q.ref)}</div>` : ""}
@@ -955,7 +997,7 @@
   // Atualiza automaticamente quando o Google Drive terminar de sincronizar
   window.addEventListener("ej-banco-questoes-sync", () => {
     const sec = document.getElementById(SEC_ID);
-    if (!montado || !questoesCarregadas.length) return;
+    if (!montado || (!bancoCarregado.fasm && !bancoCarregado.residencia)) return;
     atualizarHistorico();
     if (sec && !sec.hidden && bancoAtual && todasQuestoes.length) {
       renderStats();
