@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cinco alvos antimicrobianos</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#fbfbfa;color:#243746;font:14px system-ui,sans-serif}
+main{max-width:1000px;margin:auto;padding:16px}h1{font-size:20px;margin:0 0 5px}
+p{margin:5px 0 10px}.grid{display:grid;grid-template-columns:1.4fr 1fr;gap:15px}
+svg{width:100%;height:310px;background:#f2f5f4;border-radius:14px}
+.layer{cursor:pointer;transition:transform .4s,opacity .3s;outline:none}
+.layer:hover polygon,.layer:focus polygon{stroke:#102f48;stroke-width:3}
+.layer.active polygon{stroke:#102f48;stroke-width:4}
+svg text{font:600 15px system-ui;fill:#183548;pointer-events:none}
+aside{background:white;border:1px solid #d9e1e1;border-radius:14px;padding:15px}
+h2{font-size:18px;margin:0 0 10px}button{background:white;color:#243746;border:1px solid #aabcbc;border-radius:7px;padding:8px;margin:3px;cursor:pointer}
+button[aria-pressed=true]{background:#d9ece7;border-color:#257e70}
+.note{font-size:12px;color:#526871}.controls{margin:8px 0}
+@media(max-width:650px){.grid{grid-template-columns:1fr}svg{height:260px}}
+@media(prefers-reduced-motion:reduce){.layer{transition:none}}
+</style>
+</head>
+<body>
+<main>
+<h1>Célula bacteriana: cinco alvos</h1>
+<p>Esquema isométrico conceitual. Clique em uma camada ou use 1 a 5. E: explodir. 0: restaurar.</p>
+<div class="grid">
+<svg viewBox="0 0 540 340" role="img" aria-label="Cinco planos isométricos selecionáveis dos alvos antimicrobianos">
+<g id="layers">
+<g class="layer" data-i="4" tabindex="0" role="button" aria-label="5. Metabolismo dos folatos">
+<polygon points="70,220 290,135 470,205 250,295" fill="#f1d5a8" stroke="#bc9256"/>
+<text x="174" y="232">5 · Folatos</text>
+</g>
+<g class="layer" data-i="3" tabindex="0" role="button" aria-label="4. Ácidos nucleicos">
+<polygon points="70,190 290,105 470,175 250,265" fill="#d9cbed" stroke="#9b80ba"/>
+<path d="M180 185 Q230 130 290 190 T370 180" fill="none" stroke="#8660aa" stroke-width="4"/>
+<text x="155" y="204">4 · DNA e RNA</text>
+</g>
+<g class="layer" data-i="2" tabindex="0" role="button" aria-label="3. Ribossomos">
+<polygon points="70,160 290,75 470,145 250,235" fill="#f5d1cb" stroke="#c58478"/>
+<circle cx="210" cy="147" r="13" fill="#ba756a"/><circle cx="231" cy="143" r="18" fill="#d89687"/>
+<text x="160" y="176">3 · Ribossomos</text>
+</g>
+<g class="layer" data-i="1" tabindex="0" role="button" aria-label="2. Membrana">
+<polygon points="70,130 290,45 470,115 250,205" fill="#bdded9" stroke="#5b9e93"/>
+<text x="160" y="145">2 · Membrana</text>
+</g>
+<g class="layer" data-i="0" tabindex="0" role="button" aria-label="1. Parede">
+<polygon points="70,100 290,15 470,85 250,175" fill="#bdd5ea" fill-opacity=".92" stroke="#6794b8"/>
+<path d="M130 100L300 35M180 125L350 60M230 145L400 80" stroke="#88acc7" stroke-width="3"/>
+<text x="190" y="109">1 · Parede</text>
+</g>
+</g>
+</svg>
+<aside aria-live="polite" aria-atomic="true">
+<h2 id="title">1 · Parede celular</h2>
+<p id="reading"></p>
+<p id="example"></p>
+<p id="warning" class="note"></p>
+</aside>
+</div>
+<div class="controls" aria-label="Seleção de alvo">
+<button data-select="0">1 Parede</button>
+<button data-select="1">2 Membrana</button>
+<button data-select="2">3 Ribossomos</button>
+<button data-select="3">4 DNA/RNA</button>
+<button data-select="4">5 Folatos</button>
+<button id="explode" aria-pressed="false">E · Explodir</button>
+<button id="reset">0 · Restaurar</button>
+</div>
+<p class="note">Os planos não representam cinco camadas anatômicas reais. Ribossomos, material genético e enzimas metabólicas coexistem no interior bacteriano. A separação serve apenas à comparação de mecanismos.</p>
+</main>
+<script>
+const data=[
+["1 · Parede celular","A rede de peptidoglicano contribui para resistência mecânica. Interferir na construção fragiliza a parede.","Beta-lactâmicos: PBPs. Vancomicina: precursores terminados em D-Ala-D-Ala.","Mesmo processo final não significa mesmo alvo molecular."],
+["2 · Membrana","A membrana lipídica controla permeabilidade e participa de funções essenciais. A desorganização favorece perda de componentes celulares.","Polimixinas: interação com componentes do envelope de bactérias Gram-negativas.","Membrana não é sinônimo de parede."],
+["3 · Ribossomos","O ribossomo bacteriano 70S contém 30S e 50S. O bloqueio interfere na tradução, a produção de proteínas.","30S: aminoglicosídeos e tetraciclinas. 50S: macrolídeos, clindamicina e cloranfenicol.","Aminoglicosídeos são usualmente bactericidas; inibir tradução não implica sempre bacteriostase."],
+["4 · Ácidos nucleicos","Replicação produz DNA; transcrição produz RNA. São processos diferentes com enzimas diferentes.","Quinolonas: DNA girase e topoisomerase IV. Rifampicina: RNA polimerase.","Tradução, por contraste, produz proteínas nos ribossomos."],
+["5 · Metabolismo dos folatos","Folatos reduzidos participam da síntese de componentes dos ácidos nucleicos. O bloqueio metabólico prejudica essa produção.","Sulfonamidas: diidropteroato sintase. Trimetoprima: diidrofolato redutase.","Isoladamente, os componentes são geralmente bacteriostáticos; a associação pode ser bactericida contra microrganismos suscetíveis."]
+];
+const layers=[...document.querySelectorAll(".layer")];
+const buttons=[...document.querySelectorAll("[data-select]")];
+let selected=0,exploded=false;
+function report(){
+parent.postMessage({type:"anatomy-height",id:"modelo-principal",height:Math.ceil(document.documentElement.scrollHeight)},"*");
+}
+function render(){
+const d=data[selected];
+document.getElementById("title").textContent=d[0];
+document.getElementById("reading").textContent=d[1];
+document.getElementById("example").textContent=d[2];
+document.getElementById("warning").textContent=d[3];
+layers.forEach(g=>{
+const i=Number(g.dataset.i);
+g.classList.toggle("active",i===selected);
+g.setAttribute("aria-pressed",String(i===selected));
+g.style.transform=exploded?`translate(${(i-2)*7}px,${(i-2)*15}px)`:"translate(0px,0px)";
+g.style.opacity=i===selected?"1":".72";
+});
+buttons.forEach((b,i)=>b.setAttribute("aria-pressed",String(i===selected)));
+document.getElementById("explode").setAttribute("aria-pressed",String(exploded));
+requestAnimationFrame(report);
+}
+function select(i){selected=i;render()}
+layers.forEach(g=>{
+g.addEventListener("click",()=>select(Number(g.dataset.i)));
+g.addEventListener("keydown",e=>{
+if(e.key==="Enter"||e.key===" "){e.preventDefault();select(Number(g.dataset.i))}
+});
+});
+buttons.forEach(b=>b.addEventListener("click",()=>select(Number(b.dataset.select))));
+function toggle(){exploded=!exploded;render()}
+function reset(){selected=0;exploded=false;render()}
+document.getElementById("explode").addEventListener("click",toggle);
+document.getElementById("reset").addEventListener("click",reset);
+document.addEventListener("keydown",e=>{
+if(e.altKey||e.ctrlKey||e.metaKey)return;
+if(/^[1-5]$/.test(e.key)){e.preventDefault();select(Number(e.key)-1)}
+else if(e.key.toLowerCase()==="e"){e.preventDefault();toggle()}
+else if(e.key==="0"){e.preventDefault();reset()}
+});
+window.addEventListener("resize",report);
+if(window.ResizeObserver)new ResizeObserver(report).observe(document.body);
+render();
+window.addEventListener("load",report);
+</script>
+</body>
+</html>

@@ -76,6 +76,7 @@
     posicao: {},            // { pasta: { atualizado_em, hash, titulo, pct, y } }
     anotacoes: {},          // { pasta: { atualizado_em, itens: { id: {...} } } }
     excluidas: {},          // { pasta: timestamp }
+    banco_questoes: {},     // { uid: { status, escolha, tentativas, acertos, erros, favorita, riscadas, atualizado_em } }
   };
 
   // Apostilas importadas pelo usuário no navegador (guardadas no IndexedDB porque o HTML pode ter vários MB)
@@ -1567,9 +1568,23 @@
       }
     }
 
+    // 6. Banco de Questões (mesclado item a item pelo `atualizado_em` de cada questão)
+    if (remoto.banco_questoes && typeof remoto.banco_questoes === "object") {
+      if (!local.banco_questoes || typeof local.banco_questoes !== "object") local.banco_questoes = {};
+      for (const [uid, qRem] of Object.entries(remoto.banco_questoes)) {
+        if (!qRem || typeof qRem !== "object") continue;
+        const qLoc = local.banco_questoes[uid];
+        if (!qLoc || (Number(qRem.atualizado_em) || 0) > (Number(qLoc.atualizado_em) || 0)) {
+          local.banco_questoes[uid] = JSON.parse(JSON.stringify(qRem));
+          mudouLocal = true;
+        }
+      }
+    }
+
     if (mudouLocal) {
       sincronizarChavesLocaisComEstado();
       salvarEstadoLocal(false);
+      window.dispatchEvent(new CustomEvent("ej-banco-questoes-sync"));
     }
     return mudouLocal;
   }
@@ -1728,6 +1743,114 @@
     if (window.interativos) window.interativos.carregar();
   }
 
+  // ------------------------------------------------------------------ Integração com Banco de Questões
+  function obterEstadoBancoQuestoes() {
+    sincronizarChavesLocaisComEstado();
+    if (!estado.banco_questoes || typeof estado.banco_questoes !== "object") {
+      estado.banco_questoes = {};
+    }
+    const combinado = {};
+    // 1. Puxa testes já respondidos dentro das apostilas (estado.progresso)
+    const metas = listarMetadadosApostilas();
+    for (const a of metas) {
+      const prog = estado.progresso[a.pasta];
+      if (!prog || !prog.texto) continue;
+      const est = extrairEstadoProgresso(prog.texto);
+      const respT = (est && est.t && typeof est.t === "object") ? est.t : {};
+      const mapaTestes = {};
+      for (const t of (a.testes || [])) {
+        if (t && t.id) mapaTestes[t.id] = t;
+      }
+      for (const [tid, s] of Object.entries(respT)) {
+        if (!s || typeof s !== "object" || !s.env) continue;
+        const uid = `${a.pasta}::t::${tid}`;
+        const tMeta = mapaTestes[tid];
+        const acertou = tMeta ? (s.r === tMeta.correta) : false;
+        combinado[uid] = {
+          status: acertou ? "acertou" : "errou",
+          escolha: typeof s.r === "number" ? s.r : null,
+          tentativas: parseInt(s.tent || 1, 10) || 1,
+          acertos: acertou ? 1 : 0,
+          erros: acertou ? 0 : 1,
+          favorita: false,
+          riscadas: [],
+          atualizado_em: Number(prog.atualizado_em) || 0,
+          origem: "apostila",
+        };
+      }
+    }
+    // 2. Sobrepõe com o histórico próprio do Banco de Questões (que guarda favoritas, riscadas, provas e tentativas)
+    for (const [uid, item] of Object.entries(estado.banco_questoes)) {
+      if (!item || typeof item !== "object") continue;
+      const base = combinado[uid];
+      if (!base) {
+        combinado[uid] = Object.assign({}, item);
+      } else {
+        const usarBanco = (Number(item.atualizado_em) || 0) >= (Number(base.atualizado_em) || 0);
+        combinado[uid] = Object.assign({}, usarBanco ? base : item, usarBanco ? item : base, {
+          favorita: !!(item.favorita),
+          riscadas: Array.isArray(item.riscadas) ? item.riscadas.slice() : [],
+        });
+      }
+    }
+    return combinado;
+  }
+
+  function salvarItemBancoQuestao(uid, dados, metaTeste) {
+    if (!uid) return;
+    if (!estado.banco_questoes || typeof estado.banco_questoes !== "object") {
+      estado.banco_questoes = {};
+    }
+    const agora = Date.now() / 1000;
+    const atual = estado.banco_questoes[uid] || {};
+    estado.banco_questoes[uid] = Object.assign({}, atual, dados, { atualizado_em: agora });
+
+    // Se for um teste de apostila e houve resposta enviada, atualiza também o progresso da apostila (alimentando o BKT!)
+    if (metaTeste && metaTeste.pasta && metaTeste.id && typeof dados.escolha === "number" && (dados.status === "acertou" || dados.status === "errou")) {
+      try {
+        const pasta = metaTeste.pasta;
+        const tid = metaTeste.id;
+        const progAtual = estado.progresso[pasta];
+        let obj = {};
+        if (progAtual && progAtual.texto) {
+          try {
+            const p = JSON.parse(progAtual.texto);
+            obj = (p && typeof p.estado === "string") ? JSON.parse(p.estado) : (p || {});
+          } catch (e) { obj = {}; }
+        }
+        if (!obj || typeof obj !== "object") obj = {};
+        if (!obj.t || typeof obj.t !== "object") obj.t = {};
+        const prev = obj.t[tid] || {};
+        const tent = (parseInt(prev.tent || 0, 10) || 0) + 1;
+        obj.t[tid] = Object.assign({}, prev, {
+          r: dados.escolha,
+          env: 1,
+          tent,
+        });
+        obj.ts = Date.now();
+        const textoNovo = JSON.stringify(obj);
+        estado.progresso[pasta] = { atualizado_em: agora, texto: textoNovo };
+
+        // Sincroniza também na chave localStorage da apostila (const CH)
+        const apMeta = listarMetadadosApostilas().find(x => x.pasta === pasta);
+        if (apMeta && apMeta.chave_local) {
+          try { localStorage.setItem(apMeta.chave_local, textoNovo); } catch (e) {}
+        }
+      } catch (e) {
+        console.warn("Não foi possível espelhar resposta no progresso da apostila:", e);
+      }
+    }
+
+    salvarEstadoLocal(true);
+    return estado.banco_questoes[uid];
+  }
+
+  function obterOrganizacaoAtual() {
+    return (estado.organizacao && estado.organizacao.pastas)
+      ? estado.organizacao
+      : (catalogo.organizacao_padrao || { pastas: {}, apostilas: {} });
+  }
+
   // Inicializa logo ao carregar o script
   inicializar().then(() => {
     notificarStatusUI();
@@ -1753,6 +1876,9 @@
     entrarModoAdmin,
     sairModoAdmin,
     salvarNaPastaDoPC,
+    obterEstadoBancoQuestoes,
+    salvarItemBancoQuestao,
+    obterOrganizacaoAtual,
     temPastaPCConectada: () => !!dirProjetoHandle,
     nomePastaPCConectada: () => (dirProjetoHandle ? dirProjetoHandle.name : ""),
     obterStatus: () => ({

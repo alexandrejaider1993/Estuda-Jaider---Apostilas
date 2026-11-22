@@ -108,6 +108,121 @@ def ficha_apostila(pasta: Path):
     return None
 
 
+def resolver_disciplina_pasta(pasta_nome: str, f: dict, org_padrao: dict) -> str:
+    disc = str((f or {}).get("disciplina") or "").strip()
+    pastas = (org_padrao or {}).get("pastas") or {}
+    mapa_ap = (org_padrao or {}).get("apostilas") or {}
+    pid = mapa_ap.get(pasta_nome)
+    cadeia = []
+    visitados = set()
+    while pid and pid in pastas and pid not in visitados:
+        visitados.add(pid)
+        p_info = pastas[pid] or {}
+        nome_p = str(p_info.get("nome") or "").strip()
+        if nome_p:
+            cadeia.append(nome_p)
+        pid = p_info.get("pai")
+    if cadeia:
+        # Pasta raiz (ex.: "Anatomia Patológica II" mesmo se estiver dentro de "P4")
+        return cadeia[-1]
+    if disc:
+        return disc
+    return "Geral"
+
+
+def extrair_banco_questoes(D: dict, pasta_nome: str, titulo_apostila: str, disciplina: str):
+    itens_banco = []
+    if not isinstance(D, dict):
+        return itens_banco
+
+    mapa_conceitos = {
+        str(c.get("id")): str(c.get("nome") or c.get("id"))
+        for c in (D.get("conceitos") or [])
+        if isinstance(c, dict) and c.get("id")
+    }
+
+    # 1. Questões de prova / simulado (D.questoes)
+    for idx, q in enumerate(D.get("questoes") or []):
+        if not isinstance(q, dict):
+            continue
+        qid = str(q.get("id") or f"q{idx + 1}")
+        obj = q.get("objetiva") if isinstance(q.get("objetiva"), dict) else None
+        alts = list(obj.get("alts") or []) if obj else []
+        eh_objetiva = len(alts) >= 2 and obj.get("correta") is not None
+
+        # Tenta identificar conceito principal a partir de alvos
+        conceito_id = ""
+        conceito_nome = ""
+        alvos = q.get("alvos")
+        if isinstance(alvos, dict):
+            for vals in alvos.values():
+                if isinstance(vals, list) and vals:
+                    conceito_id = str(vals[0])
+                    conceito_nome = mapa_conceitos.get(conceito_id, conceito_id)
+                    break
+
+        itens_banco.append({
+            "uid": f"{pasta_nome}::q::{qid}",
+            "id": qid,
+            "tipo": "prova",
+            "formato": "objetiva" if eh_objetiva else "discursiva",
+            "pasta": pasta_nome,
+            "apostila": titulo_apostila,
+            "disciplina": disciplina,
+            "ref": str(q.get("ref") or "").strip(),
+            "capitulo": str(q.get("capitulo") or "").strip(),
+            "conceito_id": conceito_id,
+            "conceito_nome": conceito_nome,
+            "nivel": 0,
+            "enunciado": str(q.get("enunciado") or "").strip(),
+            "itens": [str(x) for x in (q.get("itens") or []) if x],
+            "alternativas": [str(a) for a in alts] if eh_objetiva else [],
+            "correta": int(obj.get("correta")) if eh_objetiva else None,
+            "explicacao": str(q.get("resposta_esperada") or "").strip(),
+            "comentario": str(q.get("comentario") or "").strip(),
+            "errados": {},
+            "hash": qid,
+        })
+
+    # 2. Testes de fixação (D.testes)
+    for idx, t in enumerate(D.get("testes") or []):
+        if not isinstance(t, dict):
+            continue
+        tid = str(t.get("id") or f"t{idx + 1}")
+        alts = [str(a) for a in (t.get("alternativas") or [])]
+        if len(alts) < 2 or t.get("correta") is None:
+            continue
+        cid = str(t.get("conceito") or "").strip()
+        cnome = mapa_conceitos.get(cid, cid)
+        errados_raw = t.get("errados") if isinstance(t.get("errados"), dict) else {}
+        errados = {str(k): str(v) for k, v in errados_raw.items() if v}
+
+        itens_banco.append({
+            "uid": f"{pasta_nome}::t::{tid}",
+            "id": tid,
+            "tipo": "teste",
+            "formato": "objetiva",
+            "pasta": pasta_nome,
+            "apostila": titulo_apostila,
+            "disciplina": disciplina,
+            "ref": str(t.get("tema") or "").strip(),
+            "capitulo": str(t.get("bloco") or "").strip(),
+            "conceito_id": cid,
+            "conceito_nome": cnome,
+            "nivel": int(t.get("nivel") or 1),
+            "enunciado": str(t.get("enunciado") or "").strip(),
+            "itens": [],
+            "alternativas": alts,
+            "correta": int(t.get("correta")),
+            "explicacao": str(t.get("porque") or "").strip(),
+            "comentario": "",
+            "errados": errados,
+            "hash": str(t.get("bloco") or "").strip(),
+        })
+
+    return itens_banco
+
+
 def main():
     PASTA_INTERATIVOS.mkdir(parents=True, exist_ok=True)
     catalogo_atual = ler_json(RAIZ / "catalogo.json") or {}
@@ -120,6 +235,7 @@ def main():
 
     apostilas = []
     indice_busca = {}
+    banco_questoes = []
 
     for pasta in sorted(PASTA_INTERATIVOS.iterdir(), key=lambda p: p.name.lower()):
         if not pasta.is_dir() or pasta.name.startswith((".", "_")):
@@ -192,6 +308,9 @@ def main():
             "secoes": extrair_secoes(D, html, titulo),
         }
 
+        disc_resolvida = resolver_disciplina_pasta(pasta.name, f, org_padrao)
+        banco_questoes.extend(extrair_banco_questoes(D, pasta.name, titulo, disc_resolvida))
+
     apostilas.sort(key=lambda a: a["data_aula"] or "", reverse=True)
 
     pastas_existentes = {a["pasta"] for a in apostilas}
@@ -216,7 +335,18 @@ def main():
         json.dumps(indice_busca, ensure_ascii=False),
         encoding="utf-8",
     )
-    print(f"Catálogo atualizado com {len(apostilas)} apostila(s)!")
+    (RAIZ / "banco_questoes.json").write_text(
+        json.dumps(
+            {
+                "versao": 1,
+                "total": len(banco_questoes),
+                "questoes": banco_questoes,
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+    print(f"Catálogo atualizado com {len(apostilas)} apostila(s) e {len(banco_questoes)} questão(ões) no banco!")
 
 
 if __name__ == "__main__":

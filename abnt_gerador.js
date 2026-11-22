@@ -1506,6 +1506,141 @@ KFOURI NETO, Miguel. **Responsabilidade civil do médico**. 11. ed. São Paulo: 
     atualizarMetricas();
   }
 
+  function paginarBlocosEmFolhas(blocos, clsFonte) {
+    if (!blocos.length) return [];
+    const ALTURA_UTIL = 926; // 1123px - 113px (top) - 76px (bottom) - 8px folga
+
+    // Cria medidor oculto com a mesma largura e tipografia exata da folha A4
+    const medidor = document.createElement("div");
+    medidor.className = `abnt-folha ${clsFonte}`;
+    medidor.style.position = "fixed";
+    medidor.style.left = "-99999px";
+    medidor.style.top = "0";
+    medidor.style.height = "auto";
+    medidor.style.overflow = "visible";
+    medidor.style.visibility = "hidden";
+    medidor.style.pointerEvents = "none";
+    document.body.appendChild(medidor);
+
+    const paginas = [];
+    let atual = [];
+
+    const flush = () => {
+      if (atual.length) {
+        paginas.push(atual);
+        atual = [];
+      }
+      medidor.innerHTML = "";
+    };
+
+    const renderElemento = (b) => {
+      if (b.tipo === "lista") {
+        const tag = b.ordenada ? "ol" : "ul";
+        const el = document.createElement(tag);
+        if (b.ordenada && b.num) el.start = Number(b.num) || 1;
+        el.innerHTML = `<li>${inlineParaHtml(b.texto)}</li>`;
+        return el;
+      }
+      const wrap = document.createElement("div");
+      if (b.tipo === "titulo_pre") {
+        wrap.innerHTML = `<p class="abnt-folha__pre-tit">${esc(b.texto)}</p>`;
+      } else if (b.tipo === "sumario_item") {
+        const peso = (b.nivel === 1 || b.nivel >= 3) ? "font-weight:700;" : "";
+        const pad = (b.nivel - 1) * 18;
+        wrap.innerHTML = `<p class="abnt-folha__sumario-item" style="padding-left:${pad}px;${peso}"><span>${esc(b.texto)}</span></p>`;
+      } else if (b.tipo === "ref_tit") {
+        wrap.innerHTML = `<p class="abnt-folha__ref-tit">REFERÊNCIAS</p>`;
+      } else if (b.tipo === "ref_item") {
+        wrap.innerHTML = `<p class="abnt-folha__ref-item">${inlineParaHtml(b.texto)}</p>`;
+      } else if (b.tipo === "tabela") {
+        wrap.innerHTML = `<table><thead><tr>${b.cabecalho.map(c => `<th>${inlineParaHtml(c)}</th>`).join("")}</tr></thead><tbody>${b.corpo.map(r => `<tr>${r.map(c => `<td>${inlineParaHtml(c)}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+      } else if (b.tipo === "citacao") {
+        wrap.innerHTML = `<blockquote>${inlineParaHtml(b.texto)}</blockquote>`;
+      } else if (b.tipo === "titulo") {
+        if (b.nivel === 1) wrap.innerHTML = `<h1>${inlineParaHtml(b.texto.toUpperCase())}</h1>`;
+        else if (b.nivel === 2) wrap.innerHTML = `<h2>${inlineParaHtml(b.texto.toUpperCase())}</h2>`;
+        else wrap.innerHTML = `<h3>${inlineParaHtml(toTitleCase(b.texto))}</h3>`;
+      } else {
+        const cls = b.semRecuo ? ' class="abnt-folha__sem-recuo"' : "";
+        wrap.innerHTML = `<p${cls}>${inlineParaHtml(b.texto)}</p>`;
+      }
+      return wrap.firstElementChild;
+    };
+
+    try {
+      for (const b of blocos) {
+        if (b.tipo === "page_break") {
+          flush();
+          continue;
+        }
+        if (b.tipo === "titulo" && b.quebraAntes && atual.length > 0) {
+          flush();
+        }
+
+        const el = renderElemento(b);
+        if (!el) continue;
+        medidor.appendChild(el);
+
+        // Altura útil atual (descontando padding 113 + 76 = 189px)
+        const alturaConteudo = medidor.scrollHeight - 189;
+        if (alturaConteudo > ALTURA_UTIL && atual.length > 0) {
+          medidor.removeChild(el);
+          flush();
+          medidor.appendChild(el);
+          atual.push(b);
+        } else {
+          atual.push(b);
+        }
+      }
+      flush();
+    } finally {
+      medidor.remove();
+    }
+
+    return paginas;
+  }
+
+  function renderPaginaHtml(blocos) {
+    let html = "";
+    let tipoLista = null;
+    const fecharLista = () => {
+      if (tipoLista) { html += `</${tipoLista}>`; tipoLista = null; }
+    };
+    for (const b of blocos) {
+      if (b.tipo === "lista") {
+        const tag = b.ordenada ? "ol" : "ul";
+        if (tipoLista !== tag) {
+          fecharLista();
+          const startAttr = (b.ordenada && b.num && Number(b.num) > 1) ? ` start="${Number(b.num)}"` : "";
+          html += `<${tag}${startAttr}>`;
+          tipoLista = tag;
+        }
+        html += `<li>${inlineParaHtml(b.texto)}</li>`;
+        continue;
+      }
+      fecharLista();
+      if (b.tipo === "titulo_pre") html += `<p class="abnt-folha__pre-tit">${esc(b.texto)}</p>`;
+      else if (b.tipo === "sumario_item") {
+        const peso = (b.nivel === 1 || b.nivel >= 3) ? "font-weight:700;" : "";
+        const pad = (b.nivel - 1) * 18;
+        html += `<p class="abnt-folha__sumario-item" style="padding-left:${pad}px;${peso}"><span>${esc(b.texto)}</span></p>`;
+      } else if (b.tipo === "ref_tit") html += `<p class="abnt-folha__ref-tit">REFERÊNCIAS</p>`;
+      else if (b.tipo === "ref_item") html += `<p class="abnt-folha__ref-item">${inlineParaHtml(b.texto)}</p>`;
+      else if (b.tipo === "tabela") html += `<table><thead><tr>${b.cabecalho.map(c => `<th>${inlineParaHtml(c)}</th>`).join("")}</tr></thead><tbody>${b.corpo.map(r => `<tr>${r.map(c => `<td>${inlineParaHtml(c)}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+      else if (b.tipo === "citacao") html += `<blockquote>${inlineParaHtml(b.texto)}</blockquote>`;
+      else if (b.tipo === "titulo") {
+        if (b.nivel === 1) html += `<h1>${inlineParaHtml(b.texto.toUpperCase())}</h1>`;
+        else if (b.nivel === 2) html += `<h2>${inlineParaHtml(b.texto.toUpperCase())}</h2>`;
+        else html += `<h3>${inlineParaHtml(toTitleCase(b.texto))}</h3>`;
+      } else {
+        const cls = b.semRecuo ? ' class="abnt-folha__sem-recuo"' : "";
+        html += `<p${cls}>${inlineParaHtml(b.texto)}</p>`;
+      }
+    }
+    fecharLista();
+    return html;
+  }
+
   function abrirModalPreview(meta, parsed) {
     const clsFonte = meta.fonte === "Arial" ? "abnt-folha--arial" : "abnt-folha--times";
     const fundo = document.createElement("div");
@@ -1515,92 +1650,197 @@ KFOURI NETO, Miguel. **Responsabilidade civil do médico**. 11. ed. São Paulo: 
     const temSumarioManual = parsed.preTextuais.some(b => b.tipo === "titulo_pre" && (b.texto === "SUMÁRIO" || b.texto === "SUMARIO"));
     const temSumarioAuto = meta.incluirSumario && !temSumarioManual && parsed.sumarioItens.length > 0;
 
+    // Monta blocos do sumário automático
+    const blocosSumario = [];
+    if (temSumarioAuto) {
+      blocosSumario.push({ tipo: "titulo_pre", texto: "SUMÁRIO" });
+      for (const item of parsed.sumarioItens) {
+        const txt = item.nivel === 1 ? item.texto.toUpperCase()
+          : item.nivel === 2 ? item.texto.toUpperCase()
+          : toTitleCase(item.texto);
+        blocosSumario.push({ tipo: "sumario_item", nivel: item.nivel, texto: txt });
+      }
+      if (parsed.referencias.length > 0) {
+        blocosSumario.push({ tipo: "sumario_item", nivel: 1, texto: "REFERÊNCIAS" });
+      }
+    }
+
+    // Monta blocos das referências
+    const blocosRef = [];
+    if (parsed.referencias.length > 0) {
+      blocosRef.push({ tipo: "ref_tit" });
+      for (const r of parsed.referencias) {
+        blocosRef.push({ tipo: "ref_item", texto: r });
+      }
+    }
+
+    // Pagina cada seção em folhas A4 reais (794x1123px)
+    const paginasPre = paginarBlocosEmFolhas(parsed.preTextuais, clsFonte);
+    const paginasSumario = paginarBlocosEmFolhas(blocosSumario, clsFonte);
+    const paginasTextuais = paginarBlocosEmFolhas(parsed.textuais, clsFonte);
+    const paginasRef = paginarBlocosEmFolhas(blocosRef, clsFonte);
+
     // Contagem ABNT NBR 14724: Capa não conta; Folha de Rosto = pág. 1
-    let pagAtual = 1; // Folha de rosto
-    const pagPre = parsed.preTextuais.length
-      ? (pagAtual++, `<article class="abnt-folha ${clsFonte}">${blocosParaHtml(parsed.preTextuais)}</article>`)
-      : "";
+    let pagAtual = 1; // Folha de Rosto
+    const folhasHtml = [];
 
-    const pagSumario = temSumarioAuto
-      ? (pagAtual++, `<article class="abnt-folha ${clsFonte}">${gerarSumarioHtml(parsed)}</article>`)
-      : "";
+    // Capa
+    folhasHtml.push(`
+      <div class="abnt-folha-wrap">
+        <span class="abnt-folha-tag">Capa · fora da contagem</span>
+        <article class="abnt-folha abnt-folha--capa ${clsFonte}">
+          <div class="abnt-folha__bloco-centro">
+            <div><strong>${esc(meta.instituicao.toUpperCase())}</strong></div>
+            <div><strong>${esc(meta.curso.toUpperCase())}</strong></div>
+            <div style="margin-top:70px">${autoresHtml}</div>
+          </div>
+          <div class="abnt-folha__bloco-centro">
+            <div><strong>${esc(meta.titulo.toUpperCase())}</strong></div>
+            ${meta.subtitulo ? `<div>${esc(meta.subtitulo)}</div>` : ""}
+          </div>
+          <div class="abnt-folha__bloco-centro">
+            <div>${esc(meta.cidade)}</div>
+            <div>${esc(meta.ano)}</div>
+          </div>
+        </article>
+      </div>
+    `);
 
-    const pagTextual = parsed.textuais.length
-      ? (pagAtual++, `<article class="abnt-folha ${clsFonte}">
-           <span class="abnt-folha__num">${pagAtual}</span>
-           ${blocosParaHtml(parsed.textuais)}
-         </article>`)
-      : "";
+    // Folha de Rosto
+    folhasHtml.push(`
+      <div class="abnt-folha-wrap">
+        <span class="abnt-folha-tag">Folha de Rosto · pág. 1 (oculta)</span>
+        <article class="abnt-folha abnt-folha--rosto ${clsFonte}">
+          <div class="abnt-folha__bloco-centro">${autoresHtml}</div>
+          <div class="abnt-folha__bloco-centro">
+            <div><strong>${esc(meta.titulo.toUpperCase())}</strong></div>
+            ${meta.subtitulo ? `<div>${esc(meta.subtitulo)}</div>` : ""}
+          </div>
+          <div class="abnt-folha__nota">
+            ${meta.nota ? `<div style="margin-bottom:14px">${esc(meta.nota)}</div>` : ""}
+            ${meta.orientador ? `<div>Orientador: ${esc(meta.orientador)}</div>` : ""}
+          </div>
+          <div class="abnt-folha__bloco-centro">
+            <div>${esc(meta.cidade)}</div>
+            <div>${esc(meta.ano)}</div>
+          </div>
+        </article>
+      </div>
+    `);
 
-    const pagRef = parsed.referencias.length
-      ? (pagAtual++, `<article class="abnt-folha ${clsFonte}">
-           <span class="abnt-folha__num">${pagAtual}</span>
-           <p class="abnt-folha__ref-tit">REFERÊNCIAS</p>
-           ${parsed.referencias.map(r => `<p class="abnt-folha__ref-item">${inlineParaHtml(r)}</p>`).join("")}
-         </article>`)
-      : "";
+    // Pré-textuais
+    for (const pg of paginasPre) {
+      pagAtual++;
+      folhasHtml.push(`
+        <div class="abnt-folha-wrap">
+          <span class="abnt-folha-tag">Pré-textual · pág. ${pagAtual} (oculta)</span>
+          <article class="abnt-folha ${clsFonte}">${renderPaginaHtml(pg)}</article>
+        </div>
+      `);
+    }
+
+    // Sumário
+    for (const pg of paginasSumario) {
+      pagAtual++;
+      folhasHtml.push(`
+        <div class="abnt-folha-wrap">
+          <span class="abnt-folha-tag">Sumário · pág. ${pagAtual} (oculta)</span>
+          <article class="abnt-folha ${clsFonte}">${renderPaginaHtml(pg)}</article>
+        </div>
+      `);
+    }
+
+    // Textuais (com numeração visível no canto superior direito)
+    for (const pg of paginasTextuais) {
+      pagAtual++;
+      folhasHtml.push(`
+        <div class="abnt-folha-wrap">
+          <span class="abnt-folha-tag">Página ${pagAtual}</span>
+          <article class="abnt-folha ${clsFonte}">
+            <span class="abnt-folha__num">${pagAtual}</span>
+            ${renderPaginaHtml(pg)}
+          </article>
+        </div>
+      `);
+    }
+
+    // Referências
+    for (const pg of paginasRef) {
+      pagAtual++;
+      folhasHtml.push(`
+        <div class="abnt-folha-wrap">
+          <span class="abnt-folha-tag">Referências · pág. ${pagAtual}</span>
+          <article class="abnt-folha ${clsFonte}">
+            <span class="abnt-folha__num">${pagAtual}</span>
+            ${renderPaginaHtml(pg)}
+          </article>
+        </div>
+      `);
+    }
+
+    const totalFolhas = folhasHtml.length;
 
     fundo.innerHTML = `
       <div class="abnt-preview-caixa" role="dialog" aria-modal="true" aria-label="Pré-visualização ABNT">
         <div class="abnt-preview-topo">
-          <h3>Pré-visualização ABNT (${esc(meta.fonte)} · Margens 3×3×2×2 cm · Capa fora da contagem)</h3>
-          <div style="display:flex;gap:8px">
+          <div class="abnt-preview-topo__info">
+            <h3>Pré-visualização ABNT (${totalFolhas} ${totalFolhas === 1 ? "folha" : "folhas"} A4)</h3>
+            <small>${esc(meta.fonte)} · Margens 3×3×2×2 cm · Capa fora da contagem</small>
+          </div>
+          <div class="abnt-preview-controles">
+            <div class="abnt-zoom-ctrl" aria-label="Controle de zoom">
+              <button type="button" data-zoom="menos" title="Diminuir zoom">−</button>
+              <span class="abnt-zoom-val" data-zoom-val>100%</span>
+              <button type="button" data-zoom="mais" title="Aumentar zoom">+</button>
+              <button type="button" data-zoom="fit" title="Ajustar à tela">Ajustar</button>
+            </div>
+            <button type="button" class="botao botao--primario" data-acao="baixar" style="padding:7px 14px;font-size:13px">Baixar Word (.docx)</button>
             <button type="button" class="botao botao--secundario" data-acao="fechar" style="padding:7px 14px;font-size:13px">Fechar</button>
           </div>
         </div>
-        <div class="abnt-preview-corpo">
-          <!-- CAPA -->
-          <article class="abnt-folha abnt-folha--capa ${clsFonte}">
-            <div class="abnt-folha__bloco-centro">
-              <div><strong>${esc(meta.instituicao.toUpperCase())}</strong></div>
-              <div><strong>${esc(meta.curso.toUpperCase())}</strong></div>
-              <div style="margin-top:70px">${autoresHtml}</div>
-            </div>
-            <div class="abnt-folha__bloco-centro">
-              <div><strong>${esc(meta.titulo.toUpperCase())}</strong></div>
-              ${meta.subtitulo ? `<div>${esc(meta.subtitulo)}</div>` : ""}
-            </div>
-            <div class="abnt-folha__bloco-centro">
-              <div>${esc(meta.cidade)}</div>
-              <div>${esc(meta.ano)}</div>
-            </div>
-          </article>
-
-          <!-- FOLHA DE ROSTO -->
-          <article class="abnt-folha abnt-folha--rosto ${clsFonte}">
-            <div class="abnt-folha__bloco-centro">${autoresHtml}</div>
-            <div class="abnt-folha__bloco-centro">
-              <div><strong>${esc(meta.titulo.toUpperCase())}</strong></div>
-              ${meta.subtitulo ? `<div>${esc(meta.subtitulo)}</div>` : ""}
-            </div>
-            <div class="abnt-folha__nota">
-              ${meta.nota ? `<div style="margin-bottom:14px">${esc(meta.nota)}</div>` : ""}
-              ${meta.orientador ? `<div>Orientador: ${esc(meta.orientador)}</div>` : ""}
-            </div>
-            <div class="abnt-folha__bloco-centro">
-              <div>${esc(meta.cidade)}</div>
-              <div>${esc(meta.ano)}</div>
-            </div>
-          </article>
-
-          ${pagPre}
-          ${pagSumario}
-          ${pagTextual}
-          ${pagRef}
+        <div class="abnt-preview-corpo" data-preview-corpo>
+          <div class="abnt-preview-paginas" data-preview-paginas>
+            ${folhasHtml.join("")}
+          </div>
         </div>
       </div>
     `;
+
+    const corpoEl = fundo.querySelector("[data-preview-corpo]");
+    const paginasEl = fundo.querySelector("[data-preview-paginas]");
+    const zoomValEl = fundo.querySelector("[data-zoom-val]");
+
+    let zoomAtual = 1;
+    function calcularZoomAjuste() {
+      const disp = (corpoEl?.clientWidth || window.innerWidth) - 40;
+      return Math.max(0.42, Math.min(1, disp / 794));
+    }
+    function aplicarZoom(z) {
+      zoomAtual = Math.max(0.4, Math.min(1.3, Math.round(z * 100) / 100));
+      paginasEl.style.zoom = String(zoomAtual);
+      if (zoomValEl) zoomValEl.textContent = `${Math.round(zoomAtual * 100)}%`;
+    }
 
     const onEsc = e => { if (e.key === "Escape") fechar(); };
     function fechar() {
       document.removeEventListener("keydown", onEsc);
       fundo.remove();
     }
+
     fundo.addEventListener("mousedown", e => { if (e.target === fundo) fechar(); });
     fundo.querySelector('[data-acao="fechar"]').onclick = fechar;
+    fundo.querySelector('[data-zoom="menos"]').onclick = () => aplicarZoom(zoomAtual - 0.1);
+    fundo.querySelector('[data-zoom="mais"]').onclick = () => aplicarZoom(zoomAtual + 0.1);
+    fundo.querySelector('[data-zoom="fit"]').onclick = () => aplicarZoom(calcularZoomAjuste());
+    fundo.querySelector('[data-acao="baixar"]').onclick = () => {
+      fechar();
+      const btn = document.getElementById("abntBtnGerar");
+      if (btn) btn.click();
+    };
     document.addEventListener("keydown", onEsc);
 
     document.body.appendChild(fundo);
+    aplicarZoom(calcularZoomAjuste());
   }
 
   window.EJGeradorABNT = {
