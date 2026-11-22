@@ -492,11 +492,11 @@
   .conta-modal details { margin-top: 12px; font-size: 12.5px; color: var(--cor-suave); }
   .conta-modal summary { cursor: pointer; font-weight: 600; color: var(--cor-tinta); }
 
-  /* Página Home (Hub com 2 cards) */
+  /* Página Home (Hub visual com 3 cards em destaque) */
   #homeHub.container {
     max-width: none !important;
     margin: 0 !important;
-    padding: 36px 30px 44px !important;
+    padding: 36px 32px 44px !important;
     min-height: 100%;
     display: flex;
     align-items: center;
@@ -504,24 +504,24 @@
     box-sizing: border-box !important;
   }
   .home-hub__inner {
-    width: min(1040px, 100%);
+    width: min(1060px, 100%);
     margin: 0 auto;
   }
   .home-hub__head {
-    margin-bottom: 28px;
+    margin-bottom: 30px;
   }
   .home-hub__eyebrow {
     display: inline-block;
     font: 600 11.5px/1.2 var(--fonte-ui);
-    letter-spacing: 0.05em;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--cor-suave);
-    margin-bottom: 8px;
+    margin-bottom: 10px;
   }
   .home-hub__tit {
-    margin: 0 0 8px;
-    font: 600 30px/1.18 var(--fonte-titulo);
-    letter-spacing: -0.025em;
+    margin: 0 0 10px;
+    font: 600 32px/1.15 var(--fonte-titulo);
+    letter-spacing: -0.028em;
     color: var(--cor-tinta);
   }
   .home-hub__sub {
@@ -533,89 +533,106 @@
   .home-hub__grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 18px;
+    gap: 16px;
   }
   .home-card {
     position: relative;
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    text-align: left;
-    gap: 14px;
-    padding: 28px 26px 24px;
-    border-radius: 18px;
-    border: 1px solid var(--cor-fio);
-    background: var(--cor-superficie);
-    color: var(--cor-tinta);
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    aspect-ratio: 1 / 1;
+    padding: 0;
+    border-radius: 22px;
+    border: 0;
+    overflow: hidden;
+    background: #0f0f12;
+    color: #ffffff;
     font: inherit;
     cursor: pointer;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, .04);
-    transition: transform 180ms var(--ease-out), box-shadow 180ms var(--ease-out), border-color 180ms var(--ease-out);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, .08);
+    transition: transform 220ms var(--ease-out), box-shadow 220ms var(--ease-out);
+  }
+  .home-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: radial-gradient(circle at center, rgba(0, 0, 0, 0.22) 0%, rgba(0, 0, 0, 0.06) 62%, rgba(0, 0, 0, 0.22) 100%);
+    pointer-events: none;
+    transition: opacity 220ms var(--ease-out);
   }
   .home-card:hover {
-    transform: translateY(-3px);
-    border-color: var(--cor-borda-forte, var(--cor-veia));
-    box-shadow: 0 14px 32px rgba(0, 0, 0, .09);
+    transform: translateY(-4px);
+    box-shadow: 0 18px 38px rgba(0, 0, 0, .18);
+  }
+  .home-card:active {
+    transform: translateY(-1px) scale(0.99);
   }
   .home-card:focus-visible {
-    outline: 2.5px solid var(--cor-veia);
-    outline-offset: 2px;
+    outline: 2.5px solid var(--cor-tinta);
+    outline-offset: 3px;
   }
-  .home-card__icon {
-    width: 52px;
-    height: 52px;
-    border-radius: 14px;
-    display: grid;
-    place-items: center;
-    background: var(--cor-veia-fundo);
-    color: var(--cor-veia);
+  .home-card__bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+    transition: transform 420ms var(--ease-out);
   }
-  .home-card--abnt .home-card__icon {
-    background: var(--cor-prova-fundo);
-    color: var(--cor-prova);
-  }
-  .home-card--questoes .home-card__icon {
-    background: var(--cor-professora-fundo);
-    color: var(--cor-professora);
-  }
-  .home-card__icon svg {
-    width: 26px;
-    height: 26px;
+  .home-card:hover .home-card__bg {
+    transform: scale(1.05);
   }
   .home-card__tit {
+    position: relative;
+    z-index: 2;
     margin: 0;
-    font: 600 20px/1.25 var(--fonte-titulo);
-    letter-spacing: -0.015em;
-    color: var(--cor-tinta);
+    padding: 0 20px;
+    font: 600 clamp(24px, 2.6vw, 32px)/1.12 var(--fonte-titulo);
+    letter-spacing: -0.025em;
+    color: #ffffff;
+    text-shadow: 0 2px 18px rgba(0, 0, 0, 0.36);
   }
-  .home-card__desc {
-    margin: 0;
-    font-size: 14px;
-    line-height: 1.5;
-    color: var(--cor-suave);
-    flex: 1;
+  .home-card__seta {
+    position: absolute;
+    right: 16px;
+    bottom: 16px;
+    z-index: 2;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: rgba(68, 86, 122, 0.78);
+    color: #ffffff;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: transform 220ms var(--ease-out), background-color 220ms var(--ease-out);
   }
-  .home-card__cta {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    margin-top: 6px;
-    font: 600 13.5px/1 var(--fonte-ui);
-    color: var(--cor-veia);
+  .home-card--apostilas .home-card__seta {
+    background: rgba(255, 224, 200, 0.92);
+    color: #161210;
   }
-  .home-card--abnt .home-card__cta {
-    color: var(--cor-prova);
+  .home-card--questoes .home-card__seta {
+    background: rgba(68, 88, 126, 0.8);
+    color: #ffffff;
   }
-  .home-card--questoes .home-card__cta {
-    color: var(--cor-professora);
+  .home-card--abnt .home-card__seta {
+    background: rgba(74, 92, 128, 0.8);
+    color: #ffffff;
   }
-  .home-card__cta svg {
-    width: 15px;
-    height: 15px;
-    transition: transform 160ms var(--ease-out);
+  .home-card__seta svg {
+    width: 19px;
+    height: 19px;
+    transition: transform 200ms var(--ease-out);
   }
-  .home-card:hover .home-card__cta svg {
-    transform: translateX(3px);
+  .home-card:hover .home-card__seta {
+    transform: scale(1.07);
+  }
+  .home-card:hover .home-card__seta svg {
+    transform: translateX(2px);
   }
   @media (max-width: 880px) {
     #homeHub.container {
@@ -627,7 +644,10 @@
       gap: 14px;
     }
     .home-hub__tit { font-size: 24px; }
-    .home-card { padding: 22px 20px; }
+    .home-card {
+      aspect-ratio: 16 / 10;
+      border-radius: 18px;
+    }
   }
 </style>
 </head>
@@ -700,39 +720,27 @@
           <p class="home-hub__sub">Escolha uma das ferramentas abaixo para começar seus estudos ou formatar seu trabalho acadêmico.</p>
         </div>
         <div class="home-hub__grid">
-          <button type="button" class="home-card home-card--apostilas" id="btnHomeApostilas">
-            <span class="home-card__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/></svg>
-            </span>
-            <h2 class="home-card__tit">Acessar Apostilas</h2>
-            <p class="home-card__desc">Abra suas apostilas interativas com estojo completo, busca global, pastas personalizadas e progresso salvo no Google Drive.</p>
-            <span class="home-card__cta">
-              <span>Abrir apostilas</span>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          <button type="button" class="home-card home-card--apostilas" id="btnHomeApostilas" aria-label="Acessar Apostilas">
+            <img class="home-card__bg" src="assets/home/card-apostilas.jpg" alt="" loading="eager" decoding="async">
+            <h2 class="home-card__tit">Apostilas</h2>
+            <span class="home-card__seta" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
             </span>
           </button>
 
-          <button type="button" class="home-card home-card--questoes" id="btnHomeQuestoes">
-            <span class="home-card__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-            </span>
-            <h2 class="home-card__tit">Banco de Questões</h2>
-            <p class="home-card__desc">Resolva questões de provas antigas e testes das apostilas com filtros por matéria, caderno de erros, favoritas e gabarito comentado.</p>
-            <span class="home-card__cta">
-              <span>Praticar questões</span>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          <button type="button" class="home-card home-card--questoes" id="btnHomeQuestoes" aria-label="Banco de Questões">
+            <img class="home-card__bg" src="assets/home/card-questoes.jpg" alt="" loading="eager" decoding="async">
+            <h2 class="home-card__tit">Questões</h2>
+            <span class="home-card__seta" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
             </span>
           </button>
 
-          <button type="button" class="home-card home-card--abnt" id="btnHomeAbnt">
-            <span class="home-card__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
-            </span>
-            <h2 class="home-card__tit">Colocar na ABNT</h2>
-            <p class="home-card__desc">Transforme seu texto em Markdown em um arquivo Word (.docx) formatado nas normas ABNT com capa, folha de rosto, sumário e referências.</p>
-            <span class="home-card__cta">
-              <span>Abrir formatador</span>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          <button type="button" class="home-card home-card--abnt" id="btnHomeAbnt" aria-label="Colocar na ABNT">
+            <img class="home-card__bg" src="assets/home/card-abnt.jpg" alt="" loading="eager" decoding="async">
+            <h2 class="home-card__tit">ABNT</h2>
+            <span class="home-card__seta" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
             </span>
           </button>
         </div>
