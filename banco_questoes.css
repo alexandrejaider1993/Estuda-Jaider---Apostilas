@@ -87,7 +87,7 @@
   text-align: left;
   padding: 0;
   overflow: hidden;
-  border-radius: 18px;
+  border-radius: 6px;
   border: 1px solid var(--cor-fio);
   background: var(--cor-superficie);
   color: var(--cor-tinta);
