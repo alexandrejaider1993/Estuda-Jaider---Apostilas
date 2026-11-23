@@ -12,7 +12,7 @@
       "contagem": {},
       "url": "/interativos/Beta lactâmicos e Glicopeptídeos/index.html",
       "capa": "",
-      "modificado": 1795404869,
+      "modificado": 1795449633,
       "chave_local": "beta-lactamicos-glicopeptideos",
       "conceitos": [
         {
@@ -196,7 +196,7 @@
       "contagem": {},
       "url": "/interativos/mecanismos-de-acao-visao-geral-e-conceitos-inici/index.html",
       "capa": "",
-      "modificado": 1795404869,
+      "modificado": 1795449238,
       "chave_local": "mecanismos-de-acao-visao-geral-e-conceitos-inici",
       "conceitos": [
         {
@@ -325,7 +325,7 @@
       "contagem": {},
       "url": "/interativos/patologias-do-utero-2-1a/index.html",
       "capa": "",
-      "modificado": 1795404869,
+      "modificado": 1795445313,
       "chave_local": "utero2-1a-v6",
       "conceitos": [
         {
@@ -813,7 +813,7 @@
       "contagem": {},
       "url": "/interativos/patologias-do-utero-2-1b/index.html",
       "capa": "",
-      "modificado": 1795404869,
+      "modificado": 1795445313,
       "chave_local": "utero2-1b-v6",
       "conceitos": [
         {
@@ -1112,7 +1112,7 @@
       "contagem": {},
       "url": "/interativos/quinolonas-sulfonamidas-polimixinas-metronidazol/index.html",
       "capa": "",
-      "modificado": 1795404869,
+      "modificado": 1795449633,
       "chave_local": "quinolonas-sulfonamidas-polimixinas-metronidazol",
       "conceitos": [
         {
@@ -1281,7 +1281,7 @@
       "contagem": {},
       "url": "/interativos/tetraciclinas-macrolideos-e-outros-inibidores-da/index.html",
       "capa": "",
-      "modificado": 1795404869,
+      "modificado": 1795449239,
       "chave_local": "tetraciclinas-macrolideos-e-outros-inibidores-da",
       "conceitos": [
         {
@@ -1460,6 +1460,18 @@
       "capa": "3ebb396ad1c6fe281375.webp",
       "cor": "#76b0a2",
       "atualizado_em": "2026-11-20T21:06:09"
+    },
+    "home:apostilas": {
+      "capa": "0b1de4361804a559ba14.webp",
+      "atualizado_em": 1795437175.42
+    },
+    "home:questoes": {
+      "capa": "f017fc1f58e200de8c88.webp",
+      "atualizado_em": 1795437178.868
+    },
+    "home:abnt": {
+      "capa": "a5d6d51aadd06d5aeb08.webp",
+      "atualizado_em": 1795437188.285
     }
   },
   "titulos_padrao": {},

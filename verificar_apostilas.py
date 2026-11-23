@@ -153,6 +153,30 @@ def check_file(path):
         if m.get("questao") and m["questao"] not in questoes_ids:
             errors.append(f"[microteste {mid}] Questao `{m['questao']}` nao existe em D.questoes.")
 
+    # 2b. Engenharia Reversa (D.er)
+    for qid, er in (D.get("er") or {}).items():
+        for fi, fund in enumerate(er.get("fund") or []):
+            for ti, tp in enumerate(fund.get("testes") or []):
+                if isinstance(tp, list) and tp and tp[0] == "mc":
+                    alts = tp[2] if len(tp) > 2 else []
+                    if not isinstance(alts, list) or len(alts) < 4:
+                        errors.append(
+                            f"[er {qid} fund[{fi}] teste[{ti}]] Multipla escolha deve ter no minimo 4 alternativas "
+                            f"(encontrado: {len(alts) if isinstance(alts, list) else alts})."
+                        )
+                    else:
+                        if any(not str(a).strip() for a in alts):
+                            errors.append(f"[er {qid} fund[{fi}] teste[{ti}]] Contem alternativa vazia.")
+                        if len({str(a).strip().lower() for a in alts}) != len(alts):
+                            errors.append(f"[er {qid} fund[{fi}] teste[{ti}]] Contem alternativas duplicadas.")
+                        if len(tp) >= 5 and isinstance(tp[4], list) and len(tp[4]) != len(alts) - 1:
+                            errors.append(f"[er {qid} fund[{fi}] teste[{ti}]] Numero de comentarios de erradas ({len(tp[4])}) difere de {len(alts) - 1}.")
+        for ci, c in enumerate(er.get("checagem") or []):
+            if not isinstance(c, str) or not c.strip():
+                errors.append(
+                    f"[er {qid} checagem[{ci}]] Deve ser uma pergunta em texto simples (encontrado: {type(c).__name__})."
+                )
+
     # 3. Questoes originais (objetivas vs dissertativas)
     has_any_objetiva = False
     for q in D.get("questoes", []):

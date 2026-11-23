@@ -85,6 +85,8 @@
 
   // Apostilas importadas pelo usuário no navegador (guardadas no IndexedDB porque o HTML pode ter vários MB)
   let apostilasImportadas = {}; // { pasta: { ficha, html, capaDataUrl, modificado, chave_local, conceitos, testes, secoes } }
+  // Cache local em IndexedDB de prévias de capas (evita estourar limite de 5MB do localStorage e evita 404 antes do deploy)
+  let capasCacheLocal = {}; // { "hash.webp": "data:image/webp;base64,..." }
 
   // ------------------------------------------------------------------ IndexedDB para apostilas importadas e backup grande
   function abrirIDB() {
@@ -170,6 +172,69 @@
     });
   }
 
+  async function idbLerCapasCache() {
+    const db = await abrirIDB();
+    if (!db) return {};
+    return new Promise(resolve => {
+      try {
+        const tx = db.transaction("estado_kv", "readonly");
+        const req = tx.objectStore("estado_kv").get("capas_cache");
+        req.onsuccess = () => resolve((req.result && typeof req.result === "object") ? req.result : {});
+        req.onerror = () => resolve({});
+      } catch (e) { resolve({}); }
+    });
+  }
+
+  async function idbSalvarCapasCache(mapa) {
+    const db = await abrirIDB();
+    if (!db) return;
+    return new Promise(resolve => {
+      try {
+        const tx = db.transaction("estado_kv", "readwrite");
+        tx.objectStore("estado_kv").put(mapa || {}, "capas_cache");
+        tx.oncomplete = () => resolve(true);
+        tx.onerror = () => resolve(false);
+      } catch (e) { resolve(false); }
+    });
+  }
+
+  function obterDataUrlCapaLocal(nome) {
+    if (!nome || typeof nome !== "string") return "";
+    if (capasCacheLocal && capasCacheLocal[nome]) return capasCacheLocal[nome];
+    if (estado.capas_custom && estado.capas_custom[nome]) return estado.capas_custom[nome];
+    return "";
+  }
+
+  function limparCapasNaoUsadas() {
+    const usadas = new Set();
+    for (const ap of Object.values(estado.aparencia || {})) {
+      if (ap && typeof ap.capa === "string" && ap.capa && !ap.capa.startsWith("data:")) {
+        usadas.add(ap.capa);
+      }
+    }
+    for (const ap of Object.values((catalogo && catalogo.aparencia_padrao) || {})) {
+      if (ap && typeof ap.capa === "string" && ap.capa && !ap.capa.startsWith("data:")) {
+        usadas.add(ap.capa);
+      }
+    }
+    if (estado.capas_custom && typeof estado.capas_custom === "object") {
+      for (const k of Object.keys(estado.capas_custom)) {
+        if (!usadas.has(k)) delete estado.capas_custom[k];
+      }
+    }
+    for (const k of Object.keys(capasCacheLocal)) {
+      if (!usadas.has(k)) delete capasCacheLocal[k];
+    }
+  }
+
+  function registrarCapaLocal(hash, dataUrl) {
+    if (!hash || !dataUrl) return;
+    capasCacheLocal[hash] = dataUrl;
+    limparCapasNaoUsadas();
+    capasCacheLocal[hash] = dataUrl;
+    idbSalvarCapasCache(capasCacheLocal);
+  }
+
   async function tentarRestaurarPastaProjeto() {
     try {
       const h = await idbLerHandlePasta();
@@ -220,18 +285,28 @@
     const aparenciaLimpa = JSON.parse(JSON.stringify(estado.aparencia || {}));
 
     for (const [chave, ap] of Object.entries(aparenciaLimpa)) {
-      if (ap && typeof ap.capa === "string" && ap.capa.startsWith("data:")) {
-        const mime = (ap.capa.match(/^data:(image\/[a-z0-9.+-]+);base64,/i) || [])[1] || "image/webp";
+      if (!ap || typeof ap.capa !== "string" || !ap.capa) continue;
+      if (ap.capa.startsWith("data:")) {
+        const dataUrlOriginal = ap.capa;
+        const mime = (dataUrlOriginal.match(/^data:(image\/[a-z0-9.+-]+);base64,/i) || [])[1] || "image/webp";
         const ext = mime === "image/gif" ? ".gif" : (mime === "image/png" ? ".png" : (mime === "image/jpeg" ? ".jpg" : ".webp"));
-        let hashNome = Object.keys(estado.capas_custom || {}).find(k => estado.capas_custom[k] === ap.capa);
+        let hashNome = Object.keys(capasCacheLocal).find(k => capasCacheLocal[k] === dataUrlOriginal)
+          || Object.keys(estado.capas_custom || {}).find(k => estado.capas_custom[k] === dataUrlOriginal);
         if (!hashNome) {
           hashNome = Array.from(crypto.getRandomValues(new Uint8Array(10))).map(x => x.toString(16).padStart(2, "0")).join("") + ext;
         }
-        const bytes = dataUrlParaUint8Array(ap.capa);
+        const bytes = dataUrlParaUint8Array(dataUrlOriginal);
         if (bytes) {
           await escreverArquivoNoHandle(dirCapas, hashNome, bytes);
+          registrarCapaLocal(hashNome, dataUrlOriginal);
           ap.capa = hashNome;
           if (estado.aparencia[chave]) estado.aparencia[chave].capa = hashNome;
+        }
+      } else {
+        const dataUrlCache = obterDataUrlCapaLocal(ap.capa);
+        if (dataUrlCache && dataUrlCache.startsWith("data:")) {
+          const bytes = dataUrlParaUint8Array(dataUrlCache);
+          if (bytes) await escreverArquivoNoHandle(dirCapas, ap.capa, bytes);
         }
       }
     }
@@ -416,10 +491,17 @@
 
   function salvarEstadoLocal(agendarNuvem = true) {
     estado.atualizado_em = Date.now() / 1000;
+    limparCapasNaoUsadas();
     try {
       localStorage.setItem(CHAVE_DADOS, JSON.stringify(estado));
     } catch (e) {
-      console.warn("Aviso: localStorage cheio ou indisponível", e);
+      // Se o localStorage estiver cheio (limite ~5MB), salva sem capas_custom pois elas já ficam no IndexedDB
+      try {
+        const copiaLeve = Object.assign({}, estado, { capas_custom: {} });
+        localStorage.setItem(CHAVE_DADOS, JSON.stringify(copiaLeve));
+      } catch (e2) {
+        console.warn("Aviso: localStorage cheio ou indisponível", e2);
+      }
     }
     if (agendarNuvem) agendarSincronizacaoDrive();
   }
@@ -465,14 +547,16 @@
     if (prontoPromise) return prontoPromise;
     prontoPromise = (async () => {
       carregarEstadoLocal();
-      const [catResp, indResp, imp] = await Promise.all([
+      const [catResp, indResp, imp, capasIdb] = await Promise.all([
         fetchNativo("/catalogo.json", { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
         fetchNativo("/indice_busca.json", { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
         idbLerApostilas(),
+        idbLerCapasCache(),
       ]);
       if (catResp) catalogo = catResp;
       if (indResp) indiceBusca = indResp;
       apostilasImportadas = imp || {};
+      capasCacheLocal = Object.assign({}, estado.capas_custom || {}, capasIdb || {});
 
       // Se o Admin já fez edições locais neste navegador (org_em > 0), preserva; caso contrário usa o catalogo.json oficial
       const temEdicaoAdminSalva = (Number(estado.org_em) || 0) > 0 && estado.organizacao && estado.organizacao.pastas && Object.keys(estado.organizacao.pastas).length > 0;
@@ -1197,10 +1281,9 @@
       });
       const ext = (arquivo.type === "image/gif") ? ".gif" : (arquivo.type === "image/png" ? ".png" : ".webp");
       const hash = Array.from(crypto.getRandomValues(new Uint8Array(10))).map(x => x.toString(16).padStart(2, "0")).join("") + ext;
-      if (!estado.capas_custom) estado.capas_custom = {};
-      estado.capas_custom[hash] = dataUrl;
+      registrarCapaLocal(hash, dataUrl);
       const a = estado.aparencia[chave] || {};
-      a.capa = dataUrl; // guarda direto ou via nome
+      a.capa = hash;
       delete a.sem_capa;
       if (cor) a.cor = cor;
       a.atualizado_em = new Date().toISOString().slice(0, 19);
@@ -1217,8 +1300,9 @@
       if ( nome.startsWith("data:") ) {
         return fetchNativo(nome);
       }
-      if (estado.capas_custom && estado.capas_custom[nome]) {
-        return fetchNativo(estado.capas_custom[nome]);
+      const localData = obterDataUrlCapaLocal(nome);
+      if (localData) {
+        return fetchNativo(localData);
       }
       return fetchNativo(`/capas_pastas/${encodeURIComponent(nome)}`);
     }
@@ -1247,10 +1331,13 @@
       const nome = decodeURIComponent(href.replace("/api/pastas-aparencia/capa/", ""));
       if (nome.startsWith("data:")) {
         img.setAttribute("href", nome);
-      } else if (estado.capas_custom && estado.capas_custom[nome]) {
-        img.setAttribute("href", estado.capas_custom[nome]);
       } else {
-        img.setAttribute("href", `/capas_pastas/${nome}`);
+        const localData = obterDataUrlCapaLocal(nome);
+        if (localData) {
+          img.setAttribute("href", localData);
+        } else {
+          img.setAttribute("href", `/capas_pastas/${nome}`);
+        }
       }
     });
   }
@@ -1910,8 +1997,9 @@
     if (valor.startsWith("data:") || valor.startsWith("http://") || valor.startsWith("https://") || valor.startsWith("/") || valor.startsWith("assets/")) {
       return valor;
     }
-    if (estado.capas_custom && estado.capas_custom[valor]) {
-      return estado.capas_custom[valor];
+    const localData = obterDataUrlCapaLocal(valor);
+    if (localData) {
+      return localData;
     }
     return `capas_pastas/${encodeURIComponent(valor)}`;
   }
@@ -1931,10 +2019,15 @@
     if (!HOME_CARDS_IDS.includes(cardId)) throw new Error("Card inválido.");
     if (!dataUrl || typeof dataUrl !== "string") throw new Error("Imagem inválida.");
     if (!estado.aparencia || typeof estado.aparencia !== "object") estado.aparencia = {};
+    const mime = (dataUrl.match(/^data:(image\/[a-z0-9.+-]+);base64,/i) || [])[1] || "image/webp";
+    const ext = mime === "image/gif" ? ".gif" : (mime === "image/png" ? ".png" : (mime === "image/jpeg" ? ".jpg" : ".webp"));
+    const hash = Array.from(crypto.getRandomValues(new Uint8Array(10))).map(x => x.toString(16).padStart(2, "0")).join("") + ext;
+    registrarCapaLocal(hash, dataUrl);
     estado.aparencia["home:" + cardId] = {
-      capa: dataUrl,
+      capa: hash,
       atualizado_em: Date.now() / 1000,
     };
+    estado.org_em = Date.now() / 1000;
     salvarEstadoLocal(true);
     window.dispatchEvent(new CustomEvent("ej-home-capas-mudou", { detail: obterCapasHome() }));
     autoSalvarPastaPCSeConectada();
@@ -1951,6 +2044,7 @@
     if (catalogo.aparencia_padrao && chave in catalogo.aparencia_padrao) {
       delete catalogo.aparencia_padrao[chave];
     }
+    estado.org_em = Date.now() / 1000;
     salvarEstadoLocal(true);
     window.dispatchEvent(new CustomEvent("ej-home-capas-mudou", { detail: obterCapasHome() }));
     autoSalvarPastaPCSeConectada();

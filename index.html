@@ -504,7 +504,7 @@
     box-sizing: border-box !important;
   }
   .home-hub__inner {
-    width: min(901px, 85%);
+    width: min(766px, 72%);
     margin: 0 auto;
   }
   .home-hub__head {
@@ -533,7 +533,7 @@
   .home-hub__grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 14px;
+    gap: 12px;
   }
   .home-card-wrap {
     position: relative;
@@ -637,19 +637,19 @@
     position: relative;
     z-index: 2;
     margin: 0;
-    padding: 0 20px;
-    font: 600 clamp(20px, 2.2vw, 27px)/1.12 var(--fonte-titulo);
+    padding: 0 16px;
+    font: 600 clamp(17px, 1.87vw, 23px)/1.12 var(--fonte-titulo);
     letter-spacing: -0.025em;
     color: #ffffff;
     text-shadow: 0 2px 18px rgba(0, 0, 0, 0.36);
   }
   .home-card__seta {
     position: absolute;
-    right: 14px;
-    bottom: 14px;
+    right: 12px;
+    bottom: 12px;
     z-index: 2;
-    width: 38px;
-    height: 38px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     display: grid;
     place-items: center;
@@ -672,8 +672,8 @@
     color: #ffffff;
   }
   .home-card__seta svg {
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
     transition: transform 200ms var(--ease-out);
   }
   .home-card:hover .home-card__seta {
@@ -841,7 +841,7 @@
   <!-- Scripts do Sistema -->
   <script src="marca_texto.js?v=2"></script>
   <script src="faixa_preenchida.js?v=2"></script>
-  <script src="storage_drive.js?v=14"></script>
+  <script src="storage_drive.js?v=15"></script>
   <script src="pasta_visual.js?v=5"></script>
   <script src="login_eleven.js?v=5"></script>
   <script src="interativos.js?v=12"></script>
@@ -1032,6 +1032,10 @@
           const id = img.dataset.homeBg;
           const customUrl = capas[id] || "";
           const padrao = img.dataset.defaultSrc || img.getAttribute("src") || "";
+          img.onerror = () => {
+            img.onerror = null;
+            if (padrao && img.src !== padrao) img.src = padrao;
+          };
           img.src = customUrl || padrao;
           const btnReset = document.querySelector(`[data-home-restaurar="${id}"]`);
           if (btnReset) btnReset.hidden = !customUrl;
@@ -1055,7 +1059,7 @@
           fr.onload = () => {
             const img = new Image();
             img.onload = () => {
-              const MAX = 1400;
+              const MAX = 1000;
               let w = img.naturalWidth || img.width;
               let h = img.naturalHeight || img.height;
               if (w > MAX || h > MAX) {
@@ -1069,8 +1073,8 @@
               const ctx = cv.getContext("2d");
               ctx.drawImage(img, 0, 0, w, h);
               try {
-                const saida = cv.toDataURL("image/webp", 0.9);
-                resolve(saida.startsWith("data:image/webp") ? saida : cv.toDataURL("image/jpeg", 0.9));
+                const saida = cv.toDataURL("image/webp", 0.84);
+                resolve(saida.startsWith("data:image/webp") ? saida : cv.toDataURL("image/jpeg", 0.84));
               } catch (e) {
                 resolve(fr.result);
               }
