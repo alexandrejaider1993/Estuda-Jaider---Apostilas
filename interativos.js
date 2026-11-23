@@ -824,7 +824,7 @@
     // Animações por passos com pergunta que libera o próximo (padrão v6.3): web/anim_apostila.js
     if (!q.contentWindow.ejAnim) { const an = doc.createElement("script"); an.src = "/anim_apostila.js?v=1"; doc.head.append(an); }
     // Regras universais (ex.: marcar a alternativa e só corrigir no botão "Responder"): regras_apostila.js
-    if (!q.contentWindow.__ejRegras) { const rg = doc.createElement("script"); rg.src = "/regras_apostila.js?v=4"; doc.head.append(rg); }
+    if (!q.contentWindow.__ejRegras) { const rg = doc.createElement("script"); rg.src = "/regras_apostila.js?v=6"; doc.head.append(rg); }
     injetarNav(q, doc);
     const s = doc.createElement("script");
     s.src = "/trilho_apostila.js?v=8";
