@@ -45,6 +45,9 @@
     try { sessionStorage.setItem(CHAVE_ADMIN, "1"); } catch (e) {}
     document.documentElement.dataset.admin = "1";
     window.dispatchEvent(new CustomEvent("ej-admin-mudou", { detail: { admin: true } }));
+    if (typeof sincronizarComDriveAgora === "function" && tokenAcesso) {
+      setTimeout(() => { sincronizarComDriveAgora().catch(() => {}); }, 80);
+    }
     return true;
   }
 
@@ -1556,11 +1559,18 @@
           }
         }
       }
+      const tsNum = (v) => {
+        if (v == null || v === "") return 0;
+        const n = Number(v);
+        if (!Number.isNaN(n) && n > 0) return n > 1e12 ? n / 1000 : n;
+        const parsed = Date.parse(String(v));
+        return Number.isNaN(parsed) ? 0 : parsed / 1000;
+      };
       if (remoto.aparencia && typeof remoto.aparencia === "object") {
         if (!local.aparencia) local.aparencia = {};
         for (const [chave, apRem] of Object.entries(remoto.aparencia)) {
           const apLoc = local.aparencia[chave];
-          if (!apLoc || String(apRem.atualizado_em || "") > String(apLoc.atualizado_em || "")) {
+          if (!apLoc || tsNum(apRem.atualizado_em) > tsNum(apLoc.atualizado_em)) {
             local.aparencia[chave] = JSON.parse(JSON.stringify(apRem));
             mudouLocal = true;
           }
