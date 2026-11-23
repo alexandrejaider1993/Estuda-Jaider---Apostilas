@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fig 1 · Parede Celular: β-Lactâmicos, β-Lactamases e Glicopeptídeos</title>
+<style>
+  :root {
+    --page: #f2f2ef; --card: #fbfbfa; --ink: #18181a; --text: #57575a; --muted: #8c8c90; --border: #e2e2df;
+    --veia: #2b4f7e; --veia-bg: #eef3f9; --arteria: #a8322d; --arteria-bg: #fbefee;
+    --nervo: #9a7609; --nervo-bg: #fbf4dc; --linfa: #3d7a5a; --linfa-bg: #edf6f0;
+    --roxo: #5b4b8a; --roxo-bg: #f3effa;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --serif: "Source Serif 4", Georgia, serif;
+    --ease: cubic-bezier(.32, .72, 0, 1);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--card); color: var(--ink); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+  .wrap { padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 12px; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+  .fig-meta { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .fig-num { font: 600 11px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .fig-title { font: 600 14px/1.25 var(--sans); color: var(--ink); }
+  .controls { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .btn { font: 500 11.5px var(--sans); color: var(--ink); background: #fff; border: 1px solid var(--border); border-radius: 7px; padding: 5px 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; transition: all .18s var(--ease); }
+  .btn:hover { background: var(--page); border-color: #c9c9c4; }
+  .btn[aria-pressed="true"] { background: var(--veia); border-color: var(--veia); color: #fff; }
+  .kbd { font: 600 9.5px var(--mono); opacity: .65; padding: 1px 4px; border-radius: 3px; background: rgba(0,0,0,.06); }
+  .btn[aria-pressed="true"] .kbd { background: rgba(255,255,255,.2); opacity: .9; }
+  .pills { display: flex; gap: 6px; flex-wrap: wrap; }
+  .pill { font: 500 12px var(--sans); color: var(--text); background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 5px 11px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all .2s var(--ease); }
+  .pill .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--c, var(--veia)); flex-shrink: 0; }
+  .pill:hover { border-color: var(--c, var(--veia)); color: var(--ink); }
+  .pill.active { background: var(--bg, var(--veia-bg)); border-color: var(--c, var(--veia)); color: var(--ink); font-weight: 600; }
+  .stage { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(240px, 0.95fr); gap: 14px; align-items: stretch; }
+  @media (max-width: 720px) { .stage { grid-template-columns: 1fr; } }
+  .canvas-box { position: relative; background: #fff; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; min-height: 360px; display: flex; align-items: center; justify-content: center; }
+  svg#scene { display: block; width: 100%; height: auto; max-height: 430px; user-select: none; }
+  .hint-bar { position: absolute; left: 12px; bottom: 9px; font: 500 10.5px var(--mono); color: var(--muted); pointer-events: none; }
+  .readout { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 14px 15px; display: flex; flex-direction: column; gap: 10px; }
+  .ro-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; border-bottom: 1px solid var(--border); padding-bottom: 9px; }
+  .ro-badge { font: 600 10.5px var(--mono); letter-spacing: .05em; text-transform: uppercase; padding: 3px 8px; border-radius: 5px; background: var(--veia-bg); color: var(--veia); }
+  .ro-state { font: 600 11px var(--mono); color: var(--muted); }
+  .ro-title { margin: 0; font: 600 16px/1.25 var(--sans); color: var(--ink); }
+  .ro-drugs { font: 500 12px/1.4 var(--mono); color: var(--veia); }
+  .ro-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .ro-metric { background: var(--card); border: 1px solid var(--border); border-radius: 7px; padding: 7px 9px; }
+  .ro-metric .k { display: block; font: 600 9.5px var(--mono); text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin-bottom: 3px; }
+  .ro-metric .v { display: block; font: 600 12.5px/1.3 var(--sans); color: var(--ink); }
+  .ro-desc { margin: 0; font: 400 13px/1.5 var(--serif); color: var(--text); }
+  .ro-prova { margin-top: auto; background: var(--nervo-bg); border-left: 3px solid var(--nervo); border-radius: 0 7px 7px 0; padding: 8px 10px; font: 400 12px/1.42 var(--sans); color: var(--ink); }
+  .ro-prova b { display: block; font: 600 10px var(--mono); text-transform: uppercase; letter-spacing: .05em; color: var(--nervo); margin-bottom: 2px; }
+  @keyframes pulseRing { 0%, 100% { opacity: .28; } 50% { opacity: .88; } }
+  .pulse-hi { animation: pulseRing 1.6s ease-in-out infinite; }
+  .layer-group { cursor: pointer; }
+</style>
+</head>
+<body>
+<div class="wrap" id="root">
+  <div class="topbar">
+    <div class="fig-meta">
+      <span class="fig-num">Fig 1 · Anatomy</span>
+      <span class="fig-title">Parede Celular: β-Lactâmicos, β-Lactamases e Glicopeptídeos</span>
+    </div>
+    <div class="controls">
+      <button class="btn" id="btnExplode" aria-pressed="false">Explodir camadas <span class="kbd">E</span></button>
+      <button class="btn" id="btnReset">Visão geral <span class="kbd">0</span></button>
+    </div>
+  </div>
+  <div class="pills" role="tablist"><button class="pill" data-id="lactamase" style="--c:#9a7609;--bg:#fbf4dc"><span class="dot"></span>1 · Porinas e β-Lactamases</button><button class="pill" data-id="glicopeptideos" style="--c:#a8322d;--bg:#fbefee"><span class="dot"></span>2 · Glicopeptídeos (D-Ala)</button><button class="pill" data-id="betalactamicos" style="--c:#2b4f7e;--bg:#eef3f9"><span class="dot"></span>3 · β-Lactâmicos (PBPs)</button><button class="pill" data-id="lise" style="--c:#3d7a5a;--bg:#edf6f0"><span class="dot"></span>4 · Lise Osmótica</button></div>
+  <div class="stage">
+    <div class="canvas-box">
+      <svg id="scene" viewBox="0 0 560 430" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Parede Celular: β-Lactâmicos, β-Lactamases e Glicopeptídeos"></svg>
+      <div class="hint-bar">Clique nas camadas ou teclas 1–4 · E para explodir</div>
+    </div>
+    <div class="readout" aria-live="polite">
+      <div class="ro-head">
+        <span class="ro-badge" id="roBadge">VISÃO GERAL</span>
+        <span class="ro-state" id="roState">4 CAMADAS</span>
+      </div>
+      <h2 class="ro-title" id="roTitle"></h2>
+      <div class="ro-drugs" id="roDrugs"></div>
+      <div class="ro-grid">
+        <div class="ro-metric"><span class="k">Alvo molecular</span><span class="v" id="roTarget"></span></div>
+        <div class="ro-metric"><span class="k">Espectro / Efeito</span><span class="v" id="roEffect"></span></div>
+      </div>
+      <p class="ro-desc" id="roDesc"></p>
+      <div class="ro-prova" id="roProva"></div>
+    </div>
+  </div>
+</div>
+<script>
+(() => {
+  const ANAT_ID = "parede-celular-betalactamicos";
+  const DATA = {"overview": {"badge": "VISÃO GERAL", "badgeBg": "#eef3f9", "badgeColor": "#2b4f7e", "state": "4 CAMADAS · PAREDE", "title": "Inibição da síntese da parede celular", "drugs": "Penicilinas · Cefalosporinas · Carbapenêmicos · Aztreonam · Vancomicina", "target": "PBPs e terminal D-Ala-D-Ala", "effect": "Bactericida (tempo-dependente)", "desc": "Tanto os <b>β-lactâmicos</b> quanto os <b>glicopeptídeos</b> impedem a formação da malha rígida de peptidoglicano. Sem parede íntegra, a pressão osmótica interna rompe a bactéria.", "prova": "Clique nas 4 camadas acima para comparar onde entram β-lactamases, por que a vancomicina não cobre Gram-negativos e como ocorre a resistência do MRSA (PBP2a)."}, "lactamase": {"badge": "CAMADA 1 · PERIPLASMA E PORINAS", "badgeBg": "#fbf4dc", "badgeColor": "#9a7609", "state": "INIBIDORES DE β-LACTAMASE", "title": "Porinas (Gram-) e β-Lactamases", "drugs": "Clavulanato · Sulbactam · Tazobactam · Avibactam · Aztreonam", "target": "Enzimas β-lactamases", "effect": "Protege o anel β-lactâmico", "desc": "Nos Gram-negativos, o fármaco atravessa <b>porinas</b> e enfrenta <b>β-lactamases</b> no espaço periplasmático que quebram o anel β-lactâmico. Os inibidores (clavulanato, tazobactam) funcionam como iscas suicidas protegendo a penicilina.", "prova": "Aztreonam (monobactâmico) cobre exclusivamente Gram-negativos aeróbios e não tem alergia cruzada com penicilinas. Carbapenêmicos têm o espectro mais amplo."}, "glicopeptideos": {"badge": "CAMADA 2 · PEPTIDOGLICANO", "badgeBg": "#fbefee", "badgeColor": "#a8322d", "state": "CAPA NO D-ALA-D-ALA", "title": "Glicopeptídeos (Vancomicina e Teicoplanina)", "drugs": "Vancomicina (IV / VO só C. difficile) · Teicoplanina", "target": "Terminal D-Ala-D-Ala", "effect": "Bactericida · Exclusivo Gram+", "desc": "Ligam-se com alta afinidade à extremidade <b>D-Ala-D-Ala</b> dos precursores do peptidoglicano, bloqueando por impedimento estérico a transglicosilação e a transpeptidação. São grandes demais para atravessar porinas de Gram-negativos.", "prova": "Padrão para MRSA. Infusão rápida de vancomicina libera histamina (Síndrome do Homem/Pescoço Vermelho — infundir lentamente). Monitorar nefrotoxicidade e ototoxicidade."}, "betalactamicos": {"badge": "CAMADA 3 · TRANSPEPTIDASES (PBPs)", "badgeBg": "#eef3f9", "badgeColor": "#2b4f7e", "state": "ACILAÇÃO IRREVERSÍVEL DA PBP", "title": "β-Lactâmicos (Penicilinas, Cefalosporinas, Carbapenêmicos)", "drugs": "Oxacilina · Amoxicilina · Ceftriaxona · Cefepima · Ceftarolina · Meropenem", "target": "PBPs (Penicillin-Binding Proteins)", "effect": "Bactericida · Bloqueia ligações cruzadas", "desc": "O anel β-lactâmico mimetiza estruturalmente o dipeptídeo D-Ala-D-Ala e acila irreversivelmente o sítio ativo das <b>PBPs (transpeptidases)</b>, impedindo a ligação cruzada das cadeias de peptidoglicano.", "prova": "MRSA altera a PBP (PBP2a) e escapa da oxacilina e quase todos os β-lactâmicos — única cefalosporina ativa contra MRSA é a 5ª geração (Ceftarolina)."}, "lise": {"badge": "CAMADA 4 · MEMBRANA E PRESSÃO OSMÓTICA", "badgeBg": "#edf6f0", "badgeColor": "#3d7a5a", "state": "ATIVIDADE TEMPO-DEPENDENTE", "title": "Autolisinas e Lise Osmótica", "drugs": "Todos os inibidores de parede celular", "target": "Integridade osmótica bacteriana", "effect": "Morte celular em bactérias em divisão", "desc": "Com a síntese de peptidoglicano bloqueada e as autolisinas ainda ativas degradando a parede antiga, a alta pressão osmótica interna rompe a membrana citoplasmática. Exige que a bactéria esteja em multiplicação ativa.", "prova": "β-lactâmicos são tempo-dependentes (T > CIM): manter a concentração acima da CIM pelo maior tempo possível entre doses maximiza a eficácia clínica."}};
+  const LAYERS = [{"id": "lactamase", "pill": "1 · Porinas e β-Lactamases", "label": "Periplasma · β-Lactamases", "tag": "IBL", "color": "#9a7609", "bg": "#fbf4dc", "fills": ["#fbf4dc", "#f0e2b4", "#e3ce8d"], "accentFills": ["#fef3c7", "#f59e0b", "#b45309"]}, {"id": "glicopeptideos", "pill": "2 · Glicopeptídeos (D-Ala)", "label": "Peptidoglicano · D-Ala-D-Ala", "tag": "VAN", "color": "#a8322d", "bg": "#fbefee", "fills": ["#fbefee", "#f2cfcc", "#e2a9a4"], "accentFills": ["#fee2e2", "#ef4444", "#a8322d"]}, {"id": "betalactamicos", "pill": "3 · β-Lactâmicos (PBPs)", "label": "PBPs · Transpeptidação", "tag": "PBP", "color": "#2b4f7e", "bg": "#eef3f9", "fills": ["#eef3f9", "#d5e2f2", "#bdd0ea"], "accentFills": ["#dbeafe", "#60a5fa", "#2b4f7e"]}, {"id": "lise", "pill": "4 · Lise Osmótica", "label": "Membrana · Lise Osmótica", "tag": "LISE", "color": "#3d7a5a", "bg": "#edf6f0", "fills": ["#edf6f0", "#cbe5d5", "#9ecbb0"], "accentFills": ["#dcfce7", "#4ade80", "#3d7a5a"]}];
+  const COS30 = 0.8660254, SIN30 = 0.5, CX = 212, CY = 216;
+  const iso = (x, y, z) => [+(CX + (x - y) * COS30).toFixed(2), +(CY + (x + y) * SIN30 - z).toFixed(2)];
+  const pts = (a) => a.map(p => p[0] + ',' + p[1]).join(' ');
+
+  function leaderLabel(anchor, text, color, active) {
+    const lx = 392, ly = anchor[1];
+    return `<line x1="${anchor[0]}" y1="${anchor[1]}" x2="${lx - 6}" y2="${ly}" stroke="${active ? color : '#c4c4c8'}" stroke-width="${active ? 1.1 : 0.75}" stroke-dasharray="${active ? '' : '2 2'}"/>`
+      + `<circle cx="${anchor[0]}" cy="${anchor[1]}" r="${active ? 2.6 : 1.9}" fill="${active ? color : '#8a8a8f'}"/>`
+      + `<text x="${lx}" y="${ly + 3.5}" fill="${active ? color : '#57575a'}" font-size="10.5" font-weight="${active ? 700 : 600}" font-family="Inter,sans-serif">${text}</text>`;
+  }
+
+  function isoBox(x, y, z, dx, dy, dz, fills, stroke = '#26262a', sw = 0.7) {
+    const p000 = iso(x,y,z), p100 = iso(x+dx,y,z), p110 = iso(x+dx,y+dy,z), p010 = iso(x,y+dy,z);
+    const p001 = iso(x,y,z+dz), p101 = iso(x+dx,y,z+dz), p111 = iso(x+dx,y+dy,z+dz), p011 = iso(x,y+dy,z+dz);
+    return `<polygon points="${pts([p010,p110,p111,p011])}" fill="${fills[1]}" stroke="${stroke}" stroke-width="${sw}" stroke-linejoin="round"/>`
+      + `<polygon points="${pts([p100,p110,p111,p101])}" fill="${fills[2]}" stroke="${stroke}" stroke-width="${sw}" stroke-linejoin="round"/>`
+      + `<polygon points="${pts([p001,p101,p111,p011])}" fill="${fills[0]}" stroke="${stroke}" stroke-width="${sw}" stroke-linejoin="round"/>`;
+  }
+
+  function isoCyl(cx, cy, z, r, h, fills, stroke = '#26262a', sw = 0.7) {
+    const N = 18, topP = [], botP = [], sides = [];
+    for (let i = 0; i < N; i++) {
+      const a = (i / N) * Math.PI * 2;
+      topP.push(iso(cx + Math.cos(a) * r, cy + Math.sin(a) * r, z + h));
+      botP.push(iso(cx + Math.cos(a) * r, cy + Math.sin(a) * r, z));
+    }
+    for (let i = 0; i < N; i++) {
+      const aMid = ((i + 0.5) / N) * Math.PI * 2;
+      if (Math.cos(aMid) + Math.sin(aMid) > -0.15) {
+        const j = (i + 1) % N;
+        sides.push(`<polygon points="${pts([botP[i], botP[j], topP[j], topP[i]])}" fill="${(Math.cos(aMid) - Math.sin(aMid)) > 0 ? fills[2] : fills[1]}"/>`);
+      }
+    }
+    return sides.join('') + `<polygon points="${pts(topP)}" fill="${fills[0]}" stroke="${stroke}" stroke-width="${sw}" stroke-linejoin="round"/>`;
+  }
+
+  let active = 'overview', explodedTarget = 0, exploded = 0, animFrame = null;
+  const svg = document.getElementById('scene');
+  const btnExplode = document.getElementById('btnExplode');
+  const btnReset = document.getElementById('btnReset');
+  const pills = Array.from(document.querySelectorAll('.pill'));
+
+  function render() {
+    const e = exploded;
+    const zs = [-54 - e * 32, -12 - e * 10, 30 + e * 16, 68 + e * 42];
+    const isAll = active === 'overview';
+    const parts = [];
+    const sh = [iso(-115,-115, zs[0]-18), iso(115,-115, zs[0]-18), iso(115,115, zs[0]-18), iso(-115,115, zs[0]-18)];
+    parts.push(`<polygon points="${pts(sh)}" fill="#e5e5e2" opacity="0.45"/>`);
+    if (e > 0.05) {
+      for (const [cx, cy] of [[-92,-92],[92,-92],[92,92],[-92,92]]) {
+        const a = iso(cx, cy, zs[0] + 6), b = iso(cx, cy, zs[3] + 14);
+        parts.push(`<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="#b4b4b8" stroke-width="0.7" stroke-dasharray="2 3" opacity="${(e*0.7).toFixed(2)}"/>`);
+      }
+    }
+
+    // Render layers from bottom (index 3 in UI = bottom) to top (index 0 in UI = top)
+    for (let idx = 0; idx < 4; idx++) {
+      const L = LAYERS[3 - idx];
+      const z = zs[idx];
+      const hi = active === L.id;
+      const op = (isAll || hi) ? 1 : 0.28;
+      const fills = hi ? L.fills : ['#ffffff', '#ededea', '#dcdcd9'];
+      const st = hi ? L.color : '#26262a';
+      let g = `<g class="layer-group" data-pick="${L.id}" opacity="${op}">`;
+      if (idx === 3) {
+        // Top cutaway L-slab so inner structures stay visible
+        g += isoBox(-90, -90, z, 180, 48, 12, fills, st, hi ? 1.1 : 0.7);
+        g += isoBox(-90, -42, z, 48, 132, 12, fills, st, hi ? 1.1 : 0.7);
+        for (const [sx, sy] of [[-62,-68],[-8,-68],[46,-68],[-62,12],[-62,60]]) {
+          g += isoBox(sx, sy, z + 12, 12, 12, 7, hi ? L.accentFills : ['#eef3f9','#cbd8ea','#9fb6d4'], st, 0.55);
+        }
+        if (hi) {
+          const cp = iso(18, 18, z + 10);
+          g += `<circle cx="${cp[0]}" cy="${cp[1]}" r="14" fill="${L.color}" class="pulse-hi" opacity="0.22"/>`;
+          g += `<circle cx="${cp[0]}" cy="${cp[1]}" r="10" fill="${L.color}"/><text x="${cp[0]}" y="${cp[1]+3.5}" text-anchor="middle" fill="#fff" font-size="7.5" font-weight="700" font-family="ui-monospace,monospace">${L.tag}</text>`;
+        }
+        g += leaderLabel(iso(90, -66, z + 6), L.label, L.color, hi);
+      } else if (idx === 2) {
+        g += isoBox(-90, -90, z, 180, 180, 12, fills, st, hi ? 1.1 : 0.7);
+        for (const [sx, sy] of [[-54,-18],[0,-18],[54,-18]]) {
+          g += isoBox(sx - 14, sy, z + 12, 28, 34, 10, hi ? L.accentFills : ['#f8f9fb','#e5e5e2','#d4d4d0'], st, 0.75);
+        }
+        if (hi) {
+          const bp = iso(0, 0, z + 28);
+          g += `<circle cx="${bp[0]}" cy="${bp[1]}" r="11" fill="${L.color}"/><text x="${bp[0]}" y="${bp[1]+3.5}" text-anchor="middle" fill="#fff" font-size="7.5" font-weight="700" font-family="ui-monospace,monospace">${L.tag}</text>`;
+        }
+        g += leaderLabel(iso(90, 0, z + 6), L.label, L.color, hi);
+      } else if (idx === 1) {
+        g += isoBox(-90, -90, z, 180, 180, 14, fills, st, hi ? 1.1 : 0.7);
+        g += isoBox(-58, -22, z + 14, 46, 44, 12, hi ? L.accentFills : ['#f8f9fb','#e5e5e2','#d4d4d0'], st, 0.75);
+        g += isoBox( 14, -22, z + 14, 46, 44, 12, hi ? L.accentFills : ['#f8f9fb','#e5e5e2','#d4d4d0'], st, 0.75);
+        if (hi) {
+          const bp = iso(36, 0, z + 30);
+          g += `<circle cx="${bp[0]}" cy="${bp[1]}" r="11" fill="${L.color}"/><text x="${bp[0]}" y="${bp[1]+3.5}" text-anchor="middle" fill="#fff" font-size="7.5" font-weight="700" font-family="ui-monospace,monospace">${L.tag}</text>`;
+        }
+        g += leaderLabel(iso(90, 0, z + 7), L.label, L.color, hi);
+      } else {
+        g += isoBox(-90, -90, z, 180, 180, 14, fills, st, hi ? 1.1 : 0.7);
+        g += isoCyl(0, 0, z + 14, 42, 15, hi ? L.accentFills : ['#f4f4f1','#e5e5e2','#d2d2ce'], st, 0.8);
+        if (hi) {
+          const bp = iso(0, 0, z + 32);
+          g += `<circle cx="${bp[0]}" cy="${bp[1]}" r="11" fill="${L.color}"/><text x="${bp[0]}" y="${bp[1]+3.5}" text-anchor="middle" fill="#fff" font-size="7.5" font-weight="700" font-family="ui-monospace,monospace">${L.tag}</text>`;
+        }
+        g += leaderLabel(iso(90, 0, z + 7), L.label, L.color, hi);
+      }
+      g += `</g>`;
+      parts.push(g);
+    }
+    svg.innerHTML = parts.join('');
+    svg.querySelectorAll('.layer-group').forEach(g => {
+      g.addEventListener('click', () => {
+        const id = g.getAttribute('data-pick');
+        setActive(active === id ? 'overview' : id);
+      });
+    });
+  }
+
+  function updateReadout() {
+    const d = DATA[active] || DATA.overview;
+    const badge = document.getElementById('roBadge');
+    badge.textContent = d.badge; badge.style.background = d.badgeBg; badge.style.color = d.badgeColor;
+    document.getElementById('roState').textContent = d.state;
+    document.getElementById('roTitle').textContent = d.title;
+    document.getElementById('roDrugs').textContent = d.drugs;
+    document.getElementById('roTarget').textContent = d.target;
+    document.getElementById('roEffect').textContent = d.effect;
+    document.getElementById('roDesc').innerHTML = d.desc;
+    document.getElementById('roProva').innerHTML = `<b>Ponto de prova</b>${d.prova}`;
+    pills.forEach(p => p.classList.toggle('active', p.dataset.id === active));
+    notifyHeight();
+  }
+
+  function animateTo(target) {
+    explodedTarget = target;
+    btnExplode.setAttribute('aria-pressed', target > 0.5 ? 'true' : 'false');
+    if (animFrame) cancelAnimationFrame(animFrame);
+    function step() {
+      const diff = explodedTarget - exploded;
+      if (Math.abs(diff) < 0.006) { exploded = explodedTarget; render(); animFrame = null; return; }
+      exploded += diff * 0.16; render(); animFrame = requestAnimationFrame(step);
+    }
+    animFrame = requestAnimationFrame(step);
+  }
+
+  function setActive(id) {
+    active = id;
+    if (id !== 'overview' && explodedTarget < 0.5) animateTo(1);
+    else render();
+    updateReadout();
+  }
+
+  pills.forEach(p => p.addEventListener('click', () => setActive(active === p.dataset.id ? 'overview' : p.dataset.id)));
+  btnExplode.addEventListener('click', () => animateTo(explodedTarget > 0.5 ? 0 : 1));
+  btnReset.addEventListener('click', () => { active = 'overview'; animateTo(0); updateReadout(); });
+
+  const keyMap = { '1': LAYERS[0].id, '2': LAYERS[1].id, '3': LAYERS[2].id, '4': LAYERS[3].id };
+  window.addEventListener('keydown', (ev) => {
+    if (ev.target.tagName === 'INPUT' || ev.target.tagName === 'TEXTAREA') return;
+    if (keyMap[ev.key]) setActive(keyMap[ev.key]);
+    else if (ev.key === '0' || ev.key === 'Escape') { active = 'overview'; animateTo(0); updateReadout(); }
+    else if (ev.key.toLowerCase() === 'e') animateTo(explodedTarget > 0.5 ? 0 : 1);
+  });
+
+  function notifyHeight() {
+    const h = document.getElementById('root').scrollHeight;
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({ type: 'anatomy-height', id: ANAT_ID, height: h + 4 }, '*');
+    }
+  }
+  window.addEventListener('resize', notifyHeight);
+  render(); updateReadout(); setTimeout(notifyHeight, 80);
+})();
+</script>
+</body>
+</html>

@@ -2,16 +2,16 @@
   "apostilas": [
     {
       "pasta": "Beta lactâmicos e Glicopeptídeos",
-      "titulo": "β-lactâmicos e glicopeptídeos",
+      "titulo": "02. β-lactâmicos e glicopeptídeos",
       "subtitulo": "",
-      "disciplina": "",
+      "disciplina": "Farmacoterapia",
       "periodo": "",
       "prova": "",
       "data_aula": "",
       "capitulos": [],
       "contagem": {},
       "url": "/interativos/Beta lactâmicos e Glicopeptídeos/index.html",
-      "capa": "",
+      "capa": "/interativos/Beta lactâmicos e Glicopeptídeos/capa.webp",
       "modificado": 1795450378,
       "chave_local": "beta-lactamicos-glicopeptideos",
       "conceitos": [
@@ -1417,7 +1417,8 @@
     "apostilas": {
       "patologias-do-utero-2-1a": "5274c0e1be",
       "patologias-do-utero-2-1b": "5274c0e1be",
-      "antimicrobianos-1a": "a12b7e7a48"
+      "antimicrobianos-1a": "a12b7e7a48",
+      "Beta lactâmicos e Glicopeptídeos": "a12b7e7a48"
     }
   },
   "aparencia_padrao": {
