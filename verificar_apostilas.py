@@ -201,6 +201,8 @@ def check_file(path):
             else:
                 if any(not str(a).strip() for a in alts):
                     errors.append(f"[questao {qid}] `objetiva.alts` contem alternativa vazia.")
+                if any(re.match(r"^\s*[A-E][).\-]\s+", str(a)) for a in alts):
+                    errors.append(f"[questao {qid}] `objetiva.alts` contem prefixo de letra duplicado (A), B)...).")
                 if not isinstance(cor, int) or not (0 <= cor < len(alts)):
                     errors.append(f"[questao {qid}] `objetiva.correta` invalido: {cor}.")
 
