@@ -1,6 +1,355 @@
 {
   "apostilas": [
     {
+      "pasta": "cuidados-paliativos-dor-e-sintomas",
+      "titulo": "Cuidados Paliativos: Dor e Sintomas",
+      "subtitulo": "",
+      "disciplina": "Cuidados Paliativos",
+      "periodo": "",
+      "prova": "",
+      "data_aula": "2026",
+      "capitulos": [
+        {
+          "id": "c1",
+          "titulo": "Fundamentos da dor e escada analgésica"
+        },
+        {
+          "id": "c2",
+          "titulo": "Hipodermóclise e drogas adjuvantes no manejo da dor"
+        },
+        {
+          "id": "c3",
+          "titulo": "Opioides, cálculos de morfina, rotação e efeitos adversos"
+        },
+        {
+          "id": "c4",
+          "titulo": "Controle de sintomas prevalentes e sinais de alarme"
+        },
+        {
+          "id": "c5",
+          "titulo": "Ética, espiritualidade, comunicação, luto e DAV"
+        }
+      ],
+      "contagem": {
+        "capitulos": 5,
+        "blocos": 10,
+        "testes": 25,
+        "micro": 40,
+        "questoes": 31
+      },
+      "url": "/interativos/cuidados-paliativos-dor-e-sintomas/index.html",
+      "capa": "/interativos/cuidados-paliativos-dor-e-sintomas/fig/capa.png",
+      "modificado": 1795529034,
+      "chave_local": "cuidados-paliativos-dor-e-sintomas",
+      "conceitos": [
+        {
+          "id": "dor-subjetiva",
+          "nome": "Subjetividade da dor"
+        },
+        {
+          "id": "dor-total",
+          "nome": "Dor total"
+        },
+        {
+          "id": "avaliacao-dor",
+          "nome": "Avaliação sistemática da dor"
+        },
+        {
+          "id": "dor-nociceptiva",
+          "nome": "Dor nociceptiva somática e visceral"
+        },
+        {
+          "id": "dor-neuropatica",
+          "nome": "Dor neuropática e seus sinais"
+        },
+        {
+          "id": "escada-oms",
+          "nome": "Escada analgésica proporcional da OMS"
+        },
+        {
+          "id": "hipodermoclise-tecnica",
+          "nome": "Técnica e indicações da hipodermóclise"
+        },
+        {
+          "id": "hipodermoclise-farmacos",
+          "nome": "Fármacos permitidos e proibidos na hipodermóclise"
+        },
+        {
+          "id": "adjuvantes-neuropatica",
+          "nome": "Anticonvulsivantes e antidepressivos na dor neuropática"
+        },
+        {
+          "id": "adjuvantes-ossea",
+          "nome": "Bisfosfonatos e corticoides na dor óssea"
+        },
+        {
+          "id": "benzodiazepinicos-dor",
+          "nome": "Cautela com benzodiazepínicos associados a opioides"
+        },
+        {
+          "id": "opioides-fracos",
+          "nome": "Opioides fracos e interação tramadol-ondansetrona"
+        },
+        {
+          "id": "morfina-farmacocinetica",
+          "nome": "Farmacocinética da morfina (M6G e M3G)"
+        },
+        {
+          "id": "calculo-resgate-ajuste",
+          "nome": "Cálculo de dose de resgate e ajuste da dose basal"
+        },
+        {
+          "id": "conversao-vias",
+          "nome": "Conversão de morfina entre vias (Regra do 3)"
+        },
+        {
+          "id": "rotacao-opioides",
+          "nome": "Rotação de opioides e redução por tolerância cruzada"
+        },
+        {
+          "id": "efeitos-adversos-opioides",
+          "nome": "Efeitos adversos, profilaxia da constipação e naloxona"
+        },
+        {
+          "id": "canabinoides-sedacao",
+          "nome": "Canabinoides (MBE) e sedação paliativa vs. eutanásia"
+        },
+        {
+          "id": "esas-avaliacao",
+          "nome": "Avaliação sistemática com ESAS-r"
+        },
+        {
+          "id": "manejo-dispneia",
+          "nome": "Avaliação e manejo da dispneia"
+        },
+        {
+          "id": "manejo-nauseas",
+          "nome": "Manejo de náuseas e vômitos por etiologia"
+        },
+        {
+          "id": "manejo-constipacao",
+          "nome": "Avaliação e manejo da constipação"
+        },
+        {
+          "id": "manejo-delirium",
+          "nome": "Delirium: subtipos, CAM/RASS, WHHHIMP e tratamento"
+        },
+        {
+          "id": "fadiga-caquexia",
+          "nome": "Fadiga relacionada ao câncer e caquexia"
+        },
+        {
+          "id": "ansiedade-depressao",
+          "nome": "Ansiedade e depressão em cuidados paliativos"
+        },
+        {
+          "id": "sinais-alarme-ps",
+          "nome": "Sinais de alarme para encaminhamento ao pronto-socorro"
+        },
+        {
+          "id": "principios-cp-etica",
+          "nome": "Princípios dos CP e bioética (autonomia e justiça)"
+        },
+        {
+          "id": "espiritualidade-aps",
+          "nome": "Abordagem da espiritualidade na APS"
+        },
+        {
+          "id": "spikes-equipe",
+          "nome": "Protocolo SPIKES e papel do médico na equipe interdisciplinar"
+        },
+        {
+          "id": "luto-cuidador",
+          "nome": "Luto normal, antecipatório, prolongado e sobrecarga do cuidador"
+        },
+        {
+          "id": "pncp-sus",
+          "nome": "Política Nacional de Cuidados Paliativos (PNCP)"
+        },
+        {
+          "id": "dav-cfm",
+          "nome": "Diretivas Antecipadas de Vontade (Resolução CFM nº 1.995/2012)"
+        }
+      ],
+      "testes": [
+        {
+          "id": "t1",
+          "conceito": "dor-subjetiva",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t2",
+          "conceito": "dor-total",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t3",
+          "conceito": "avaliacao-dor",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t4",
+          "conceito": "dor-neuropatica",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t5",
+          "conceito": "escada-oms",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t6",
+          "conceito": "hipodermoclise-tecnica",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t7",
+          "conceito": "hipodermoclise-farmacos",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t8",
+          "conceito": "adjuvantes-neuropatica",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t9",
+          "conceito": "adjuvantes-ossea",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t10",
+          "conceito": "benzodiazepinicos-dor",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t11",
+          "conceito": "opioides-fracos",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t12",
+          "conceito": "morfina-farmacocinetica",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t13",
+          "conceito": "calculo-resgate-ajuste",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t14",
+          "conceito": "conversao-vias",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t15",
+          "conceito": "efeitos-adversos-opioides",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t16",
+          "conceito": "esas-avaliacao",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t17",
+          "conceito": "manejo-dispneia",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t18",
+          "conceito": "manejo-nauseas",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t19",
+          "conceito": "manejo-delirium",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t20",
+          "conceito": "ansiedade-depressao",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t21",
+          "conceito": "principios-cp-etica",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t22",
+          "conceito": "espiritualidade-aps",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t23",
+          "conceito": "spikes-equipe",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t24",
+          "conceito": "luto-cuidador",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t25",
+          "conceito": "dav-cfm",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        }
+      ]
+    },
+    {
       "pasta": "Beta lactâmicos e Glicopeptídeos",
       "titulo": "02. β-lactâmicos e glicopeptídeos",
       "subtitulo": "",

@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Da lesão à experiência dolorosa</title>
+<style>
+:root{color-scheme:light;font-family:system-ui,sans-serif;color:#24363b;background:#fbfbfa}
+*{box-sizing:border-box}body{margin:0;padding:18px}h1{font-size:20px;margin:0 0 6px}
+.intro{font-size:13px;line-height:1.5;margin:0 0 12px;color:#526269}
+.layout{display:grid;grid-template-columns:minmax(240px,1.3fr) minmax(210px,1fr);gap:16px}
+figure{margin:0;background:#f1f4f2;border:1px solid #d5dfda;border-radius:14px}
+svg{display:block;width:100%;height:310px}
+.layer{cursor:pointer;outline:none;transition:transform .45s,opacity .3s}
+.layer polygon{stroke:#fff;stroke-width:2;transition:stroke .2s}
+.layer:hover polygon,.layer:focus polygon,.layer.selected polygon{stroke:#24363b;stroke-width:3}
+.layer text{pointer-events:none;font-size:13px;font-weight:650;fill:#152f36}
+.controls{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+button{font:inherit;font-size:12px;padding:7px 9px;background:white;color:#24363b;border:1px solid #a9bbb4;border-radius:7px;cursor:pointer}
+button:focus-visible{outline:3px solid #287b91;outline-offset:2px}
+button[aria-pressed=true]{background:#d9ece6;border-color:#28715f}
+aside{padding:14px;border:1px solid #d5dfda;border-radius:14px;background:white}
+h2{font-size:17px;margin:0 0 10px}#reading{font-size:14px;line-height:1.65;min-height:155px}
+.note{font-size:12px;line-height:1.5;color:#526269}
+.key{font-size:12px;margin:8px 0}
+@media(max-width:580px){.layout{grid-template-columns:1fr}svg{height:270px}#reading{min-height:90px}}
+@media(prefers-reduced-motion:reduce){.layer{transition:none}}
+</style>
+</head>
+<body>
+<main>
+<h1>Da lesão à experiência dolorosa</h1>
+<p class="intro">Explore cinco componentes de um percurso possível. A experiência dolorosa também depende do contexto emocional, social e espiritual.</p>
+<div class="layout">
+<section aria-label="Modelo interativo">
+<figure>
+<svg viewBox="0 0 440 345" role="group" aria-label="Diagrama isométrico conceitual em cinco camadas">
+<title>Percurso conceitual da nocicepção e da experiência dolorosa</title>
+<desc>Camadas selecionáveis representam tecido, nervo periférico, medula, processamento cerebral e contexto da experiência.</desc>
+<g class="layer" data-index="4" tabindex="0" role="button" aria-label="5. Experiência e contexto" transform="translate(0,116)">
+<polygon fill="#e5cf9f" points="65,115 245,40 382,108 202,186"/>
+<text x="150" y="118">5 · Experiência</text>
+</g>
+<g class="layer" data-index="3" tabindex="0" role="button" aria-label="4. Processamento cerebral" transform="translate(0,87)">
+<polygon fill="#c5badd" points="65,115 245,40 382,108 202,186"/>
+<text x="151" y="118">4 · Cérebro</text>
+</g>
+<g class="layer" data-index="2" tabindex="0" role="button" aria-label="3. Integração na medula" transform="translate(0,58)">
+<polygon fill="#a9ccd8" points="65,115 245,40 382,108 202,186"/>
+<text x="155" y="118">3 · Medula</text>
+</g>
+<g class="layer" data-index="1" tabindex="0" role="button" aria-label="2. Nervo periférico" transform="translate(0,29)">
+<polygon fill="#b9d6ba" points="65,115 245,40 382,108 202,186"/>
+<text x="160" y="118">2 · Nervo</text>
+</g>
+<g class="layer selected" data-index="0" tabindex="0" role="button" aria-label="1. Tecido e nociceptores" transform="translate(0,0)">
+<polygon fill="#e8b9a9" points="65,115 245,40 382,108 202,186"/>
+<text x="155" y="118">1 · Tecido</text>
+</g>
+</svg>
+</figure>
+<nav class="controls" aria-label="Selecionar componente">
+<button data-select="0" aria-pressed="true">1 Tecido</button>
+<button data-select="1" aria-pressed="false">2 Nervo</button>
+<button data-select="2" aria-pressed="false">3 Medula</button>
+<button data-select="3" aria-pressed="false">4 Cérebro</button>
+<button data-select="4" aria-pressed="false">5 Contexto</button>
+<button id="explode" aria-pressed="false">E Expandir</button>
+<button id="reset">0 Reiniciar</button>
+</nav>
+<p class="key">Teclas 1 a 5: selecionar · E: expandir ou reunir · 0: reiniciar</p>
+</section>
+<aside aria-label="Painel de leitura">
+<div aria-live="polite" aria-atomic="true">
+<h2 id="heading">1. Tecido e nociceptores</h2>
+<p id="reading">Uma inflamação pode ativar terminações nervosas que detectam estímulos potencialmente lesivos. Essa detecção inicia a nocicepção, mas não determina sozinha a intensidade da dor.</p>
+</div>
+<p class="note"><strong>Limite do modelo:</strong> as placas são uma metáfora visual, não camadas anatômicas sobrepostas. Dor pode ocorrer sem lesão tecidual demonstrável. O contexto não é uma etapa final isolada: o contexto influencia todo o processamento.</p>
+</aside>
+</div>
+</main>
+<script>
+(function(){
+'use strict';
+const content=[
+['1. Tecido e nociceptores','Uma inflamação pode ativar terminações nervosas que detectam estímulos potencialmente lesivos. Essa detecção inicia a nocicepção, mas não determina sozinha a intensidade da dor.'],
+['2. Nervo periférico','Fibras sensitivas conduzem informações em direção ao sistema nervoso central. Lesão ou doença do sistema somatossensorial pode produzir dor neuropática, com achados como queimação, choque ou alodínia.'],
+['3. Integração na medula','A medula participa da transmissão e da modulação dos sinais. Circuitos medulares também podem produzir uma retirada reflexa antes da percepção consciente do estímulo.'],
+['4. Processamento cerebral','Redes cerebrais integram informação sensorial, atenção, memória e emoção. A dor não funciona como um medidor direto do dano nem depende de um único centro cerebral.'],
+['5. Experiência e contexto','Medo, apoio familiar, condições sociais e questões de sentido podem modificar o sofrimento. A dor total reúne dimensões física, emocional, social e espiritual sem tornar a dor menos real.']
+];
+const layers=Array.from(document.querySelectorAll('.layer'));
+const buttons=Array.from(document.querySelectorAll('[data-select]'));
+const heading=document.getElementById('heading');
+const reading=document.getElementById('reading');
+const explode=document.getElementById('explode');
+let expanded=false;
+function select(index){
+heading.textContent=content[index][0];
+reading.textContent=content[index][1];
+layers.forEach(function(layer,i){
+layer.classList.toggle('selected',i===index);
+layer.setAttribute('aria-pressed',String(i===index));
+});
+buttons.forEach(function(button,i){button.setAttribute('aria-pressed',String(i===index));});
+notify();
+}
+function arrange(){
+layers.forEach(function(layer){
+const i=Number(layer.dataset.index);
+const y=expanded?i*59-55:i*29;
+layer.setAttribute('transform','translate(0,'+y+')');
+});
+explode.setAttribute('aria-pressed',String(expanded));
+explode.textContent=expanded?'E Reunir':'E Expandir';
+notify();
+}
+function toggle(){expanded=!expanded;arrange();}
+function reset(){expanded=false;arrange();select(0);}
+buttons.forEach(function(button){
+button.addEventListener('click',function(){select(Number(button.dataset.select));});
+});
+layers.forEach(function(layer){
+layer.addEventListener('click',function(){select(Number(layer.dataset.index));});
+layer.addEventListener('keydown',function(event){
+if(event.key==='Enter'||event.key===' '){
+event.preventDefault();
+select(Number(layer.dataset.index));
+}
+});
+});
+explode.addEventListener('click',toggle);
+document.getElementById('reset').addEventListener('click',reset);
+document.addEventListener('keydown',function(event){
+if(event.altKey||event.ctrlKey||event.metaKey||/INPUT|TEXTAREA|SELECT/.test(event.target.tagName)||event.target.isContentEditable)return;
+if(/^[1-5]$/.test(event.key)){event.preventDefault();select(Number(event.key)-1);}
+else if(event.key.toLowerCase()==='e'){event.preventDefault();toggle();}
+else if(event.key==='0'){event.preventDefault();reset();}
+});
+let lastHeight=0;
+function notify(){
+requestAnimationFrame(function(){
+const height=Math.ceil(document.documentElement.getBoundingClientRect().height);
+if(height===lastHeight)return;
+lastHeight=height;
+window.parent.postMessage({type:'anatomy-height',id:'modelo-principal',height:height},'*');
+});
+}
+if(window.ResizeObserver)new ResizeObserver(notify).observe(document.body);
+window.addEventListener('resize',notify);
+window.addEventListener('load',notify);
+select(0);
+notify();
+})();
+</script>
+</body>
+</html>

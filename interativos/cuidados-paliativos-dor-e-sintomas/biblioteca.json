@@ -1,0 +1,39 @@
+{
+  "formato": "estuda-jaider-site",
+  "versao_formato": 1,
+  "id": "cuidados-paliativos-dor-e-sintomas",
+  "titulo": "Cuidados Paliativos: Dor e Sintomas",
+  "disciplina": "Cuidados Paliativos",
+  "data_aula": "2026",
+  "capa": "fig/capa.png",
+  "arquivo": "index.html",
+  "capitulos": [
+    {
+      "id": "c1",
+      "titulo": "Fundamentos da dor e escada analgésica"
+    },
+    {
+      "id": "c2",
+      "titulo": "Hipodermóclise e drogas adjuvantes no manejo da dor"
+    },
+    {
+      "id": "c3",
+      "titulo": "Opioides, cálculos de morfina, rotação e efeitos adversos"
+    },
+    {
+      "id": "c4",
+      "titulo": "Controle de sintomas prevalentes e sinais de alarme"
+    },
+    {
+      "id": "c5",
+      "titulo": "Ética, espiritualidade, comunicação, luto e DAV"
+    }
+  ],
+  "contagem": {
+    "capitulos": 5,
+    "blocos": 10,
+    "testes": 25,
+    "micro": 40,
+    "questoes": 31
+  }
+}
