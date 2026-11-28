@@ -1,0 +1,850 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Simulador de Microscópio · Lâmina 32 (Fibroadenoma)</title>
+<style>
+:root{
+  color-scheme:light;
+  --bg:#fbfbfa;
+  --card:#ffffff;
+  --ink:#1f2d36;
+  --muted:#566670;
+  --line:#dbe2e3;
+  --accent:#146c78;
+  --accent-soft:#e6f3f4;
+  --ok:#166534;
+  --ok-bg:#ecfdf3;
+  --err:#991b1b;
+  --err-bg:#fef2f2;
+  --warn:#92400e;
+  --warn-bg:#fffbeb;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14.5px/1.55 Inter,system-ui,-apple-system,sans-serif}
+.wrap{max-width:1120px;margin:0 auto;padding:16px 18px 22px}
+.top{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:14px}
+.eyebrow{text-transform:uppercase;letter-spacing:.1em;font-size:11px;font-weight:700;color:var(--accent)}
+h1{font-size:20px;line-height:1.2;margin:2px 0 0;font-weight:700}
+.mode-switch{display:inline-flex;background:#eef3f4;padding:4px;border-radius:11px;gap:4px}
+.mode-btn{border:0;background:transparent;color:var(--muted);font:600 13.5px/1 Inter,system-ui,sans-serif;padding:9px 14px;border-radius:8px;cursor:pointer;transition:.15s}
+.mode-btn.on{background:var(--accent);color:#fff;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(300px,.85fr);gap:16px;align-items:start}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px}
+
+/* Ocular do microscopio */
+.scope-stage{display:flex;flex-direction:column;align-items:center;gap:12px}
+.ocular-shell{
+  position:relative;
+  width:min(100%, 470px);
+  aspect-ratio:1/1;
+  border-radius:50%;
+  background:#090d10;
+  padding:10px;
+  box-shadow:inset 0 0 24px rgba(0,0,0,.9), 0 10px 28px rgba(15,23,42,.18);
+  border:3px solid #2b3842;
+}
+.ocular-view{
+  position:relative;
+  width:100%;
+  height:100%;
+  border-radius:50%;
+  overflow:hidden;
+  background:#050709;
+  cursor:grab;
+  touch-action:none;
+  user-select:none;
+}
+.ocular-view:active{cursor:grabbing}
+.slide-layer{
+  position:absolute;
+  inset:0;
+  transform-origin:center center;
+  will-change:transform,filter;
+}
+.slide-layer img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+  pointer-events:none;
+  user-select:none;
+}
+/* Vinheta optica realista */
+.ocular-vignette{
+  position:absolute;
+  inset:0;
+  border-radius:50%;
+  pointer-events:none;
+  box-shadow:inset 0 0 42px 12px rgba(0,0,0,.78);
+}
+.ocular-badge{
+  position:absolute;
+  top:14px;
+  left:50%;
+  transform:translateX(-50%);
+  background:rgba(15,23,42,.78);
+  color:#f8fafc;
+  font-size:11.5px;
+  font-weight:600;
+  padding:4px 10px;
+  border-radius:999px;
+  pointer-events:none;
+  backdrop-filter:blur(4px);
+  white-space:nowrap;
+}
+.ocular-hint{
+  position:absolute;
+  bottom:14px;
+  left:50%;
+  transform:translateX(-50%);
+  background:rgba(15,23,42,.72);
+  color:#e2e8f0;
+  font-size:11px;
+  padding:3px 10px;
+  border-radius:999px;
+  pointer-events:none;
+  white-space:nowrap;
+}
+
+/* Marcadores no modo estudo */
+.pin{
+  position:absolute;
+  transform:translate(-50%,-50%);
+  width:28px;
+  height:28px;
+  border-radius:50%;
+  border:2px solid #fff;
+  background:var(--accent);
+  color:#fff;
+  font:700 12px/1 Inter,system-ui,sans-serif;
+  display:grid;
+  place-items:center;
+  cursor:pointer;
+  box-shadow:0 2px 8px rgba(0,0,0,.45);
+  transition:transform .15s, background .15s;
+  z-index:5;
+}
+.pin:hover,.pin.on{transform:translate(-50%,-50%) scale(1.18);background:#0f4f58}
+
+/* Seta preta da ocular no modo prova */
+.exam-pointer{
+  position:absolute;
+  pointer-events:none;
+  z-index:6;
+  width:72px;
+  height:72px;
+  transform:translate(-50%,-50%);
+  filter:drop-shadow(0 0 2px rgba(255,255,255,.9));
+}
+
+/* Controles abaixo da ocular */
+.controls{width:100%;display:flex;flex-direction:column;gap:10px}
+.obj-bar{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.obj-btn{
+  border:1px solid #cbd6d8;
+  background:#fff;
+  color:var(--ink);
+  font:600 12.5px/1.2 Inter,system-ui,sans-serif;
+  padding:7px 10px;
+  border-radius:8px;
+  cursor:pointer;
+}
+.obj-btn:hover{background:#eff6f6}
+.obj-btn.on{background:var(--accent-soft);border-color:var(--accent);color:#0b4f59}
+.sliders{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  background:#f6f8f8;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:9px 12px;
+}
+.ctrl-item{display:flex;flex-direction:column;gap:3px;font-size:11.5px;color:var(--muted)}
+.ctrl-item b{color:var(--ink);font-weight:600}
+.ctrl-item input[type=range]{width:100%;accent-color:var(--accent)}
+.action-row{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.btn-sm{
+  border:1px solid #cbd6d8;
+  background:#fff;
+  color:var(--ink);
+  font:600 12.5px/1 Inter,system-ui,sans-serif;
+  padding:7px 11px;
+  border-radius:8px;
+  cursor:pointer;
+}
+.btn-sm:hover{background:#eff6f6}
+.btn-sm.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn-sm.primary:hover{background:#0f5660}
+
+/* Painel lateral */
+.side h2{font-size:16.5px;margin:0 0 6px}
+.side p{margin:6px 0;text-align:justify;text-justify:inter-word}
+.tag{display:inline-block;background:var(--accent-soft);color:#0d545e;font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:999px;margin-bottom:6px}
+.pin-list{display:flex;flex-direction:column;gap:7px;margin-top:10px}
+.pin-card{
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:9px 11px;
+  cursor:pointer;
+  background:#fff;
+  transition:.15s;
+}
+.pin-card:hover{border-color:#9fc6cb;background:#f8fbfb}
+.pin-card.on{border-color:var(--accent);background:var(--accent-soft)}
+.pin-card .ptitle{font-weight:700;font-size:13.5px;display:flex;align-items:center;gap:7px}
+.pin-card .pnum{width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;display:inline-grid;place-items:center;flex:none}
+.pin-card .pdesc{font-size:13px;color:var(--muted);margin-top:4px;text-align:justify}
+
+/* Modo Prova */
+.exam-head{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;background:#f6f8f8;border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-bottom:10px}
+.timer{font:700 18px/1 monospace;color:var(--accent)}
+.timer.low{color:var(--err)}
+.sub-tabs{display:flex;gap:6px;margin-bottom:10px}
+.sub-tab{flex:1;border:1px solid #cbd6d8;background:#fff;padding:7px 8px;border-radius:8px;font:600 12.5px/1.2 Inter,sans-serif;cursor:pointer;color:var(--muted)}
+.sub-tab.on{background:var(--accent-soft);border-color:var(--accent);color:#0b4f59}
+.field{margin-bottom:9px}
+.field label{display:block;font-size:12.5px;font-weight:700;margin-bottom:3px;color:var(--ink)}
+.field input{width:100%;padding:8px 10px;border:1px solid #cbd6d8;border-radius:8px;font:13.5px/1.3 Inter,system-ui,sans-serif}
+.field input:focus{outline:2px solid var(--accent);border-color:var(--accent)}
+.fb{border-radius:10px;padding:10px 12px;margin-top:10px;font-size:13.5px;text-align:justify}
+.fb.ok{background:var(--ok-bg);border:1px solid #86efac;color:var(--ok)}
+.fb.err{background:var(--err-bg);border:1px solid #fca5a5;color:var(--err)}
+.fb.warn{background:var(--warn-bg);border:1px solid #fcd34d;color:var(--warn)}
+.opt-list{display:flex;flex-direction:column;gap:7px;margin:10px 0}
+.opt-btn{
+  text-align:left;
+  border:1px solid #cbd6d8;
+  background:#fff;
+  padding:9px 11px;
+  border-radius:9px;
+  font:13.5px/1.35 Inter,system-ui,sans-serif;
+  cursor:pointer;
+  color:var(--ink);
+}
+.opt-btn:hover{background:#f3f8f8}
+.opt-btn.sel{border-color:var(--accent);background:var(--accent-soft);font-weight:600}
+.hidden{display:none !important}
+
+@media(max-width:860px){
+  .grid{grid-template-columns:1fr}
+  .sliders{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="eyebrow">Anatomia Patológica II · Lâmina 32 (Cx. Pato 2)</div>
+      <h1>Simulador de Microscópio: Fibroadenoma de Mama</h1>
+    </div>
+    <div class="mode-switch" role="tablist" aria-label="Modo do simulador">
+      <button id="btnEstudo" class="mode-btn on" role="tab" aria-selected="true">Modo Estudo</button>
+      <button id="btnProva" class="mode-btn" role="tab" aria-selected="false">Modo Prova Prática</button>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- ESQUERDA: OCULAR E CONTROLES -->
+    <section class="panel scope-stage" aria-label="Visor do microscópio">
+      <div class="ocular-shell">
+        <div id="ocular" class="ocular-view">
+          <div id="slideLayer" class="slide-layer">
+            <img id="slideImg" src="" alt="Campo microscópico da Lâmina 32">
+            <div id="pinsLayer"></div>
+            <svg id="examPointer" class="exam-pointer hidden" viewBox="0 0 80 80" aria-hidden="true">
+              <path d="M68 12 L22 58" stroke="#000000" stroke-width="5.5" stroke-linecap="round"/>
+              <path d="M22 58 L25 38 M22 58 L42 55" stroke="#000000" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="ocular-vignette"></div>
+          <div id="ocularBadge" class="ocular-badge">4× · Fronteira e Cápsula</div>
+          <div class="ocular-hint">Arraste para mover a lâmina (charriot) · Roda do mouse para zoom</div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <div id="objBar" class="obj-bar" aria-label="Campos e objetivas"></div>
+
+        <div class="sliders">
+          <label class="ctrl-item">
+            <span>Zoom digital: <b id="lblZoom">1,0×</b></span>
+            <input id="rngZoom" type="range" min="1" max="3.2" step="0.1" value="1">
+          </label>
+          <label class="ctrl-item">
+            <span>Micrométrico (foco): <b id="lblFocus">Nítido</b></span>
+            <input id="rngFocus" type="range" min="-5" max="5" step="0.2" value="0">
+          </label>
+          <label class="ctrl-item">
+            <span>Diafragma (luz): <b id="lblLight">100%</b></span>
+            <input id="rngLight" type="range" min="75" max="125" step="5" value="100">
+          </label>
+        </div>
+
+        <div class="action-row">
+          <button id="btnCenter" class="btn-sm">Centralizar lâmina</button>
+          <button id="btnTogglePins" class="btn-sm primary">Ocultar marcadores (testar olho)</button>
+          <label id="chkRealWrap" class="btn-sm hidden" style="display:inline-flex;align-items:center;gap:6px;cursor:pointer">
+            <input id="chkBlurStart" type="checkbox"> Iniciar desfocado
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <!-- DIREITA: PAINEL DIDÁTICO OU FOLHA DE PROVA -->
+    <aside class="panel side">
+      <!-- PAINEL MODO ESTUDO -->
+      <div id="paneEstudo">
+        <span id="studyTag" class="tag">Objetiva 4×</span>
+        <h2 id="studyTitle">Fronteira: Normal, Cápsula e Fibroadenoma</h2>
+        <p id="studySummary"></p>
+        <div id="pinList" class="pin-list"></div>
+      </div>
+
+      <!-- PAINEL MODO PROVA PRÁTICA -->
+      <div id="paneProva" class="hidden">
+        <div class="exam-head">
+          <div>
+            <div style="font-size:11.5px;color:var(--muted);font-weight:600">ESTAÇÃO DE BANCADA</div>
+            <div id="stationLabel" style="font-weight:700;font-size:14px">Estação 1 de 4</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span id="timerDisplay" class="timer">02:00</span>
+            <button id="btnTimer" class="btn-sm">Iniciar</button>
+            <button id="btnNextStation" class="btn-sm primary">Próxima estação</button>
+          </div>
+        </div>
+
+        <div class="sub-tabs" role="tablist">
+          <button id="tabBancada" class="sub-tab on">Folha de Bancada (4 itens)</button>
+          <button id="tabObjetiva" class="sub-tab">Treino Seta (4 opções)</button>
+        </div>
+
+        <p id="examPrompt" style="font-size:13.5px;margin-bottom:10px"></p>
+
+        <!-- SUBMODO FOLHA DE BANCADA -->
+        <div id="boxBancada">
+          <div class="field">
+            <label for="inOrgao">1. Diagnóstico do órgão</label>
+            <input id="inOrgao" type="text" placeholder="Ex.: mama">
+          </div>
+          <div class="field">
+            <label for="inProc1">2. Processo patológico 1 (apontado pela seta)</label>
+            <input id="inProc1" type="text" placeholder="O que a ponta da seta indica?">
+          </div>
+          <div class="field">
+            <label for="inProc2">3. Processo patológico 2 (complementar)</label>
+            <input id="inProc2" type="text" placeholder="Outro achado que fecha o diagnóstico">
+          </div>
+          <div class="field">
+            <label for="inDiag">4. Diagnóstico final</label>
+            <input id="inDiag" type="text" placeholder="Nome da lesão">
+          </div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button id="btnCheckBancada" class="btn-sm primary" style="flex:1">Conferir na Folha Oficial</button>
+            <button id="btnClearBancada" class="btn-sm">Limpar</button>
+          </div>
+          <div id="fbBancada" class="fb hidden"></div>
+        </div>
+
+        <!-- SUBMODO TREINO OBJETIVO (REGRA S1: ERRO NÃO MOSTRA A CERTA) -->
+        <div id="boxObjetiva" class="hidden">
+          <div id="optList" class="opt-list"></div>
+          <button id="btnResponderObj" class="btn-sm primary" style="width:100%">Responder</button>
+          <div id="fbObjetiva" class="fb hidden"></div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+const FIELDS = [
+  {
+    id:'fronteira',
+    label:'4× · Fronteira & Cápsula',
+    obj:'Objetiva 4× (Menor aumento)',
+    img:'../fig/fib_03_fronteira_capsula_4x',
+    title:'Fronteira: Mama Normal, Cápsula Conjuntiva e Fibroadenoma',
+    summary:'Campo clássico para responder os quatro itens da prova prática. No canto superior esquerdo estão os lóbulos mamários normais; na diagonal central corre a cápsula conjuntiva lamelar; no canto inferior direito aparece o fibroadenoma.',
+    pins:[
+      {x:32, y:30, t:'Lóbulos mamários normais', d:'Tecido glandular hígido organizado em pequenos ácinos e ductos. Garante o item 1 da prova: órgão = mama.'},
+      {x:49, y:51, t:'Cápsula conjuntiva lamelar', d:'Faixa de fibras colágenas que delimita o fibroadenoma benigno. Se a seta apontar aqui, você é obrigado a complementar com hiperplasia estromal.'},
+      {x:68, y:68, t:'Interior do fibroadenoma', d:'Estroma intralobular proliferado (hiperplasia estromal) afastando e comprimindo os ductos, que ficam alongados e ectasiados.'}
+    ]
+  },
+  {
+    id:'normal4x',
+    label:'4× · Mama Normal',
+    obj:'Objetiva 4× (Periferia da lâmina)',
+    img:'../fig/fib_01_normal_4x',
+    title:'Tecido Mamário Normal na Periferia da Lâmina',
+    summary:'Sempre procure este trecho hígido na borda da Lâmina 32 antes de avaliar a lesão. Os ácinos agrupam-se em lóbulos bem definidos cercados por ductos.',
+    pins:[
+      {x:60, y:34, t:'Lóbulo mamário preservado', d:'Agrupamento compacto de pequenos ácinos com estroma intralobular delicado, sem proliferação patológica.'},
+      {x:34, y:44, t:'Ducto com secreção láctea', d:'Material róseo homogêneo na luz ductal indicando atividade secretiva (mama funcional).'}
+    ]
+  },
+  {
+    id:'normal10x',
+    label:'10× · Lóbulo Normal',
+    obj:'Objetiva 10× (Aumento médio)',
+    img:'../fig/fib_02_normal_10x',
+    title:'Lóbulo Mamário Normal com Atividade Secretiva',
+    summary:'Em aumento médio, note como os ácinos ficam juntinhos e organizados, com estroma intralobular muito discreto entre eles e secreção láctea rósea nas luzes.',
+    pins:[
+      {x:54, y:48, t:'Ácinos organizados com secreção', d:'Luzes preenchidas por secreção láctea rósea e revestimento epitelial preservado, sem atipias.'},
+      {x:44, y:62, t:'Estroma intralobular normal', d:'Tecido conjuntivo delicado entre os ácinos. É exatamente este tecido que sofre hiperplasia no fibroadenoma.'}
+    ]
+  },
+  {
+    id:'estroma10x',
+    label:'10× · Hiperplasia & Ectasia',
+    obj:'Objetiva 10× (Interior da lesão)',
+    img:'../fig/fib_04_hiperplasia_estromal_10x',
+    title:'Hiperplasia Estromal Intralobular e Ectasia Ductal',
+    summary:'Aqui você vê o processo patológico obrigatório do fibroadenoma: o estroma intralobular proliferou intensamente, afastou as glândulas e comprimiu os ductos, que se dilataram (ectasia ductal).',
+    pins:[
+      {x:62, y:26, t:'Hiperplasia estromal (obrigatório)', d:'Grande área de tecido conjuntivo proliferado afastando os ácinos e ductos. Achado indispensável no laudo de fibroadenoma.'},
+      {x:65, y:56, t:'Ectasia ductal', d:'Ducto nitidamente dilatado e distorcido pela compressão do estroma hiperplasiado ao redor.'},
+      {x:44, y:61, t:'Distribuição glandular irregular', d:'Os ductos e ácinos perdem a disposição compacta dos lóbulos normais e ficam separados pela matriz estromal.'}
+    ]
+  },
+  {
+    id:'dupla40x',
+    label:'40× · Fibroblastos & Dupla Camada',
+    obj:'Objetiva 40× (Maior aumento)',
+    img:'../fig/fib_05_dupla_camada_40x',
+    title:'Hipercelularidade Fibroblástica e Camada Dupla Preservada',
+    summary:'No maior aumento, você confirma os dois detalhes celulares da lâmina: abundância de fibroblastos no estroma e manutenção da dupla camada epitelial no ducto (critério de benignidade).',
+    pins:[
+      {x:35, y:34, t:'Hipercelularidade fibroblástica', d:'Muitos núcleos fusiformes (alongados) de fibroblastos entre fibras levemente basofílicas e infiltrado inflamatório crônico discreto.'},
+      {x:54, y:56, t:'Preservação da camada dupla', d:'Células luminais internas (núcleos arredondados voltados à luz) e células mioepiteliais externas (núcleos achatados). Confirma benignidade.'}
+    ]
+  },
+  {
+    id:'wa_capsula',
+    label:'Ocular Real · Cápsula',
+    obj:'Foto real da ocular (4×)',
+    img:'../fig/fib_09_wa_capsula',
+    title:'Foto Real da Ocular: Cápsula Conjuntiva',
+    summary:'Registro direto do microscópio de aula mostrando a faixa capsular bem definida separando o nódulo do tecido adjacente.',
+    pins:[
+      {x:50, y:43, t:'Cápsula conjuntiva', d:'Faixa fibrosa contínua revestindo a borda do fibroadenoma.'},
+      {x:52, y:62, t:'Estroma hiperplasiado com ductos', d:'Interior da lesão com glândulas afastadas pelo estroma proliferado.'}
+    ]
+  },
+  {
+    id:'wa_ectasia',
+    label:'Ocular Real · Ectasia',
+    obj:'Foto real da ocular (10×)',
+    img:'../fig/fib_11_wa_ectasia',
+    title:'Foto Real da Ocular: Ectasia Ductal Acentuada',
+    summary:'Campo real de microscópio evidenciando múltiplos ductos fortemente dilatados e alongados em meio ao estroma hiperplasiado.',
+    pins:[
+      {x:54, y:46, t:'Ductos ectasiados', d:'Dilatação acentuada da luz ductal provocada pela compressão estromal.'},
+      {x:42, y:64, t:'Hiperplasia estromal', d:'Proliferação do tecido conjuntivo intralobular entre os ductos.'}
+    ]
+  },
+  {
+    id:'wa_dupla',
+    label:'Ocular Real · Dupla Camada',
+    obj:'Foto real da ocular (40×)',
+    img:'../fig/fib_10_wa_dupla_camada',
+    title:'Foto Real da Ocular: Dupla Camada em 40×',
+    summary:'Foto direta do microscópio em grande aumento exibindo o epitélio ductal benigno em dupla camada cercado por fibroblastos.',
+    pins:[
+      {x:45, y:58, t:'Camada dupla preservada', d:'Revestimento ductal ordenado sem atipias nucleares.'},
+      {x:64, y:40, t:'Estroma fibroblástico', d:'Hipercelularidade de fibroblastos no estroma intralobular.'}
+    ]
+  }
+];
+
+const STATIONS = [
+  {
+    fieldIdx:0,
+    pointer:{x:50, y:50},
+    prompt:'A seta preta da ocular aponta a faixa fibrosa na fronteira da lesão em 4×. Preencha os 4 itens da folha prática respeitando a regra obrigatória da aula.',
+    mustEstromaInComp:true,
+    acceptedProc1:['capsula','cápsula','capsula conjuntiva','cápsula conjuntiva','capsula fibrosa','cápsula fibrosa'],
+    gabarito:'<strong>1. Órgão:</strong> mama (tecido mamário).<br><strong>2. Processo apontado pela seta:</strong> cápsula conjuntiva.<br><strong>3. Processo complementar (obrigatório):</strong> hiperplasia estromal intralobular.<br><strong>4. Diagnóstico:</strong> fibroadenoma de mama.',
+    objQ:'O que a ponta da seta preta está indicando neste campo em 4×?',
+    opts:[
+      'Cápsula conjuntiva delimitando o fibroadenoma',
+      'Membrana basal glomerular difusamente espessada',
+      'Epitélio ectocervical com displasia nos três terços',
+      'Septo alveolar rompido com fibrose pulmonar'
+    ],
+    correta:0,
+    errMsgs:[
+      '',
+      'Membrana basal glomerular espessada pertence ao rim (glomerulopatia membranosa), não a uma lesão capsulada mamária.',
+      'Displasia nos três terços do epitélio estratificado caracteriza o carcinoma in situ de colo uterino.',
+      'Ruptura de septos alveolares ocorre no pulmão enfisematoso, sem relação com lóbulos glandulares mamários.'
+    ],
+    okMsg:'Correto! A faixa lamelar fibrosa na fronteira é a cápsula conjuntiva. Lembre-se: na folha dissertativa, quando a seta aponta a cápsula, você precisa citar hiperplasia estromal no item complementar.'
+  },
+  {
+    fieldIdx:3,
+    pointer:{x:62, y:28},
+    prompt:'A seta preta aponta a extensa matriz conjuntiva no interior da lesão em 10×. Preencha os 4 itens da folha de bancada.',
+    mustEstromaInComp:false,
+    acceptedProc1:['hiperplasia estromal','hiperplasia do estroma','proliferacao estromal','proliferação estromal','hiperplasia estromal intralobular'],
+    gabarito:'<strong>1. Órgão:</strong> mama.<br><strong>2. Processo apontado pela seta:</strong> hiperplasia estromal (intralobular).<br><strong>3. Processo complementar:</strong> ectasia ductal, cápsula conjuntiva ou hipercelularidade fibroblástica.<br><strong>4. Diagnóstico:</strong> fibroadenoma de mama.',
+    objQ:'Qual processo patológico obrigatório a seta está apontando neste aumento médio (10×)?',
+    opts:[
+      'Hiperplasia estromal intralobular',
+      'Infiltrado linfocitário destruindo folículos tireoidianos',
+      'Proliferação mesangial com lobulação glomerular em trevo',
+      'Glândulas endometriais justapostas em padrão back-to-back'
+    ],
+    correta:0,
+    errMsgs:[
+      '',
+      'Infiltrado linfocitário com folículos atróficos descreve a tireoidite de Hashimoto na Lâmina 79.',
+      'Proliferação mesangial com aspecto em folhas de trevo caracteriza a glomerulonefrite membranoproliferativa.',
+      'Glândulas justapostas em padrão back-to-back pertencem à hiperplasia do endométrio (Lâmina 43, caixa 1).'
+    ],
+    okMsg:'Exato! A hiperplasia estromal intralobular é o motor do fibroadenoma. Como a seta já apontou a hiperplasia estromal, você fica livre para complementar com cápsula conjuntiva, ectasia ductal ou hipercelularidade fibroblástica.'
+  },
+  {
+    fieldIdx:4,
+    pointer:{x:54, y:56},
+    prompt:'Em maior aumento (40×), a seta aponta o revestimento epitelial do ducto dentro do nódulo. Qual é o significado desse achado?',
+    mustEstromaInComp:true,
+    acceptedProc1:['dupla camada','camada dupla','preservacao da camada dupla','preservação da camada dupla','epitelio benigno'],
+    gabarito:'<strong>1. Órgão:</strong> mama.<br><strong>2. Processo apontado pela seta:</strong> preservação da camada dupla (células luminais + mioepiteliais).<br><strong>3. Processo complementar (obrigatório):</strong> hiperplasia estromal / hipercelularidade fibroblástica.<br><strong>4. Diagnóstico:</strong> fibroadenoma de mama.',
+    objQ:'O que a preservação da camada dupla apontada pela seta em 40× confirma sobre esta lesão?',
+    opts:[
+      'Caráter benigno do revestimento glandular, mantendo células luminais e mioepiteliais',
+      'Invasão maligna do estroma com perda completa da membrana basal',
+      'Carcinoma espinocelular in situ com perda de polaridade em toda a espessura',
+      'Atrofia folicular secundária à destruição autoimune por linfócitos'
+    ],
+    correta:0,
+    errMsgs:[
+      '',
+      'Na invasão maligna a camada mioepitelial desaparece e as células atípicas rompem a membrana basal.',
+      'Perda de polaridade nos três terços é critério de carcinoma in situ de colo uterino, não de revestimento ductal preservado.',
+      'Atrofia folicular autoimune ocorre na tireoidite de Hashimoto, sem relação com ductos mamários.'
+    ],
+    okMsg:'Perfeito! A manutenção da camada dupla (luminais internas arredondadas e mioepiteliais externas achatadas) confirma benignidade.'
+  },
+  {
+    fieldIdx:6,
+    pointer:{x:55, y:46},
+    prompt:'Foto real da ocular de aula! A seta aponta um ducto amplamente dilatado no interior do nódulo. Complete a folha prática.',
+    mustEstromaInComp:true,
+    acceptedProc1:['ectasia','ectasia ductal','ducto dilatado','dilatacao ductal','dilatação ductal'],
+    gabarito:'<strong>1. Órgão:</strong> mama.<br><strong>2. Processo apontado pela seta:</strong> ectasia ductal (ducto dilatado).<br><strong>3. Processo complementar (obrigatório):</strong> hiperplasia estromal intralobular.<br><strong>4. Diagnóstico:</strong> fibroadenoma de mama.',
+    objQ:'Como se denomina a dilatação do ducto apontada pela seta nesta foto real da ocular?',
+    opts:[
+      'Ectasia ductal',
+      'Cisto de Naboth',
+      'Enfisema centroacinar',
+      'Espessamento hialino capilar'
+    ],
+    correta:0,
+    errMsgs:[
+      '',
+      'Cisto de Naboth é um cisto de retenção mucoso encontrado na endocérvice uterina, não na mama.',
+      'Enfisema descreve distensão de alvéolos pulmonares com ruptura de septos.',
+      'Espessamento hialino capilar é achado glomerular renal.'
+    ],
+    okMsg:'Acertou! A ectasia ductal resulta da compressão e distorção dos ductos pelo estroma hiperplasiado. Na prova dissertativa, lembre de citar hiperplasia estromal no item complementar!'
+  }
+];
+
+let mode = 'estudo';
+let currentField = 0;
+let currentStation = 0;
+let showPins = true;
+let activePin = 0;
+let zoom = 1;
+let panX = 0, panY = 0;
+let dragging = false, startX = 0, startY = 0;
+let timerSec = 120, timerId = null;
+let selectedOpt = null;
+
+const $ = id => document.getElementById(id);
+
+function loadImageWithFallback(basePath){
+  const img = $('slideImg');
+  img.onerror = function(){
+    if(img.src.endsWith('.jpg')){ img.onerror = null; img.src = basePath + '.png'; }
+    else if(img.src.endsWith('.png')){ img.onerror = null; img.src = basePath + '.jpeg'; }
+  };
+  img.src = basePath + '.jpg';
+}
+
+function updateTransform(){
+  const blurVal = Math.abs(parseFloat($('rngFocus').value));
+  const lightVal = parseInt($('rngLight').value, 10);
+  $('slideLayer').style.transform = `translate(${panX}px, ${panY}px) scale(${zoom})`;
+  $('slideLayer').style.filter = `blur(${blurVal.toFixed(1)}px) brightness(${lightVal}%)`;
+  $('lblZoom').textContent = zoom.toFixed(1).replace('.', ',') + '×';
+  $('lblFocus').textContent = blurVal < 0.3 ? 'Nítido' : (blurVal < 2 ? 'Leve desfoque' : 'Desfocado');
+  $('lblLight').textContent = lightVal + '%';
+}
+
+function resetView(blurInitial=0){
+  zoom = 1; panX = 0; panY = 0;
+  $('rngZoom').value = '1';
+  $('rngFocus').value = String(blurInitial);
+  updateTransform();
+}
+
+function renderObjBar(){
+  $('objBar').innerHTML = FIELDS.map((f, i) =>
+    `<button class="obj-btn ${i===currentField?'on':''}" data-idx="${i}">${f.label}</button>`
+  ).join('');
+  $('objBar').querySelectorAll('button').forEach(b => {
+    b.onclick = () => {
+      if(mode !== 'estudo') return;
+      selectField(parseInt(b.dataset.idx, 10));
+    };
+  });
+}
+
+function selectField(idx){
+  currentField = idx;
+  activePin = 0;
+  const f = FIELDS[idx];
+  loadImageWithFallback(f.img);
+  $('ocularBadge').textContent = f.label;
+  $('studyTag').textContent = f.obj;
+  $('studyTitle').textContent = f.title;
+  $('studySummary').textContent = f.summary;
+  resetView(0);
+  renderObjBar();
+  renderPins();
+}
+
+function renderPins(){
+  const f = FIELDS[currentField];
+  const layer = $('pinsLayer');
+  const list = $('pinList');
+  if(mode !== 'estudo'){
+    layer.innerHTML = '';
+    return;
+  }
+  layer.innerHTML = showPins ? f.pins.map((p, i) =>
+    `<button class="pin ${i===activePin?'on':''}" style="left:${p.x}%;top:${p.y}%" data-pin="${i}" title="${p.t}">${i+1}</button>`
+  ).join('') : '';
+  layer.querySelectorAll('.pin').forEach(btn => {
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      activePin = parseInt(btn.dataset.pin, 10);
+      renderPins();
+    };
+  });
+  list.innerHTML = f.pins.map((p, i) =>
+    `<div class="pin-card ${i===activePin?'on':''}" data-pin="${i}">
+      <div class="ptitle"><span class="pnum">${i+1}</span>${p.t}</div>
+      <div class="pdesc">${p.d}</div>
+    </div>`
+  ).join('');
+  list.querySelectorAll('.pin-card').forEach(card => {
+    card.onclick = () => {
+      activePin = parseInt(card.dataset.pin, 10);
+      renderPins();
+    };
+  });
+}
+
+function loadStation(idx){
+  currentStation = idx % STATIONS.length;
+  const st = STATIONS[currentStation];
+  const f = FIELDS[st.fieldIdx];
+  currentField = st.fieldIdx;
+  loadImageWithFallback(f.img);
+  $('ocularBadge').textContent = `Estação ${currentStation+1} · ${f.obj}`;
+  $('stationLabel').textContent = `Estação ${currentStation+1} de ${STATIONS.length}`;
+  $('examPrompt').textContent = st.prompt;
+  const ptr = $('examPointer');
+  ptr.classList.remove('hidden');
+  ptr.style.left = st.pointer.x + '%';
+  ptr.style.top = st.pointer.y + '%';
+  $('pinsLayer').innerHTML = '';
+  const startBlur = $('chkBlurStart').checked ? 3.2 : 0;
+  resetView(startBlur);
+  clearBancada();
+  renderObjetiva();
+  resetTimer();
+}
+
+function clearBancada(){
+  $('inOrgao').value = '';
+  $('inProc1').value = '';
+  $('inProc2').value = '';
+  $('inDiag').value = '';
+  $('fbBancada').className = 'fb hidden';
+  $('fbBancada').innerHTML = '';
+}
+
+function norm(s){
+  return (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+}
+
+function checkBancada(){
+  const st = STATIONS[currentStation];
+  const org = norm($('inOrgao').value);
+  const p1 = norm($('inProc1').value);
+  const p2 = norm($('inProc2').value);
+  const diag = norm($('inDiag').value);
+  const notes = [];
+  const okOrg = org.includes('mama') || org.includes('mamar');
+  const okP1 = st.acceptedProc1.some(a => p1.includes(norm(a)));
+  const hasEstroma = (p1 + ' ' + p2).includes('estrom') || (p1 + ' ' + p2).includes('fibroblast');
+  const okDiag = diag.includes('fibroadenoma');
+
+  if(!okOrg) notes.push('Item 1: o órgão desta lâmina é mama (ou tecido mamário).');
+  if(!okP1) notes.push('Item 2: revise exatamente o que a ponta da seta está indicando.');
+  if(st.mustEstromaInComp && !hasEstroma) notes.push('Atenção à regra obrigatória da prova: faltou citar hiperplasia estromal para fechar o diagnóstico de fibroadenoma.');
+  if(!okDiag) notes.push('Item 4: o diagnóstico final é fibroadenoma.');
+
+  const fb = $('fbBancada');
+  if(notes.length === 0){
+    fb.className = 'fb ok';
+    fb.innerHTML = '<strong>Excelente! Folha de bancada fechada corretamente.</strong><br><br>' + st.gabarito;
+  } else {
+    fb.className = 'fb warn';
+    fb.innerHTML = '<strong>Pontos para ajustar na folha:</strong><ul style="margin:6px 0 8px;padding-left:18px">' +
+      notes.map(n => `<li>${n}</li>`).join('') +
+      '</ul><strong>Gabarito oficial da estação:</strong><br>' + st.gabarito;
+  }
+}
+
+function renderObjetiva(){
+  const st = STATIONS[currentStation];
+  selectedOpt = null;
+  $('fbObjetiva').className = 'fb hidden';
+  $('optList').innerHTML = `<div style="font-weight:700;font-size:13.5px;margin-bottom:4px">${st.objQ}</div>` +
+    st.opts.map((o, i) => `<button class="opt-btn" data-opt="${i}">${String.fromCharCode(65+i)}) ${o}</button>`).join('');
+  $('optList').querySelectorAll('.opt-btn').forEach(b => {
+    b.onclick = () => {
+      selectedOpt = parseInt(b.dataset.opt, 10);
+      $('optList').querySelectorAll('.opt-btn').forEach(x => x.classList.remove('sel'));
+      b.classList.add('sel');
+    };
+  });
+}
+
+function responderObjetiva(){
+  if(selectedOpt === null) return;
+  const st = STATIONS[currentStation];
+  const fb = $('fbObjetiva');
+  if(selectedOpt === st.correta){
+    fb.className = 'fb ok';
+    fb.innerHTML = '<strong>Acertou!</strong> ' + st.okMsg;
+  } else {
+    // Regra S1 Estuda Jaider: nunca mostrar a resposta certa no erro
+    fb.className = 'fb err';
+    fb.innerHTML = '<strong>Ainda não.</strong> ' + st.errMsgs[selectedOpt] + ' Reavalie a lâmina no visor e tente de novo.';
+  }
+}
+
+function formatTime(s){
+  const m = String(Math.floor(s/60)).padStart(2,'0');
+  const sec = String(s%60).padStart(2,'0');
+  return `${m}:${sec}`;
+}
+
+function resetTimer(){
+  if(timerId){ clearInterval(timerId); timerId = null; }
+  timerSec = 120;
+  $('timerDisplay').textContent = formatTime(timerSec);
+  $('timerDisplay').classList.remove('low');
+  $('btnTimer').textContent = 'Iniciar';
+}
+
+function toggleTimer(){
+  if(timerId){
+    clearInterval(timerId); timerId = null;
+    $('btnTimer').textContent = 'Retomar';
+    return;
+  }
+  $('btnTimer').textContent = 'Pausar';
+  timerId = setInterval(() => {
+    timerSec = Math.max(0, timerSec - 1);
+    $('timerDisplay').textContent = formatTime(timerSec);
+    if(timerSec <= 20) $('timerDisplay').classList.add('low');
+    if(timerSec === 0){ clearInterval(timerId); timerId = null; $('btnTimer').textContent = 'Tempo esgotado'; }
+  }, 1000);
+}
+
+function setMode(newMode){
+  mode = newMode;
+  $('btnEstudo').classList.toggle('on', mode==='estudo');
+  $('btnProva').classList.toggle('on', mode==='prova');
+  $('paneEstudo').classList.toggle('hidden', mode!=='estudo');
+  $('paneProva').classList.toggle('hidden', mode!=='prova');
+  $('objBar').classList.toggle('hidden', mode!=='estudo');
+  $('btnTogglePins').classList.toggle('hidden', mode!=='estudo');
+  $('chkRealWrap').classList.toggle('hidden', mode!=='prova');
+  if(mode === 'estudo'){
+    $('examPointer').classList.add('hidden');
+    resetTimer();
+    selectField(currentField);
+  } else {
+    loadStation(currentStation);
+  }
+}
+
+// Eventos de pan e zoom no charriot
+const ocular = $('ocular');
+ocular.addEventListener('pointerdown', e => {
+  if(e.target.classList.contains('pin')) return;
+  dragging = true;
+  startX = e.clientX - panX;
+  startY = e.clientY - panY;
+  ocular.setPointerCapture(e.pointerId);
+});
+ocular.addEventListener('pointermove', e => {
+  if(!dragging) return;
+  const maxPan = 180 * zoom;
+  panX = Math.max(-maxPan, Math.min(maxPan, e.clientX - startX));
+  panY = Math.max(-maxPan, Math.min(maxPan, e.clientY - startY));
+  updateTransform();
+});
+ocular.addEventListener('pointerup', () => dragging = false);
+ocular.addEventListener('wheel', e => {
+  e.preventDefault();
+  const delta = e.deltaY < 0 ? 0.2 : -0.2;
+  zoom = Math.max(1, Math.min(3.2, +(zoom + delta).toFixed(1)));
+  $('rngZoom').value = String(zoom);
+  updateTransform();
+}, {passive:false});
+
+$('rngZoom').oninput = e => { zoom = parseFloat(e.target.value); updateTransform(); };
+$('rngFocus').oninput = updateTransform;
+$('rngLight').oninput = updateTransform;
+$('btnCenter').onclick = () => resetView(0);
+$('btnTogglePins').onclick = () => {
+  showPins = !showPins;
+  $('btnTogglePins').textContent = showPins ? 'Ocultar marcadores (testar olho)' : 'Mostrar marcadores';
+  renderPins();
+};
+$('btnEstudo').onclick = () => setMode('estudo');
+$('btnProva').onclick = () => setMode('prova');
+$('btnTimer').onclick = toggleTimer;
+$('btnNextStation').onclick = () => loadStation(currentStation + 1);
+$('btnCheckBancada').onclick = checkBancada;
+$('btnClearBancada').onclick = clearBancada;
+$('btnResponderObj').onclick = responderObjetiva;
+$('tabBancada').onclick = () => {
+  $('tabBancada').classList.add('on'); $('tabObjetiva').classList.remove('on');
+  $('boxBancada').classList.remove('hidden'); $('boxObjetiva').classList.add('hidden');
+};
+$('tabObjetiva').onclick = () => {
+  $('tabObjetiva').classList.add('on'); $('tabBancada').classList.remove('on');
+  $('boxObjetiva').classList.remove('hidden'); $('boxBancada').classList.add('hidden');
+};
+
+selectField(0);
+</script>
+</body>
+</html>

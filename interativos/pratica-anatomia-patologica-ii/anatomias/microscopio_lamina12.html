@@ -1,0 +1,674 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Simulador de Microscópio: Carcinoma in situ (Colo Uterino)</title>
+<style>
+:root{
+  color-scheme:light;
+  --bg:#fbfbfa;
+  --card:#ffffff;
+  --ink:#1f2d36;
+  --muted:#566670;
+  --line:#dbe2e3;
+  --accent:#146c78;
+  --accent-soft:#e6f3f4;
+  --ok:#166534;
+  --ok-bg:#ecfdf3;
+  --err:#991b1b;
+  --err-bg:#fef2f2;
+  --warn:#92400e;
+  --warn-bg:#fffbeb;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14.5px/1.55 Inter,system-ui,-apple-system,sans-serif}
+.wrap{max-width:1120px;margin:0 auto;padding:16px 18px 22px}
+.top{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:14px}
+.eyebrow{text-transform:uppercase;letter-spacing:.1em;font-size:11px;font-weight:700;color:var(--accent)}
+h1{font-size:20px;line-height:1.2;margin:2px 0 0;font-weight:700}
+.mode-switch{display:inline-flex;background:#eef3f4;padding:4px;border-radius:11px;gap:4px}
+.mode-btn{border:0;background:transparent;color:var(--muted);font:600 13.5px/1 Inter,system-ui,sans-serif;padding:9px 14px;border-radius:8px;cursor:pointer;transition:.15s}
+.mode-btn.on{background:var(--accent);color:#fff;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(300px,.85fr);gap:16px;align-items:start}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px}
+
+/* Ocular do microscopio */
+.scope-stage{display:flex;flex-direction:column;align-items:center;gap:12px}
+.ocular-shell{
+  position:relative;
+  width:min(100%, 470px);
+  aspect-ratio:1/1;
+  border-radius:50%;
+  background:#090d10;
+  padding:10px;
+  box-shadow:inset 0 0 24px rgba(0,0,0,.9), 0 10px 28px rgba(15,23,42,.18);
+  border:3px solid #2b3842;
+}
+.ocular-view{
+  position:relative;
+  width:100%;
+  height:100%;
+  border-radius:50%;
+  overflow:hidden;
+  background:#050709;
+  cursor:grab;
+  touch-action:none;
+  user-select:none;
+}
+.ocular-view:active{cursor:grabbing}
+.slide-layer{
+  position:absolute;
+  inset:0;
+  transform-origin:center center;
+  will-change:transform,filter;
+}
+.slide-layer img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+  pointer-events:none;
+  user-select:none;
+}
+/* Vinheta optica realista */
+.ocular-vignette{
+  position:absolute;
+  inset:0;
+  border-radius:50%;
+  pointer-events:none;
+  box-shadow:inset 0 0 42px 12px rgba(0,0,0,.78);
+}
+.ocular-badge{
+  position:absolute;
+  top:14px;
+  left:50%;
+  transform:translateX(-50%);
+  background:rgba(15,23,42,.78);
+  color:#f8fafc;
+  font-size:11.5px;
+  font-weight:600;
+  padding:4px 10px;
+  border-radius:999px;
+  pointer-events:none;
+  backdrop-filter:blur(4px);
+  white-space:nowrap;
+}
+.ocular-hint{
+  position:absolute;
+  bottom:14px;
+  left:50%;
+  transform:translateX(-50%);
+  background:rgba(15,23,42,.72);
+  color:#e2e8f0;
+  font-size:11px;
+  padding:3px 10px;
+  border-radius:999px;
+  pointer-events:none;
+  white-space:nowrap;
+}
+
+/* Marcadores no modo estudo */
+.pin{
+  position:absolute;
+  transform:translate(-50%,-50%);
+  width:28px;
+  height:28px;
+  border-radius:50%;
+  border:2px solid #fff;
+  background:var(--accent);
+  color:#fff;
+  font:700 12px/1 Inter,system-ui,sans-serif;
+  display:grid;
+  place-items:center;
+  cursor:pointer;
+  box-shadow:0 2px 8px rgba(0,0,0,.45);
+  transition:transform .15s, background .15s;
+  z-index:5;
+}
+.pin:hover,.pin.on{transform:translate(-50%,-50%) scale(1.18);background:#0f4f58}
+
+/* Seta preta da ocular no modo prova */
+.exam-pointer{
+  position:absolute;
+  pointer-events:none;
+  z-index:6;
+  width:72px;
+  height:72px;
+  transform:translate(-50%,-50%);
+  filter:drop-shadow(0 0 2px rgba(255,255,255,.9));
+}
+
+/* Controles abaixo da ocular */
+.controls{width:100%;display:flex;flex-direction:column;gap:10px}
+.obj-bar{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.obj-btn{
+  border:1px solid #cbd6d8;
+  background:#fff;
+  color:var(--ink);
+  font:600 12.5px/1.2 Inter,system-ui,sans-serif;
+  padding:7px 10px;
+  border-radius:8px;
+  cursor:pointer;
+}
+.obj-btn:hover{background:#eff6f6}
+.obj-btn.on{background:var(--accent-soft);border-color:var(--accent);color:#0b4f59}
+.sliders{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  background:#f6f8f8;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:9px 12px;
+}
+.ctrl-item{display:flex;flex-direction:column;gap:3px;font-size:11.5px;color:var(--muted)}
+.ctrl-item b{color:var(--ink);font-weight:600}
+.ctrl-item input[type=range]{width:100%;accent-color:var(--accent)}
+.action-row{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.btn-sm{
+  border:1px solid #cbd6d8;
+  background:#fff;
+  color:var(--ink);
+  font:600 12.5px/1 Inter,system-ui,sans-serif;
+  padding:7px 11px;
+  border-radius:8px;
+  cursor:pointer;
+}
+.btn-sm:hover{background:#eff6f6}
+.btn-sm.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn-sm.primary:hover{background:#0f5660}
+
+/* Painel lateral */
+.side h2{font-size:16.5px;margin:0 0 6px}
+.side p{margin:6px 0;text-align:justify;text-justify:inter-word}
+.tag{display:inline-block;background:var(--accent-soft);color:#0d545e;font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:999px;margin-bottom:6px}
+.pin-list{display:flex;flex-direction:column;gap:7px;margin-top:10px}
+.pin-card{
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:9px 11px;
+  cursor:pointer;
+  background:#fff;
+  transition:.15s;
+}
+.pin-card:hover{border-color:#9fc6cb;background:#f8fbfb}
+.pin-card.on{border-color:var(--accent);background:var(--accent-soft)}
+.pin-card .ptitle{font-weight:700;font-size:13.5px;display:flex;align-items:center;gap:7px}
+.pin-card .pnum{width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;display:inline-grid;place-items:center;flex:none}
+.pin-card .pdesc{font-size:13px;color:var(--muted);margin-top:4px;text-align:justify}
+
+/* Modo Prova */
+.exam-head{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;background:#f6f8f8;border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-bottom:10px}
+.timer{font:700 18px/1 monospace;color:var(--accent)}
+.timer.low{color:var(--err)}
+.sub-tabs{display:flex;gap:6px;margin-bottom:10px}
+.sub-tab{flex:1;border:1px solid #cbd6d8;background:#fff;padding:7px 8px;border-radius:8px;font:600 12.5px/1.2 Inter,sans-serif;cursor:pointer;color:var(--muted)}
+.sub-tab.on{background:var(--accent-soft);border-color:var(--accent);color:#0b4f59}
+.field{margin-bottom:9px}
+.field label{display:block;font-size:12.5px;font-weight:700;margin-bottom:3px;color:var(--ink)}
+.field input{width:100%;padding:8px 10px;border:1px solid #cbd6d8;border-radius:8px;font:13.5px/1.3 Inter,system-ui,sans-serif}
+.field input:focus{outline:2px solid var(--accent);border-color:var(--accent)}
+.fb{border-radius:10px;padding:10px 12px;margin-top:10px;font-size:13.5px;text-align:justify}
+.fb.ok{background:var(--ok-bg);border:1px solid #86efac;color:var(--ok)}
+.fb.err{background:var(--err-bg);border:1px solid #fca5a5;color:var(--err)}
+.fb.warn{background:var(--warn-bg);border:1px solid #fcd34d;color:var(--warn)}
+.opt-list{display:flex;flex-direction:column;gap:7px;margin:10px 0}
+.opt-btn{
+  text-align:left;
+  border:1px solid #cbd6d8;
+  background:#fff;
+  padding:9px 11px;
+  border-radius:9px;
+  font:13.5px/1.35 Inter,system-ui,sans-serif;
+  cursor:pointer;
+  color:var(--ink);
+}
+.opt-btn:hover{background:#f3f8f8}
+.opt-btn.sel{border-color:var(--accent);background:var(--accent-soft);font-weight:600}
+.hidden{display:none !important}
+
+@media(max-width:860px){
+  .grid{grid-template-columns:1fr}
+  .sliders{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="eyebrow">Anatomia Patológica II · Lâmina 12 (Cx. Pato 2)</div>
+      <h1>Simulador de Microscópio: Carcinoma in situ (Colo Uterino)</h1>
+    </div>
+    <div class="mode-switch" role="tablist" aria-label="Modo do simulador">
+      <button id="btnEstudo" class="mode-btn on" role="tab" aria-selected="true">Modo Estudo</button>
+      <button id="btnProva" class="mode-btn" role="tab" aria-selected="false">Modo Prova Prática</button>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- ESQUERDA: OCULAR E CONTROLES -->
+    <section class="panel scope-stage" aria-label="Visor do microscópio">
+      <div class="ocular-shell">
+        <div id="ocular" class="ocular-view">
+          <div id="slideLayer" class="slide-layer">
+            <img id="slideImg" src="" alt="Campo microscópico da Lâmina 32">
+            <div id="pinsLayer"></div>
+            <svg id="examPointer" class="exam-pointer hidden" viewBox="0 0 80 80" aria-hidden="true">
+              <path d="M68 12 L22 58" stroke="#000000" stroke-width="5.5" stroke-linecap="round"/>
+              <path d="M22 58 L25 38 M22 58 L42 55" stroke="#000000" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="ocular-vignette"></div>
+          <div id="ocularBadge" class="ocular-badge">4× · Fronteira e Cápsula</div>
+          <div class="ocular-hint">Arraste para mover a lâmina (charriot) · Roda do mouse para zoom</div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <div id="objBar" class="obj-bar" aria-label="Campos e objetivas"></div>
+
+        <div class="sliders">
+          <label class="ctrl-item">
+            <span>Zoom digital: <b id="lblZoom">1,0×</b></span>
+            <input id="rngZoom" type="range" min="1" max="3.2" step="0.1" value="1">
+          </label>
+          <label class="ctrl-item">
+            <span>Micrométrico (foco): <b id="lblFocus">Nítido</b></span>
+            <input id="rngFocus" type="range" min="-5" max="5" step="0.2" value="0">
+          </label>
+          <label class="ctrl-item">
+            <span>Diafragma (luz): <b id="lblLight">100%</b></span>
+            <input id="rngLight" type="range" min="75" max="125" step="5" value="100">
+          </label>
+        </div>
+
+        <div class="action-row">
+          <button id="btnCenter" class="btn-sm">Centralizar lâmina</button>
+          <button id="btnTogglePins" class="btn-sm primary">Ocultar marcadores (testar olho)</button>
+          <label id="chkRealWrap" class="btn-sm hidden" style="display:inline-flex;align-items:center;gap:6px;cursor:pointer">
+            <input id="chkBlurStart" type="checkbox"> Iniciar desfocado
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <!-- DIREITA: PAINEL DIDÁTICO OU FOLHA DE PROVA -->
+    <aside class="panel side">
+      <!-- PAINEL MODO ESTUDO -->
+      <div id="paneEstudo">
+        <span id="studyTag" class="tag">Objetiva 4×</span>
+        <h2 id="studyTitle">Fronteira: Normal, Cápsula e Fibroadenoma</h2>
+        <p id="studySummary"></p>
+        <div id="pinList" class="pin-list"></div>
+      </div>
+
+      <!-- PAINEL MODO PROVA PRÁTICA -->
+      <div id="paneProva" class="hidden">
+        <div class="exam-head">
+          <div>
+            <div style="font-size:11.5px;color:var(--muted);font-weight:600">ESTAÇÃO DE BANCADA</div>
+            <div id="stationLabel" style="font-weight:700;font-size:14px">Estação 1 de 4</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span id="timerDisplay" class="timer">02:00</span>
+            <button id="btnTimer" class="btn-sm">Iniciar</button>
+            <button id="btnNextStation" class="btn-sm primary">Próxima estação</button>
+          </div>
+        </div>
+
+        <div class="sub-tabs" role="tablist">
+          <button id="tabBancada" class="sub-tab on">Folha de Bancada (4 itens)</button>
+          <button id="tabObjetiva" class="sub-tab">Treino Seta (4 opções)</button>
+        </div>
+
+        <p id="examPrompt" style="font-size:13.5px;margin-bottom:10px"></p>
+
+        <!-- SUBMODO FOLHA DE BANCADA -->
+        <div id="boxBancada">
+          <div class="field">
+            <label for="inOrgao">1. Diagnóstico do órgão</label>
+            <input id="inOrgao" type="text" placeholder="Ex.: mama">
+          </div>
+          <div class="field">
+            <label for="inProc1">2. Processo patológico 1 (apontado pela seta)</label>
+            <input id="inProc1" type="text" placeholder="O que a ponta da seta indica?">
+          </div>
+          <div class="field">
+            <label for="inProc2">3. Processo patológico 2 (complementar)</label>
+            <input id="inProc2" type="text" placeholder="Outro achado que fecha o diagnóstico">
+          </div>
+          <div class="field">
+            <label for="inDiag">4. Diagnóstico final</label>
+            <input id="inDiag" type="text" placeholder="Nome da lesão">
+          </div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button id="btnCheckBancada" class="btn-sm primary" style="flex:1">Conferir na Folha Oficial</button>
+            <button id="btnClearBancada" class="btn-sm">Limpar</button>
+          </div>
+          <div id="fbBancada" class="fb hidden"></div>
+        </div>
+
+        <!-- SUBMODO TREINO OBJETIVO (REGRA S1: ERRO NÃO MOSTRA A CERTA) -->
+        <div id="boxObjetiva" class="hidden">
+          <div id="optList" class="opt-list"></div>
+          <button id="btnResponderObj" class="btn-sm primary" style="width:100%">Responder</button>
+          <div id="fbObjetiva" class="fb hidden"></div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+const FIELDS = [{"id": "c1", "label": "4× · Cisto de Naboth", "obj": "Objetiva 4× (Panorâmica)", "img": "../fig/colo_01_panoramica_naboth_4x", "title": "Colo Uterino em 4×: Ectocérvice e Cisto de Naboth", "summary": "Visão panorâmica ideal para cravar o órgão (colo uterino): epitélio escamoso estratificado na superfície e grande cisto de Naboth preenchido por muco no estroma.", "pins": [{"x": 54, "y": 42, "t": "Ectocérvice alterada", "d": "Faixa superficial de epitélio escamoso espessado e intensamente arroxeado."}, {"x": 36, "y": 72, "t": "Cisto de Naboth", "d": "Grande cisto benigno de retenção de muco na endocérvice; pista anatômica direta do colo uterino."}]}, {"id": "c2", "label": "10× · Ectocérvice", "obj": "Objetiva 10× (Aumento médio)", "img": "../fig/colo_02_ectocervice_10x", "title": "Transição Ectocervical e Estroma Subepitelial", "summary": "Em aumento médio, note o contraste entre o epitélio escamoso roxo escuro (displásico) e o estroma subjacente com vasos sanguíneos neoformados e infiltrado inflamatório.", "pins": [{"x": 46, "y": 54, "t": "Epitélio ectocervical displásico", "d": "Camada epitelial intensamente basofílica (roxa) sem maturação superficial."}, {"x": 58, "y": 74, "t": "Estroma com neoangiogênese e inflamação", "d": "Numerosos vasos neoformados e denso infiltrado inflamatório subepitelial."}]}, {"id": "c3", "label": "40× · Displasia 3/3", "obj": "Objetiva 40× (Maior aumento)", "img": "../fig/colo_03_displasia_40x", "title": "Displasia nos 3 Terços (NIC 3) e Membrana Basal Íntegra", "summary": "Campo decisivo da prova: hipercromasia, cariomegalia, hipercelularidade e perda de polaridade comprometendo os 3 terços do epitélio, mas sem invasão da membrana basal (in situ).", "pins": [{"x": 44, "y": 44, "t": "Displasia nos 3 terços (NIC 3)", "d": "Núcleos grandes, muito escuros (hipercromasia) e caóticos da base até a superfície."}, {"x": 48, "y": 64, "t": "Membrana basal íntegra (in situ)", "d": "Limite inferior preservado sem invasão estromal nem pérolas córneas: carcinoma espinocelular in situ."}, {"x": 64, "y": 78, "t": "Infiltrado inflamatório e vasos", "d": "Estroma subepitelial com neoangiogênese e intenso infiltrado inflamatório."}]}, {"id": "c4", "label": "Ocular Real · Displasia", "obj": "Foto real da ocular (40×)", "img": "../fig/colo_08_wa_displasia", "title": "Foto Real da Ocular: Epitélio Displásico de Alto Grau", "summary": "Registro direto do microscópio de aula mostrando a espessura epitelial completamente desorganizada e arroxeada sobre o estroma.", "pins": [{"x": 52, "y": 62, "t": "Displasia em toda a espessura", "d": "Perda de polaridade e hipercromasia ocupando os 3 terços do epitélio."}]}];
+const STATIONS = [{"fieldIdx": 2, "pointer": {"x": 44, "y": 44}, "prompt": "A seta preta aponta o epitélio ectocervical em 40×. Preencha os 4 itens da folha prática sem esquecer o qualificador obrigatório no diagnóstico.", "acceptedOrgao": ["colo", "utero", "útero"], "orgHint": "Item 1: prefira colo uterino (ou colo de útero).", "acceptedProc1": ["displasia", "nic 3", "nic3", "hipercromasia", "cariomegalia", "perda de polaridade"], "mustTerm": "in situ", "mustHint": "Atenção: é obrigatório especificar \"in situ\" no diagnóstico (sem in situ vale meio certo).", "acceptedDiag": ["carcinoma", "espinocelular"], "diagHint": "Item 4: carcinoma espinocelular in situ.", "gabarito": "<strong>1. Órgão:</strong> colo uterino.<br><strong>2. Processo 1 (obrigatório):</strong> displasia nos 3 terços do epitélio (NIC 3, hipercromasia, cariomegalia, perda de polaridade).<br><strong>3. Processo 2:</strong> neoangiogênese, intenso infiltrado inflamatório ou ausência de invasão.<br><strong>4. Diagnóstico:</strong> carcinoma espinocelular in situ.", "objQ": "Qual conjunto descreve o achado apontado pela seta e o diagnóstico completo desta lâmina?", "opts": ["Displasia nos 3 terços do epitélio sem invasão; carcinoma espinocelular in situ", "Hiperplasia estromal com dupla camada preservada; fibroadenoma", "Glândulas espiriformes em padrão back-to-back; hiperplasia endometrial sem atipias", "Invasão estromal franca com pérolas córneas; carcinoma espinocelular invasor"], "correta": 0, "errMsgs": ["", "Hiperplasia estromal e camada dupla pertencem à mama (Lâmina 32).", "Glândulas espiriformes back-to-back pertencem ao endométrio (Lâmina 43, Cx. 1).", "Na Lâmina 12 a membrana basal está íntegra e não há invasão nem pérolas córneas."], "okMsg": "Correto! Displasia nos 3 terços (NIC 3) com membrana basal íntegra fecha carcinoma espinocelular in situ."}];
+const DEFAULT_MODE = "estudo";
+
+let mode = DEFAULT_MODE;
+let currentField = 0;
+let currentStation = 0;
+let stationOrder = STATIONS.map((_, i) => i);
+let showPins = true;
+let activePin = 0;
+let zoom = 1;
+let panX = 0, panY = 0;
+let dragging = false, startX = 0, startY = 0;
+let timerSec = 120, timerId = null;
+let selectedOpt = null;
+let hits = 0, doneSet = new Set();
+
+const $ = id => document.getElementById(id);
+
+function loadImageWithFallback(basePath){
+  const img = $('slideImg');
+  img.onerror = function(){
+    if(img.src.endsWith('.jpg')){ img.onerror = null; img.src = basePath + '.png'; }
+    else if(img.src.endsWith('.png')){ img.onerror = null; img.src = basePath + '.jpeg'; }
+  };
+  img.src = basePath + '.jpg';
+}
+
+function updateTransform(){
+  const blurVal = Math.abs(parseFloat($('rngFocus').value));
+  const lightVal = parseInt($('rngLight').value, 10);
+  $('slideLayer').style.transform = `translate(${panX}px, ${panY}px) scale(${zoom})`;
+  $('slideLayer').style.filter = `blur(${blurVal.toFixed(1)}px) brightness(${lightVal}%)`;
+  $('lblZoom').textContent = zoom.toFixed(1).replace('.', ',') + '×';
+  $('lblFocus').textContent = blurVal < 0.3 ? 'Nítido' : (blurVal < 2 ? 'Leve desfoque' : 'Desfocado');
+  $('lblLight').textContent = lightVal + '%';
+}
+
+function resetView(blurInitial=0){
+  zoom = 1; panX = 0; panY = 0;
+  $('rngZoom').value = '1';
+  $('rngFocus').value = String(blurInitial);
+  updateTransform();
+}
+
+function renderObjBar(){
+  $('objBar').innerHTML = FIELDS.map((f, i) =>
+    `<button class="obj-btn ${i===currentField?'on':''}" data-idx="${i}">${f.label}</button>`
+  ).join('');
+  $('objBar').querySelectorAll('button').forEach(b => {
+    b.onclick = () => {
+      if(mode !== 'estudo') return;
+      selectField(parseInt(b.dataset.idx, 10));
+    };
+  });
+}
+
+function selectField(idx){
+  currentField = idx;
+  activePin = 0;
+  const f = FIELDS[idx];
+  loadImageWithFallback(f.img);
+  $('ocularBadge').textContent = f.label;
+  $('studyTag').textContent = f.obj;
+  $('studyTitle').textContent = f.title;
+  $('studySummary').textContent = f.summary;
+  resetView(0);
+  renderObjBar();
+  renderPins();
+}
+
+function renderPins(){
+  const f = FIELDS[currentField];
+  const layer = $('pinsLayer');
+  const list = $('pinList');
+  if(mode !== 'estudo'){ layer.innerHTML = ''; return; }
+  layer.innerHTML = showPins ? f.pins.map((p, i) =>
+    `<button class="pin ${i===activePin?'on':''}" style="left:${p.x}%;top:${p.y}%" data-pin="${i}" title="${p.t}">${i+1}</button>`
+  ).join('') : '';
+  layer.querySelectorAll('.pin').forEach(btn => {
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      activePin = parseInt(btn.dataset.pin, 10);
+      renderPins();
+    };
+  });
+  list.innerHTML = f.pins.map((p, i) =>
+    `<div class="pin-card ${i===activePin?'on':''}" data-pin="${i}">
+      <div class="ptitle"><span class="pnum">${i+1}</span>${p.t}</div>
+      <div class="pdesc">${p.d}</div>
+    </div>`
+  ).join('');
+  list.querySelectorAll('.pin-card').forEach(card => {
+    card.onclick = () => {
+      activePin = parseInt(card.dataset.pin, 10);
+      renderPins();
+    };
+  });
+}
+
+function loadStation(pos){
+  currentStation = pos % stationOrder.length;
+  const st = STATIONS[stationOrder[currentStation]];
+  const f = FIELDS[st.fieldIdx];
+  currentField = st.fieldIdx;
+  loadImageWithFallback(f.img);
+  $('ocularBadge').textContent = `Estação ${currentStation+1} · ${st.badge || f.obj}`;
+  $('stationLabel').textContent = `Estação ${currentStation+1} de ${STATIONS.length} · Acertos: ${hits}/${doneSet.size}`;
+  $('examPrompt').textContent = st.prompt;
+  const ptr = $('examPointer');
+  ptr.classList.remove('hidden');
+  ptr.style.left = st.pointer.x + '%';
+  ptr.style.top = st.pointer.y + '%';
+  $('pinsLayer').innerHTML = '';
+  const startBlur = $('chkBlurStart').checked ? 3.2 : 0;
+  resetView(startBlur);
+  clearBancada();
+  renderObjetiva();
+  resetTimer();
+}
+
+function clearBancada(){
+  $('inOrgao').value = '';
+  $('inProc1').value = '';
+  $('inProc2').value = '';
+  $('inDiag').value = '';
+  $('fbBancada').className = 'fb hidden';
+  $('fbBancada').innerHTML = '';
+}
+
+function norm(s){
+  return (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+}
+
+function checkBancada(){
+  const st = STATIONS[stationOrder[currentStation]];
+  const org = norm($('inOrgao').value);
+  const p1 = norm($('inProc1').value);
+  const p2 = norm($('inProc2').value);
+  const diag = norm($('inDiag').value);
+  const notes = [];
+  const okOrg = (st.acceptedOrgao || []).some(a => org.includes(norm(a)));
+  const okP1 = (st.acceptedProc1 || []).some(a => p1.includes(norm(a)));
+  const okDiag = (st.acceptedDiag || []).some(a => diag.includes(norm(a)));
+
+  if(!okOrg) notes.push(st.orgHint || 'Item 1: revise o diagnóstico do órgão.');
+  if(!okP1) notes.push('Item 2: revise exatamente o processo apontado pela ponta da seta.');
+  if(st.mustTerm && !(p1 + ' ' + p2 + ' ' + diag).includes(norm(st.mustTerm))){
+    notes.push(st.mustHint);
+  }
+  if(!okDiag) notes.push(st.diagHint || 'Item 4: revise o diagnóstico completo.');
+
+  const fb = $('fbBancada');
+  const key = 'b_' + stationOrder[currentStation];
+  if(!doneSet.has(key)){
+    doneSet.add(key);
+    if(notes.length === 0) hits++;
+    $('stationLabel').textContent = `Estação ${currentStation+1} de ${STATIONS.length} · Acertos: ${hits}/${doneSet.size}`;
+  }
+  if(notes.length === 0){
+    fb.className = 'fb ok';
+    fb.innerHTML = '<strong>Excelente! Folha de bancada fechada corretamente.</strong><br><br>' + st.gabarito;
+  } else {
+    fb.className = 'fb warn';
+    fb.innerHTML = '<strong>Pontos para ajustar na folha:</strong><ul style="margin:6px 0 8px;padding-left:18px">' +
+      notes.map(n => `<li>${n}</li>`).join('') +
+      '</ul><strong>Gabarito oficial da estação:</strong><br>' + st.gabarito;
+  }
+}
+
+function renderObjetiva(){
+  const st = STATIONS[stationOrder[currentStation]];
+  selectedOpt = null;
+  $('fbObjetiva').className = 'fb hidden';
+  $('optList').innerHTML = `<div style="font-weight:700;font-size:13.5px;margin-bottom:4px">${st.objQ}</div>` +
+    st.opts.map((o, i) => `<button class="opt-btn" data-opt="${i}">${String.fromCharCode(65+i)}) ${o}</button>`).join('');
+  $('optList').querySelectorAll('.opt-btn').forEach(b => {
+    b.onclick = () => {
+      selectedOpt = parseInt(b.dataset.opt, 10);
+      $('optList').querySelectorAll('.opt-btn').forEach(x => x.classList.remove('sel'));
+      b.classList.add('sel');
+    };
+  });
+}
+
+function responderObjetiva(){
+  if(selectedOpt === null) return;
+  const st = STATIONS[stationOrder[currentStation]];
+  const fb = $('fbObjetiva');
+  if(selectedOpt === st.correta){
+    const key = 'o_' + stationOrder[currentStation];
+    if(!doneSet.has(key)){ doneSet.add(key); hits++; $('stationLabel').textContent = `Estação ${currentStation+1} de ${STATIONS.length} · Acertos: ${hits}/${doneSet.size}`; }
+    fb.className = 'fb ok';
+    fb.innerHTML = '<strong>Acertou!</strong> ' + st.okMsg;
+  } else {
+    fb.className = 'fb err';
+    fb.innerHTML = '<strong>Ainda não.</strong> ' + st.errMsgs[selectedOpt] + ' Reavalie a lâmina no visor e tente de novo.';
+  }
+}
+
+function formatTime(s){
+  const m = String(Math.floor(s/60)).padStart(2,'0');
+  const sec = String(s%60).padStart(2,'0');
+  return `${m}:${sec}`;
+}
+
+function resetTimer(){
+  if(timerId){ clearInterval(timerId); timerId = null; }
+  timerSec = 120;
+  $('timerDisplay').textContent = formatTime(timerSec);
+  $('timerDisplay').classList.remove('low');
+  $('btnTimer').textContent = 'Iniciar';
+}
+
+function toggleTimer(){
+  if(timerId){
+    clearInterval(timerId); timerId = null;
+    $('btnTimer').textContent = 'Retomar';
+    return;
+  }
+  $('btnTimer').textContent = 'Pausar';
+  timerId = setInterval(() => {
+    timerSec = Math.max(0, timerSec - 1);
+    $('timerDisplay').textContent = formatTime(timerSec);
+    if(timerSec <= 20) $('timerDisplay').classList.add('low');
+    if(timerSec === 0){ clearInterval(timerId); timerId = null; $('btnTimer').textContent = 'Tempo esgotado'; }
+  }, 1000);
+}
+
+function setMode(newMode){
+  mode = newMode;
+  $('btnEstudo').classList.toggle('on', mode==='estudo');
+  $('btnProva').classList.toggle('on', mode==='prova');
+  $('paneEstudo').classList.toggle('hidden', mode!=='estudo');
+  $('paneProva').classList.toggle('hidden', mode!=='prova');
+  $('objBar').classList.toggle('hidden', mode!=='estudo');
+  $('btnTogglePins').classList.toggle('hidden', mode!=='estudo');
+  $('chkRealWrap').classList.toggle('hidden', mode!=='prova');
+  if(mode === 'estudo'){
+    $('examPointer').classList.add('hidden');
+    resetTimer();
+    selectField(currentField);
+  } else {
+    loadStation(currentStation);
+  }
+}
+
+const ocular = $('ocular');
+ocular.addEventListener('pointerdown', e => {
+  if(e.target.classList.contains('pin')) return;
+  dragging = true;
+  startX = e.clientX - panX;
+  startY = e.clientY - panY;
+  ocular.setPointerCapture(e.pointerId);
+});
+ocular.addEventListener('pointermove', e => {
+  if(!dragging) return;
+  const maxPan = 180 * zoom;
+  panX = Math.max(-maxPan, Math.min(maxPan, e.clientX - startX));
+  panY = Math.max(-maxPan, Math.min(maxPan, e.clientY - startY));
+  updateTransform();
+});
+ocular.addEventListener('pointerup', () => dragging = false);
+ocular.addEventListener('wheel', e => {
+  e.preventDefault();
+  const delta = e.deltaY < 0 ? 0.2 : -0.2;
+  zoom = Math.max(1, Math.min(3.2, +(zoom + delta).toFixed(1)));
+  $('rngZoom').value = String(zoom);
+  updateTransform();
+}, {passive:false});
+
+$('rngZoom').oninput = e => { zoom = parseFloat(e.target.value); updateTransform(); };
+$('rngFocus').oninput = updateTransform;
+$('rngLight').oninput = updateTransform;
+$('btnCenter').onclick = () => resetView(0);
+$('btnTogglePins').onclick = () => {
+  showPins = !showPins;
+  $('btnTogglePins').textContent = showPins ? 'Ocultar marcadores (testar olho)' : 'Mostrar marcadores';
+  renderPins();
+};
+$('btnEstudo').onclick = () => setMode('estudo');
+$('btnProva').onclick = () => setMode('prova');
+$('btnTimer').onclick = toggleTimer;
+$('btnNextStation').onclick = () => loadStation(currentStation + 1);
+if($('btnShuffle')){
+  $('btnShuffle').onclick = () => {
+    for(let i=stationOrder.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [stationOrder[i], stationOrder[j]] = [stationOrder[j], stationOrder[i]];
+    }
+    hits = 0; doneSet.clear();
+    loadStation(0);
+  };
+}
+$('btnCheckBancada').onclick = checkBancada;
+$('btnClearBancada').onclick = clearBancada;
+$('btnResponderObj').onclick = responderObjetiva;
+$('tabBancada').onclick = () => {
+  $('tabBancada').classList.add('on'); $('tabObjetiva').classList.remove('on');
+  $('boxBancada').classList.remove('hidden'); $('boxObjetiva').classList.add('hidden');
+};
+$('tabObjetiva').onclick = () => {
+  $('tabObjetiva').classList.add('on'); $('tabBancada').classList.remove('on');
+  $('boxObjetiva').classList.remove('hidden'); $('boxBancada').classList.add('hidden');
+};
+
+setMode(DEFAULT_MODE);
+</script>
+</body>
+</html>

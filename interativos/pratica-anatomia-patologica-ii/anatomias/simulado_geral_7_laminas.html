@@ -1,0 +1,775 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Simulado Oficial · Prova Prática de Microscopia (7 Lâminas)</title>
+<style>
+:root{
+  color-scheme:light;
+  --bg:#fbfbfa;
+  --card:#ffffff;
+  --ink:#1f2d36;
+  --muted:#566670;
+  --line:#dbe2e3;
+  --accent:#146c78;
+  --accent-soft:#e6f3f4;
+  --ok:#166534;
+  --ok-bg:#ecfdf3;
+  --err:#991b1b;
+  --err-bg:#fef2f2;
+  --warn:#92400e;
+  --warn-bg:#fffbeb;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14.5px/1.55 Inter,system-ui,-apple-system,sans-serif}
+.wrap{max-width:1160px;margin:0 auto;padding:16px 18px 28px}
+.top{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:14px}
+.eyebrow{text-transform:uppercase;letter-spacing:.1em;font-size:11px;font-weight:700;color:var(--accent)}
+h1{font-size:21px;line-height:1.2;margin:2px 0 0;font-weight:700}
+.mode-switch{display:inline-flex;flex-wrap:wrap;background:#eef3f4;padding:4px;border-radius:11px;gap:4px}
+.mode-btn{border:0;background:transparent;color:var(--muted);font:600 13px/1 Inter,system-ui,sans-serif;padding:9px 12px;border-radius:8px;cursor:pointer;transition:.15s}
+.mode-btn.on{background:var(--accent);color:#fff;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+
+.config-bar{
+  display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;
+  background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px 14px;margin-bottom:14px;
+}
+.cfg-group{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.cfg-label{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+select,.btn-sm{
+  border:1px solid #cbd6d8;background:#fff;color:var(--ink);
+  font:600 12.5px/1.2 Inter,system-ui,sans-serif;padding:7px 11px;border-radius:8px;cursor:pointer;
+}
+.btn-sm:hover{background:#eff6f6}
+.btn-sm.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn-sm.primary:hover{background:#0f5660}
+.btn-sm.finish{background:#0f766e;border-color:#0f766e;color:#fff}
+.btn-sm.finish:hover{background:#115e59}
+
+.stepper{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:14px}
+.st-pill{
+  border:1px solid #cbd6d8;background:#fff;color:var(--muted);
+  font:600 12.5px/1 Inter,system-ui,sans-serif;padding:7px 11px;border-radius:999px;cursor:pointer;
+  display:inline-flex;align-items:center;gap:6px;
+}
+.st-pill.cur{border-color:var(--accent);background:var(--accent-soft);color:#0b4f59}
+.st-pill.filled{background:#ecfdf3;border-color:#86efac;color:#166534}
+.st-pill.cur.filled{background:var(--accent);border-color:var(--accent);color:#fff}
+
+.grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(320px,.9fr);gap:16px;align-items:start}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px}
+
+.scope-stage{display:flex;flex-direction:column;align-items:center;gap:12px}
+.ocular-shell{
+  position:relative;width:min(100%,465px);aspect-ratio:1/1;border-radius:50%;
+  background:#090d10;padding:10px;
+  box-shadow:inset 0 0 24px rgba(0,0,0,.9), 0 10px 28px rgba(15,23,42,.18);
+  border:3px solid #2b3842;
+}
+.ocular-view{
+  position:relative;width:100%;height:100%;border-radius:50%;overflow:hidden;
+  background:#050709;cursor:grab;touch-action:none;user-select:none;
+}
+.ocular-view:active{cursor:grabbing}
+.slide-layer{position:absolute;inset:0;transform-origin:center center;will-change:transform,filter}
+.slide-layer img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;user-select:none}
+.ocular-vignette{position:absolute;inset:0;border-radius:50%;pointer-events:none;box-shadow:inset 0 0 42px 12px rgba(0,0,0,.78)}
+.ocular-badge{
+  position:absolute;top:14px;left:50%;transform:translateX(-50%);
+  background:rgba(15,23,42,.8);color:#f8fafc;font-size:11.5px;font-weight:600;
+  padding:4px 11px;border-radius:999px;pointer-events:none;white-space:nowrap;
+}
+.ocular-hint{
+  position:absolute;bottom:14px;left:50%;transform:translateX(-50%);
+  background:rgba(15,23,42,.74);color:#e2e8f0;font-size:11px;
+  padding:3px 10px;border-radius:999px;pointer-events:none;white-space:nowrap;
+}
+.exam-pointer{
+  position:absolute;pointer-events:none;z-index:6;width:72px;height:72px;
+  transform:translate(-50%,-50%);filter:drop-shadow(0 0 2px rgba(255,255,255,.95));
+}
+
+.sliders{
+  width:100%;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
+  background:#f6f8f8;border:1px solid var(--line);border-radius:12px;padding:9px 12px;
+}
+.ctrl-item{display:flex;flex-direction:column;gap:3px;font-size:11.5px;color:var(--muted)}
+.ctrl-item b{color:var(--ink);font-weight:600}
+.ctrl-item input[type=range]{width:100%;accent-color:var(--accent)}
+
+.exam-head{
+  display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;
+  background:#f6f8f8;border:1px solid var(--line);border-radius:10px;padding:8px 11px;margin-bottom:10px;
+}
+.timer{font:700 18px/1 monospace;color:var(--accent)}
+.timer.low{color:var(--err)}
+.field{margin-bottom:9px}
+.field label{display:block;font-size:12.5px;font-weight:700;margin-bottom:3px;color:var(--ink)}
+.field input{width:100%;padding:8px 10px;border:1px solid #cbd6d8;border-radius:8px;font:13.5px/1.3 Inter,system-ui,sans-serif}
+.field input:focus{outline:2px solid var(--accent);border-color:var(--accent)}
+.fb{border-radius:10px;padding:10px 12px;margin-top:10px;font-size:13.5px;text-align:justify}
+.fb.ok{background:var(--ok-bg);border:1px solid #86efac;color:var(--ok)}
+.fb.err{background:var(--err-bg);border:1px solid #fca5a5;color:var(--err)}
+.fb.warn{background:var(--warn-bg);border:1px solid #fcd34d;color:var(--warn)}
+.opt-list{display:flex;flex-direction:column;gap:7px;margin:10px 0}
+.opt-btn{
+  text-align:left;border:1px solid #cbd6d8;background:#fff;padding:9px 11px;
+  border-radius:9px;font:13.5px/1.35 Inter,system-ui,sans-serif;cursor:pointer;color:var(--ink);
+}
+.opt-btn:hover{background:#f3f8f8}
+.opt-btn.sel{border-color:var(--accent);background:var(--accent-soft);font-weight:600}
+
+/* Boletim Final */
+.report{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px}
+.score-hero{
+  display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between;
+  background:var(--accent-soft);border:1px solid #b6dce0;border-radius:14px;padding:16px 20px;margin-bottom:18px;
+}
+.score-num{font:700 40px/1 Inter,system-ui,sans-serif;color:var(--accent)}
+.rep-card{border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
+.rep-card h3{margin:0 0 8px;font-size:15.5px;display:flex;justify-content:space-between;gap:8px;align-items:center}
+.badge-pt{font-size:12px;padding:3px 9px;border-radius:999px;font-weight:700}
+.badge-pt.ok{background:var(--ok-bg);color:var(--ok)}
+.badge-pt.mid{background:var(--warn-bg);color:var(--warn)}
+.badge-pt.bad{background:var(--err-bg);color:var(--err)}
+.rep-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:13.5px}
+.hidden{display:none !important}
+@media(max-width:860px){
+  .grid,.sliders,.rep-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="eyebrow">Simulado Oficial · Anatomia Patológica II</div>
+      <h1>Prova Prática de Microscopia: Rodízio das 7 Bancadas</h1>
+    </div>
+    <div class="mode-switch" role="tablist" aria-label="Formato do simulado">
+      <button id="mProvaReal" class="mode-btn on" role="tab">Prova Real (Nota 0 a 10)</button>
+      <button id="mTreino" class="mode-btn" role="tab">Treino (Corrige na hora)</button>
+      <button id="mObjetivo" class="mode-btn" role="tab">Objetivo (4 opções)</button>
+    </div>
+  </header>
+
+  <div class="config-bar">
+    <div class="cfg-group">
+      <span class="cfg-label">Tempo/bancada:</span>
+      <select id="selTime">
+        <option value="120" selected>2 minutos</option>
+        <option value="180">3 minutos</option>
+        <option value="0">Sem limite</option>
+      </select>
+      <label class="btn-sm" style="display:inline-flex;align-items:center;gap:6px">
+        <input id="chkBlur" type="checkbox"> Iniciar desfocado
+      </label>
+    </div>
+    <div class="cfg-group">
+      <button id="btnShuffle" class="btn-sm">Embaralhar nova prova</button>
+      <button id="btnEntregar" class="btn-sm finish">Entregar Prova e Ver Nota</button>
+    </div>
+  </div>
+
+  <div id="stepper" class="stepper" aria-label="Estações do simulado"></div>
+
+  <div id="examBody" class="grid">
+    <section class="panel scope-stage">
+      <div class="ocular-shell">
+        <div id="ocular" class="ocular-view">
+          <div id="slideLayer" class="slide-layer">
+            <img id="slideImg" src="" alt="Campo microscópico da bancada">
+            <svg id="examPointer" class="exam-pointer" viewBox="0 0 80 80" aria-hidden="true">
+              <path d="M68 12 L22 58" stroke="#000000" stroke-width="5.5" stroke-linecap="round"/>
+              <path d="M22 58 L25 38 M22 58 L42 55" stroke="#000000" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="ocular-vignette"></div>
+          <div id="ocularBadge" class="ocular-badge">Bancada 1</div>
+          <div class="ocular-hint">Arraste (charriot) · Roda do mouse para zoom</div>
+        </div>
+      </div>
+
+      <div class="sliders">
+        <label class="ctrl-item">
+          <span>Zoom digital: <b id="lblZoom">1,0×</b></span>
+          <input id="rngZoom" type="range" min="1" max="3.2" step="0.1" value="1">
+        </label>
+        <label class="ctrl-item">
+          <span>Micrométrico: <b id="lblFocus">Nítido</b></span>
+          <input id="rngFocus" type="range" min="-5" max="5" step="0.2" value="0">
+        </label>
+        <label class="ctrl-item">
+          <span>Diafragma (luz): <b id="lblLight">100%</b></span>
+          <input id="rngLight" type="range" min="75" max="125" step="5" value="100">
+        </label>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center">
+        <button id="btnCenter" class="btn-sm">Centralizar lâmina</button>
+        <button id="btnAltView" class="btn-sm">Alternar aumento (outro campo desta lâmina)</button>
+      </div>
+    </section>
+
+    <aside class="panel">
+      <div class="exam-head">
+        <div>
+          <div style="font-size:11px;color:var(--muted);font-weight:700">BANCADA CEGA</div>
+          <div id="stationTitle" style="font-weight:700;font-size:15px">Estação 1 de 7</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span id="timerDisplay" class="timer">02:00</span>
+          <button id="btnTimer" class="btn-sm">Iniciar</button>
+        </div>
+      </div>
+
+      <p id="examPrompt" style="margin:0 0 10px;font-size:13.5px;text-align:justify"></p>
+
+      <!-- FOLHA DISSERTATIVA -->
+      <div id="boxDissert">
+        <div class="field">
+          <label for="inOrgao">1. Diagnóstico do órgão</label>
+          <input id="inOrgao" type="text" placeholder="Digite o órgão ou tecido">
+        </div>
+        <div class="field">
+          <label for="inProc1">2. Processo patológico 1 (apontado pela seta)</label>
+          <input id="inProc1" type="text" placeholder="O que a ponta da seta aponta?">
+        </div>
+        <div class="field">
+          <label for="inProc2">3. Processo patológico 2 (complementar)</label>
+          <input id="inProc2" type="text" placeholder="Outro processo que fecha o diagnóstico">
+        </div>
+        <div class="field">
+          <label for="inDiag">4. Diagnóstico final</label>
+          <input id="inDiag" type="text" placeholder="Nome completo da doença/lesão">
+        </div>
+
+        <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+          <button id="btnPrev" class="btn-sm">Anterior</button>
+          <button id="btnCheckNow" class="btn-sm primary hidden" style="flex:1">Conferir esta bancada</button>
+          <button id="btnNext" class="btn-sm primary" style="flex:1">Salvar e próxima bancada</button>
+        </div>
+        <div id="fbNow" class="fb hidden"></div>
+      </div>
+
+      <!-- MODO OBJETIVO (4 ALTERNATIVAS - REGRA S1) -->
+      <div id="boxObj" class="hidden">
+        <div id="optList" class="opt-list"></div>
+        <div style="display:flex;gap:8px">
+          <button id="btnRespObj" class="btn-sm primary" style="flex:1">Responder</button>
+          <button id="btnNextObj" class="btn-sm">Próxima</button>
+        </div>
+        <div id="fbObj" class="fb hidden"></div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- BOLETIM FINAL DA PROVA REAL -->
+  <section id="reportBox" class="report hidden"></section>
+</div>
+
+<script>
+const BANK = [
+  {
+    id:'l32',
+    nome:'Lâmina 32 (Cx. Pato 2) · Fibroadenoma de Mama',
+    imgs:[
+      {src:'../fig/fib_03_fronteira_capsula_4x', badge:'4× · Fronteira', ptr:{x:50, y:50}},
+      {src:'../fig/fib_04_hiperplasia_estromal_10x', badge:'10× · Interior', ptr:{x:62, y:28}},
+      {src:'../fig/fib_05_dupla_camada_40x', badge:'40× · Detalhe', ptr:{x:54, y:56}}
+    ],
+    prompt:'Observe o campo principal (4×) com a seta apontando a faixa fibrosa diagonal. Você pode alternar o aumento para inspecionar o estroma e o revestimento ductal antes de preencher os 4 itens.',
+    orgOk:['mama','mamar'],
+    orgMsg:'Órgão esperado: mama (ou tecido mamário).',
+    p1Ok:['capsula','cápsula','hiperplasia estromal','dupla camada','camada dupla'],
+    p2Ok:['hiperplasia estromal','estrom','ectasia','fibroblast','capsula','cápsula','dupla camada'],
+    mustTerm:'estrom',
+    mustMsg:'Regra obrigatória: faltou citar hiperplasia estromal para fechar fibroadenoma.',
+    diagOk:['fibroadenoma'],
+    diagMsg:'Diagnóstico esperado: fibroadenoma de mama.',
+    gabarito:'<strong>1. Órgão:</strong> mama. <strong>2. Seta (4×):</strong> cápsula conjuntiva. <strong>3. Complementar obrigatório:</strong> hiperplasia estromal intralobular. <strong>4. Diagnóstico:</strong> fibroadenoma de mama.',
+    objQ:'Identifique a lesão desta bancada cega e a regra obrigatória do seu laudo:',
+    opts:[
+      'Fibroadenoma de mama; hiperplasia estromal é obrigatória quando a seta aponta a cápsula',
+      'Carcinoma espinocelular in situ; cisto de Naboth é o processo maligno principal',
+      'Tireoidite de Hashimoto; folículos hiperplásicos com excesso de coloide',
+      'Hiperplasia endometrial sem atipias; padrão back-to-back em curetagem'
+    ],
+    correta:0,
+    errMsgs:['','Não há epitélio escamoso ectocervical nem cisto de Naboth neste campo.','Não há folículos tireoidianos nem denso infiltrado linfocitário.','Os lóbulos no canto superior esquerdo e a cápsula fibrosa são de mama, não de endométrio.'],
+    okMsg:'Correto! Lâmina 32: mama + cápsula conjuntiva + hiperplasia estromal obrigatória = fibroadenoma.'
+  },
+  {
+    id:'l12',
+    nome:'Lâmina 12 (Cx. Pato 2) · Carcinoma Espinocelular in situ',
+    imgs:[
+      {src:'../fig/colo_03_displasia_40x', badge:'40× · Epitélio', ptr:{x:44, y:44}},
+      {src:'../fig/colo_01_panoramica_naboth_4x', badge:'4× · Panorâmica', ptr:{x:36, y:72}},
+      {src:'../fig/colo_08_wa_displasia', badge:'Ocular real · 40×', ptr:{x:52, y:62}}
+    ],
+    prompt:'Observe o epitélio escamoso em 40× apontado pela seta (você pode voltar para 4× para confirmar o órgão). Lembre-se de qualificar completamente o diagnóstico final.',
+    orgOk:['colo','utero','útero'],
+    orgMsg:'Órgão esperado: colo uterino (ou colo de útero).',
+    p1Ok:['displasia','nic 3','nic3','hipercromasia','cariomegalia','polaridade','hipercelularidade'],
+    p2Ok:['neoangiogenese','neoangiogênese','vaso','infiltrado','inflamatorio','inflamatório','sem invasao','sem invasão','in situ','naboth'],
+    mustTerm:'in situ',
+    mustMsg:'Atenção: faltou escrever "in situ" (omitir in situ vale apenas meio certo).',
+    diagOk:['carcinoma','espinocelular'],
+    diagMsg:'Diagnóstico esperado: carcinoma espinocelular in situ.',
+    gabarito:'<strong>1. Órgão:</strong> colo uterino. <strong>2. Seta (40×):</strong> displasia nos 3 terços do epitélio (NIC 3: hipercromasia, cariomegalia, perda de polaridade). <strong>3. Complementar:</strong> neoangiogênese, intenso infiltrado inflamatório ou ausência de invasão. <strong>4. Diagnóstico:</strong> carcinoma espinocelular in situ.',
+    objQ:'Qual diagnóstico completo garante pontuação integral nesta bancada?',
+    opts:[
+      'Carcinoma espinocelular in situ de colo uterino (displasia nos 3 terços sem invasão)',
+      'Carcinoma espinocelular invasor com pérolas córneas no estroma',
+      'Hiperplasia endometrial sem atipias com manutenção da polaridade',
+      'Glomerulonefrite membranoproliferativa em folhas de trevo'
+    ],
+    correta:0,
+    errMsgs:['','A membrana basal permanece íntegra e não há pérolas córneas invadindo o estroma.','Há intensa perda de polaridade e atipia nos 3 terços de epitélio escamoso, não glândulas endometriais.','Não há glomérulos nem túbulos renais nesta lâmina.'],
+    okMsg:'Exato! Displasia nos 3 terços com membrana basal íntegra fecha carcinoma espinocelular in situ.'
+  },
+  {
+    id:'l43e',
+    nome:'Lâmina 43 (Cx. Pato 1) · Hiperplasia do Endométrio (sem atipias)',
+    imgs:[
+      {src:'../fig/endo_02_backtoback_10x', badge:'10× · Glândulas', ptr:{x:50, y:48}},
+      {src:'../fig/endo_01_glandula_40x', badge:'40× · Uma glândula', ptr:{x:48, y:50}},
+      {src:'../fig/endo_05_wa_backtoback', badge:'Ocular real · 10×', ptr:{x:50, y:50}}
+    ],
+    prompt:'Observe as numerosas glândulas tortuosas e justapostas em 10× (alterne para 40× para conferir os núcleos). Atenção ao nome específico do órgão e do diagnóstico.',
+    orgOk:['endometrio','endométrio'],
+    orgMsg:'Órgão esperado: endométrio (responder apenas "útero" dá meio certo).',
+    p1Ok:['hiperplasia glandular','proliferacao','proliferação','hipercelularidade','back','espiriforme','dilatacao','dilatação'],
+    p2Ok:['espiriforme','espiral','distorcid','back','justaposta','mononuclear','infiltrado','sem atipia','polaridade'],
+    mustTerm:'sem atipia',
+    mustMsg:'Atenção: é obrigatório escrever "sem atipias" no diagnóstico final.',
+    diagOk:['hiperplasia'],
+    diagMsg:'Diagnóstico esperado: hiperplasia endometrial sem atipias.',
+    gabarito:'<strong>1. Órgão:</strong> endométrio. <strong>2. Seta (10×):</strong> hiperplasia glandular. <strong>3. Complementar:</strong> glândulas espiriformes, padrão back-to-back ou infiltrado inflamatório mononuclear no estroma. <strong>4. Diagnóstico:</strong> hiperplasia endometrial sem atipias.',
+    objQ:'Qual combinação corresponde exatamente a esta bancada (Caixa Pato 1, Lâmina 43)?',
+    opts:[
+      'Endométrio: hiperplasia glandular, padrão back-to-back e hiperplasia endometrial sem atipias',
+      'Rim: espessamento difuso da MBG e glomerulopatia membranosa',
+      'Mama: hiperplasia estromal intralobular e fibroadenoma',
+      'Pulmão: ruptura de septos alveolares e enfisema pulmonar'
+    ],
+    correta:0,
+    errMsgs:['','Rim e MBG pertencem à Lâmina 43 da Caixa Pato 2, não a esta amostra glandular de curetagem.','Não há cápsula fibrosa nem estroma fibroblástico afastando ductos.','Não há espaços aéreos alveolares pulmonares.'],
+    okMsg:'Perfeito! Endométrio + hiperplasia glandular + back-to-back/espiriformes = hiperplasia endometrial sem atipias.'
+  },
+  {
+    id:'l30',
+    nome:'Lâmina 30 (Cx. Pato 2) · Enfisema Pulmonar',
+    imgs:[
+      {src:'../fig/enf_02_septos_10x', badge:'10× · Septos', ptr:{x:38, y:48}},
+      {src:'../fig/enf_01_panoramica_4x', badge:'4× · Panorâmica', ptr:{x:46, y:44}},
+      {src:'../fig/enf_07_wa_ruptura', badge:'Ocular real · 10×', ptr:{x:52, y:50}}
+    ],
+    prompt:'Observe os amplos espaços vazios e os filetes interrompidos apontados pela seta em 10×. Preencha os 4 itens da bancada.',
+    orgOk:['pulmao','pulmão'],
+    orgMsg:'Órgão esperado: pulmão.',
+    p1Ok:['ruptura','septo','alveolo','alvéolo','distendido','dilatado','confluencia','confluência'],
+    p2Ok:['adensamento','espessamento','parede','fibrose','congestao','congestão','vascular','antracose','ruptura','distendido'],
+    diagOk:['enfisema'],
+    diagMsg:'Diagnóstico esperado: enfisema pulmonar.',
+    gabarito:'<strong>1. Órgão:</strong> pulmão. <strong>2. Seta (10×):</strong> ruptura de septos alveolares / alvéolos distendidos. <strong>3. Complementar:</strong> áreas de adensamento (espessamento) da parede alveolar ou congestão vascular. <strong>4. Diagnóstico:</strong> enfisema pulmonar.',
+    objQ:'Qual par de processos patológicos fecha o diagnóstico desta bancada?',
+    opts:[
+      'Ruptura de septos alveolares (alvéolos distendidos) e adensamento de parede alveolar: enfisema pulmonar',
+      'Intenso infiltrado linfocitário e folículos atróficos: tireoidite de Hashimoto',
+      'Alças capilares espessadas hialinas: glomerulopatia membranosa',
+      'Displasia nos 3 terços e neoangiogênese: carcinoma in situ'
+    ],
+    correta:0,
+    errMsgs:['','Não há folículos preenchidos por coloide nem infiltrado linfocitário denso.','Não há glomérulos renais.','Não há epitélio escamoso estratificado displásico.'],
+    okMsg:'Acertou! Pulmão + ruptura de septos alveolares + adensamento parietal = enfisema pulmonar.'
+  },
+  {
+    id:'l79',
+    nome:'Lâmina 79 (Cx. Pato 2) · Tireoidite de Hashimoto',
+    imgs:[
+      {src:'../fig/hash_05_atroficos_40x', badge:'40× · Infiltrado e atrofia', ptr:{x:34, y:54}},
+      {src:'../fig/hash_01_panoramica_4x', badge:'4× · Panorâmica', ptr:{x:54, y:38}},
+      {src:'../fig/hash_07_wa_foliculos', badge:'Ocular real · 10×', ptr:{x:48, y:50}}
+    ],
+    prompt:'Observe em 40× a massa roxa celular apontada pela seta ao lado de folículos de tamanhos muito desiguais. Complete a folha oficial.',
+    orgOk:['tireoide','tireóide'],
+    orgMsg:'Órgão esperado: tireoide.',
+    p1Ok:['infiltrado','linfocitario','linfocitário','mononuclear','linfocito','linfócito'],
+    p2Ok:['atrofic','atrófic','coloide','colóide','foliculo','folículo'],
+    mustTerm:'atrofic',
+    mustMsg:'Complemente obrigatoriamente com folículos tireoidianos atróficos (pouco ou nenhum coloide).',
+    diagOk:['hashimoto'],
+    diagMsg:'Diagnóstico esperado: tireoidite de Hashimoto.',
+    gabarito:'<strong>1. Órgão:</strong> tireoide. <strong>2. Seta (40×):</strong> área de intenso infiltrado inflamatório linfocitário. <strong>3. Complementar:</strong> folículos tireoidianos atróficos com pouco ou nenhum coloide. <strong>4. Diagnóstico:</strong> tireoidite de Hashimoto.',
+    objQ:'Qual diagnóstico e qual achado complementar fecham esta bancada?',
+    opts:[
+      'Tireoidite de Hashimoto: intenso infiltrado linfocitário + folículos atróficos com pouco ou nenhum coloide',
+      'Fibroadenoma de mama: lóbulos com secreção láctea + cápsula fibrosa',
+      'Enfisema pulmonar: ruptura de septos + antracose',
+      'Hiperplasia endometrial: infiltrado mononuclear + back-to-back'
+    ],
+    correta:0,
+    errMsgs:['','Os folículos preenchidos por coloide homogêneo ao lado do infiltrado identificam tireoide, não mama.','Não há espaços aéreos alveolares pulmonares.','Não há glândulas endometriais tubulares espiriformes.'],
+    okMsg:'Excelente! Tireoide + intenso infiltrado linfocitário + folículos atróficos sem coloide = Hashimoto.'
+  },
+  {
+    id:'l43m',
+    nome:'Lâmina 43 (Cx. Pato 2) · Glomerulopatia Membranosa',
+    imgs:[
+      {src:'../fig/memb_02_glomerulo_40x', badge:'40× · Glomérulo', ptr:{x:50, y:48}},
+      {src:'../fig/memb_03_difuso_10x', badge:'10× · Córtex difuso', ptr:{x:48, y:46}},
+      {src:'../fig/memb_05_wa_glomerulo', badge:'Ocular real · 40×', ptr:{x:50, y:48}}
+    ],
+    prompt:'Bancada renal! Observe cuidadosamente as alças capilares em 40× e decida entre as duas glomerulopatias da prova (lembre: no HE não se veem imunocomplexos).',
+    orgOk:['rim','renal'],
+    orgMsg:'Órgão esperado: rim.',
+    p1Ok:['espessamento','mbg','alca','alça','hialina','parede capilar','membrana basal'],
+    p2Ok:['difus','todos','mbg','espessamento','hialina','alca','alça'],
+    diagOk:['membranosa'],
+    diagMsg:'Diagnóstico esperado: glomerulopatia membranosa.',
+    gabarito:'<strong>1. Órgão:</strong> rim. <strong>2. Seta (40×):</strong> espessamento difuso e uniforme da parede capilar glomerular (MBG / alças espessadas hialinas). <strong>3. Complementar:</strong> glomérulos renais difusamente afetados. <strong>4. Diagnóstico:</strong> glomerulopatia membranosa.',
+    objQ:'Qual das duas lâminas renais da Caixa Pato 2 está nesta bancada?',
+    opts:[
+      'Glomerulopatia membranosa (Lâmina 43): alças capilares espessadas hialinas, sem folhas de trevo',
+      'Glomerulonefrite membranoproliferativa (Lâmina 44): hipercelularidade mesangial em folhas de trevo',
+      'Tireoidite de Hashimoto (Lâmina 79): folículos atróficos',
+      'Carcinoma espinocelular in situ (Lâmina 12): displasia nos 3 terços'
+    ],
+    correta:0,
+    errMsgs:['','Note que não há hipercelularidade mesangial exuberante nem divisão do tufo em folhas de trevo.','Trata-se de um glomérulo no córtex renal, não tireoide.','Não há epitélio escamoso ectocervical.'],
+    okMsg:'Acertou! Alças capilares espessadas hialinas uniformes sem trevo = Glomerulopatia Membranosa.'
+  },
+  {
+    id:'l44',
+    nome:'Lâmina 44 (Cx. Pato 2) · Glomerulonefrite Membranoproliferativa',
+    imgs:[
+      {src:'../fig/gnmp_02_trevo_40x', badge:'40× · Glomérulo', ptr:{x:54, y:52}},
+      {src:'../fig/gnmp_04_trevo_st', badge:'40× · Campo 2', ptr:{x:50, y:48}},
+      {src:'../fig/gnmp_05_wa_trevo', badge:'Ocular real · 40×', ptr:{x:50, y:50}}
+    ],
+    prompt:'Bancada renal! Avalie a celularidade e o formato dos tufos glomerulares em 40× apontados pela seta e feche os 4 itens.',
+    orgOk:['rim','renal'],
+    orgMsg:'Órgão esperado: rim.',
+    p1Ok:['hipercelularidade','mesangial','mesangiais','lobulacao','lobulação','trevo'],
+    p2Ok:['espessamento','parede','capilar','duplo contorno','hipercelularidade','trevo'],
+    diagOk:['membranoproliferativa','gnmp'],
+    diagMsg:'Diagnóstico esperado: glomerulonefrite membranoproliferativa.',
+    gabarito:'<strong>1. Órgão:</strong> rim. <strong>2. Seta (40×):</strong> hipercelularidade às custas de células mesangiais (lobulação glomerular em folhas de trevo). <strong>3. Complementar:</strong> espessamento da parede dos capilares glomerulares. <strong>4. Diagnóstico:</strong> glomerulonefrite membranoproliferativa.',
+    objQ:'Qual diagnóstico e qual achado chave definem esta bancada renal?',
+    opts:[
+      'Glomerulonefrite membranoproliferativa: hipercelularidade mesangial em folhas de trevo + espessamento capilar',
+      'Glomerulopatia membranosa: alças hialinas sem aumento de celularidade mesangial',
+      'Enfisema pulmonar: alvéolos distendidos com septos rompidos',
+      'Fibroadenoma de mama: hiperplasia estromal intralobular'
+    ],
+    correta:0,
+    errMsgs:['','A intensa hipercelularidade mesangial dividindo o tufo em folhas de trevo separa esta lâmina da membranosa.','Não há alvéolos pulmonares.','Não há estroma mamário nem ductos em dupla camada.'],
+    okMsg:'Perfeito! Hipercelularidade mesangial em folhas de trevo + espessamento capilar = GNMP (Lâmina 44).'
+  }
+];
+
+let appMode = 'real'; // 'real' | 'treino' | 'obj'
+let order = BANK.map((_, i) => i);
+let pos = 0;
+let imgSub = 0;
+let answers = {}; // idx -> {org, p1, p2, diag}
+let objDone = {};
+let selectedOpt = null;
+let zoom = 1, panX = 0, panY = 0, dragging = false, sx = 0, sy = 0;
+let timerSec = 120, timerId = null;
+
+const $ = id => document.getElementById(id);
+
+function norm(s){ return (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim(); }
+
+function loadImg(base){
+  const im = $('slideImg');
+  im.onerror = function(){
+    if(im.src.endsWith('.jpg')){ im.onerror = null; im.src = base + '.png'; }
+    else if(im.src.endsWith('.png')){ im.onerror = null; im.src = base + '.jpeg'; }
+  };
+  im.src = base + '.jpg';
+}
+
+function updateTransform(){
+  const blurVal = Math.abs(parseFloat($('rngFocus').value));
+  const lightVal = parseInt($('rngLight').value, 10);
+  $('slideLayer').style.transform = `translate(${panX}px, ${panY}px) scale(${zoom})`;
+  $('slideLayer').style.filter = `blur(${blurVal.toFixed(1)}px) brightness(${lightVal}%)`;
+  $('lblZoom').textContent = zoom.toFixed(1).replace('.', ',') + '×';
+  $('lblFocus').textContent = blurVal < 0.3 ? 'Nítido' : (blurVal < 2 ? 'Leve desfoque' : 'Desfocado');
+  $('lblLight').textContent = lightVal + '%';
+}
+
+function resetView(){
+  zoom = 1; panX = 0; panY = 0;
+  $('rngZoom').value = '1';
+  $('rngFocus').value = $('chkBlur').checked ? '3.2' : '0';
+  updateTransform();
+}
+
+function saveCurrentInputs(){
+  if(appMode === 'obj') return;
+  const idx = order[pos];
+  answers[idx] = {
+    org: $('inOrgao').value,
+    p1: $('inProc1').value,
+    p2: $('inProc2').value,
+    diag: $('inDiag').value
+  };
+}
+
+function isFilled(idx){
+  if(appMode === 'obj') return !!objDone[idx];
+  const a = answers[idx];
+  return a && (a.org.trim() || a.p1.trim() || a.diag.trim());
+}
+
+function renderStepper(){
+  $('stepper').innerHTML = order.map((idx, i) => {
+    const fl = isFilled(idx) ? 'filled' : '';
+    const cur = i === pos ? 'cur' : '';
+    return `<button class="st-pill ${cur} ${fl}" data-p="${i}">Bancada ${i+1}${fl?' ✓':''}</button>`;
+  }).join('');
+  $('stepper').querySelectorAll('button').forEach(b => {
+    b.onclick = () => { saveCurrentInputs(); showStation(parseInt(b.dataset.p, 10)); };
+  });
+}
+
+function showStation(p){
+  pos = (p + order.length) % order.length;
+  imgSub = 0;
+  const idx = order[pos];
+  const st = BANK[idx];
+  const imObj = st.imgs[imgSub];
+  loadImg(imObj.src);
+  $('ocularBadge').textContent = `Bancada ${pos+1} · ${imObj.badge}`;
+  $('stationTitle').textContent = `Estação ${pos+1} de ${order.length}`;
+  $('examPrompt').textContent = st.prompt;
+  const ptr = $('examPointer');
+  ptr.style.left = imObj.ptr.x + '%';
+  ptr.style.top = imObj.ptr.y + '%';
+  resetView();
+
+  const a = answers[idx] || {org:'', p1:'', p2:'', diag:''};
+  $('inOrgao').value = a.org;
+  $('inProc1').value = a.p1;
+  $('inProc2').value = a.p2;
+  $('inDiag').value = a.diag;
+  $('fbNow').className = 'fb hidden';
+
+  selectedOpt = null;
+  $('fbObj').className = 'fb hidden';
+  $('optList').innerHTML = `<div style="font-weight:700;font-size:13.5px;margin-bottom:4px">${st.objQ}</div>` +
+    st.opts.map((o, i) => `<button class="opt-btn" data-o="${i}">${String.fromCharCode(65+i)}) ${o}</button>`).join('');
+  $('optList').querySelectorAll('.opt-btn').forEach(b => {
+    b.onclick = () => {
+      selectedOpt = parseInt(b.dataset.o, 10);
+      $('optList').querySelectorAll('.opt-btn').forEach(x => x.classList.remove('sel'));
+      b.classList.add('sel');
+    };
+  });
+
+  renderStepper();
+  resetTimer();
+}
+
+function evaluateStation(idx){
+  const st = BANK[idx];
+  const a = answers[idx] || {org:'', p1:'', p2:'', diag:''};
+  const o = norm(a.org), p1 = norm(a.p1), p2 = norm(a.p2), d = norm(a.diag);
+  let pts = 0;
+  const issues = [];
+  const okOrg = st.orgOk.some(k => o.includes(norm(k)));
+  const okP1 = st.p1Ok.some(k => p1.includes(norm(k)));
+  const okP2 = st.p2Ok.some(k => p2.includes(norm(k)));
+  const okDiag = st.diagOk.some(k => d.includes(norm(k)));
+  const okMust = !st.mustTerm || (p1 + ' ' + p2 + ' ' + d).includes(norm(st.mustTerm));
+
+  if(okOrg) pts += 0.25; else issues.push(st.orgMsg);
+  if(okP1) pts += 0.25; else issues.push('Item 2: revise o processo apontado pela seta.');
+  if(okP2 && okMust) pts += 0.25;
+  else {
+    if(!okMust) issues.push(st.mustMsg);
+    else issues.push('Item 3: complemente com outro processo patológico da lâmina.');
+  }
+  if(okDiag && (!st.mustTerm || st.mustTerm !== 'in situ' || d.includes('in situ')) && (!st.mustTerm || st.mustTerm !== 'sem atipia' || d.includes('sem atipia'))){
+    pts += 0.25;
+  } else {
+    if(okDiag) { pts += 0.125; issues.push(st.mustMsg || st.diagMsg); }
+    else issues.push(st.diagMsg);
+  }
+  return {pts, issues, a, st};
+}
+
+function renderReport(){
+  saveCurrentInputs();
+  if(timerId){ clearInterval(timerId); timerId = null; }
+  let sum = 0;
+  const cards = order.map((idx, i) => {
+    const r = evaluateStation(idx);
+    sum += r.pts;
+    const pct = Math.round(r.pts * 100);
+    const cls = pct >= 90 ? 'ok' : (pct >= 50 ? 'mid' : 'bad');
+    return `<div class="rep-card">
+      <h3><span>Bancada ${i+1}: ${r.st.nome}</span><span class="badge-pt ${cls}">${pct}%</span></h3>
+      <div class="rep-grid">
+        <div><strong>Sua folha:</strong><br>
+          1. Órgão: ${r.a.org || '<em>em branco</em>'}<br>
+          2. Processo 1: ${r.a.p1 || '<em>em branco</em>'}<br>
+          3. Processo 2: ${r.a.p2 || '<em>em branco</em>'}<br>
+          4. Diagnóstico: ${r.a.diag || '<em>em branco</em>'}
+        </div>
+        <div><strong>Gabarito oficial:</strong><br>${r.st.gabarito}</div>
+      </div>
+      ${r.issues.length ? `<div class="fb warn" style="margin-top:8px"><strong>Ajustes:</strong> ${r.issues.join(' ')}</div>` : `<div class="fb ok" style="margin-top:8px"><strong>Bancada perfeita!</strong> Todos os critérios obrigatórios preenchidos.</div>`}
+    </div>`;
+  }).join('');
+  const nota = ((sum / order.length) * 10).toFixed(1).replace('.', ',');
+  $('reportBox').innerHTML = `
+    <div class="score-hero">
+      <div>
+        <div class="eyebrow">Resultado Final do Simulado Prático</div>
+        <h2 style="margin:4px 0 2px">Boletim das 7 Bancadas</h2>
+        <div style="font-size:13.5px;color:var(--muted)">Avaliação automática baseada nos critérios obrigatórios da aula prática.</div>
+      </div>
+      <div style="text-align:right">
+        <div class="score-num">${nota} / 10</div>
+        <button id="btnRefazer" class="btn-sm primary" style="margin-top:8px">Refazer Simulado Embaralhado</button>
+      </div>
+    </div>
+    ${cards}
+  `;
+  $('examBody').classList.add('hidden');
+  $('reportBox').classList.remove('hidden');
+  $('btnRefazer').onclick = () => { shuffleExam(); };
+}
+
+function setAppMode(m){
+  saveCurrentInputs();
+  appMode = m;
+  $('mProvaReal').classList.toggle('on', m==='real');
+  $('mTreino').classList.toggle('on', m==='treino');
+  $('mObjetivo').classList.toggle('on', m==='obj');
+  $('boxDissert').classList.toggle('hidden', m==='obj');
+  $('boxObj').classList.toggle('hidden', m!=='obj');
+  $('btnCheckNow').classList.toggle('hidden', m!=='treino');
+  $('btnEntregar').classList.toggle('hidden', m==='obj');
+  $('examBody').classList.remove('hidden');
+  $('reportBox').classList.add('hidden');
+  showStation(pos);
+}
+
+function shuffleExam(){
+  for(let i=order.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [order[i], order[j]] = [order[j], order[i]];
+  }
+  answers = {}; objDone = {};
+  $('examBody').classList.remove('hidden');
+  $('reportBox').classList.add('hidden');
+  showStation(0);
+}
+
+function formatTime(s){
+  const m = String(Math.floor(s/60)).padStart(2,'0');
+  const sec = String(s%60).padStart(2,'0');
+  return `${m}:${sec}`;
+}
+function resetTimer(){
+  if(timerId){ clearInterval(timerId); timerId = null; }
+  const val = parseInt($('selTime').value, 10);
+  timerSec = val;
+  $('timerDisplay').textContent = val ? formatTime(val) : 'Livre';
+  $('timerDisplay').classList.remove('low');
+  $('btnTimer').textContent = val ? 'Iniciar' : 'Livre';
+  $('btnTimer').disabled = !val;
+}
+function toggleTimer(){
+  if(!parseInt($('selTime').value, 10)) return;
+  if(timerId){ clearInterval(timerId); timerId = null; $('btnTimer').textContent = 'Retomar'; return; }
+  $('btnTimer').textContent = 'Pausar';
+  timerId = setInterval(() => {
+    timerSec = Math.max(0, timerSec - 1);
+    $('timerDisplay').textContent = formatTime(timerSec);
+    if(timerSec <= 20) $('timerDisplay').classList.add('low');
+    if(timerSec === 0){ clearInterval(timerId); timerId = null; $('btnTimer').textContent = 'Tempo esgotado'; }
+  }, 1000);
+}
+
+// Pan & zoom
+const ocular = $('ocular');
+ocular.addEventListener('pointerdown', e => { dragging = true; sx = e.clientX - panX; sy = e.clientY - panY; ocular.setPointerCapture(e.pointerId); });
+ocular.addEventListener('pointermove', e => {
+  if(!dragging) return;
+  const maxPan = 180 * zoom;
+  panX = Math.max(-maxPan, Math.min(maxPan, e.clientX - sx));
+  panY = Math.max(-maxPan, Math.min(maxPan, e.clientY - sy));
+  updateTransform();
+});
+ocular.addEventListener('pointerup', () => dragging = false);
+ocular.addEventListener('wheel', e => {
+  e.preventDefault();
+  zoom = Math.max(1, Math.min(3.2, +(zoom + (e.deltaY < 0 ? 0.2 : -0.2)).toFixed(1)));
+  $('rngZoom').value = String(zoom);
+  updateTransform();
+}, {passive:false});
+
+$('rngZoom').oninput = e => { zoom = parseFloat(e.target.value); updateTransform(); };
+$('rngFocus').oninput = updateTransform;
+$('rngLight').oninput = updateTransform;
+$('btnCenter').onclick = resetView;
+$('btnAltView').onclick = () => {
+  const st = BANK[order[pos]];
+  imgSub = (imgSub + 1) % st.imgs.length;
+  const imObj = st.imgs[imgSub];
+  loadImg(imObj.src);
+  $('ocularBadge').textContent = `Bancada ${pos+1} · ${imObj.badge}`;
+  $('examPointer').style.left = imObj.ptr.x + '%';
+  $('examPointer').style.top = imObj.ptr.y + '%';
+  resetView();
+};
+$('selTime').onchange = resetTimer;
+$('btnTimer').onclick = toggleTimer;
+$('btnShuffle').onclick = shuffleExam;
+$('btnEntregar').onclick = renderReport;
+$('mProvaReal').onclick = () => setAppMode('real');
+$('mTreino').onclick = () => setAppMode('treino');
+$('mObjetivo').onclick = () => setAppMode('obj');
+$('btnPrev').onclick = () => { saveCurrentInputs(); showStation(pos - 1); };
+$('btnNext').onclick = () => { saveCurrentInputs(); showStation(pos + 1); };
+$('btnCheckNow').onclick = () => {
+  saveCurrentInputs();
+  const r = evaluateStation(order[pos]);
+  const fb = $('fbNow');
+  if(r.issues.length === 0){
+    fb.className = 'fb ok';
+    fb.innerHTML = '<strong>Bancada perfeita!</strong><br>' + r.st.gabarito;
+  } else {
+    fb.className = 'fb warn';
+    fb.innerHTML = '<strong>Pontos para ajustar:</strong> ' + r.issues.join(' ') + '<br><br><strong>Gabarito:</strong> ' + r.st.gabarito;
+  }
+  renderStepper();
+};
+$('btnRespObj').onclick = () => {
+  if(selectedOpt === null) return;
+  const idx = order[pos];
+  const st = BANK[idx];
+  const fb = $('fbObj');
+  if(selectedOpt === st.correta){
+    objDone[idx] = true;
+    fb.className = 'fb ok';
+    fb.innerHTML = '<strong>Acertou!</strong> ' + st.okMsg;
+    renderStepper();
+  } else {
+    fb.className = 'fb err';
+    fb.innerHTML = '<strong>Ainda não.</strong> ' + st.errMsgs[selectedOpt] + ' Reavalie a lâmina no visor e tente de novo.';
+  }
+};
+$('btnNextObj').onclick = () => showStation(pos + 1);
+
+shuffleExam();
+</script>
+</body>
+</html>

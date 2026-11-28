@@ -1450,6 +1450,362 @@
       ]
     },
     {
+      "pasta": "pratica-anatomia-patologica-ii",
+      "titulo": "Anatomia Patológica II · Prática de Microscopia (7 Lâminas)",
+      "subtitulo": "",
+      "disciplina": "",
+      "periodo": "",
+      "prova": "",
+      "data_aula": "",
+      "capitulos": [],
+      "contagem": {},
+      "url": "/interativos/pratica-anatomia-patologica-ii/index.html",
+      "capa": "",
+      "modificado": 1795818399,
+      "chave_local": "pratica-anatomia-patologica-ii",
+      "conceitos": [
+        {
+          "id": "mama-normal-identificacao",
+          "nome": "Identificação do tecido mamário normal em 4×"
+        },
+        {
+          "id": "hiperplasia-estromal-intralobular",
+          "nome": "Hiperplasia estromal intralobular (critério obrigatório)"
+        },
+        {
+          "id": "capsula-ectasia-fibroblastos",
+          "nome": "Cápsula conjuntiva, ectasia ductal e hipercelularidade fibroblástica"
+        },
+        {
+          "id": "camada-dupla-benignidade",
+          "nome": "Preservação da camada dupla epitelial"
+        },
+        {
+          "id": "colo-uterino-identificacao",
+          "nome": "Identificação do colo uterino (ectocérvice e cisto de Naboth)"
+        },
+        {
+          "id": "displasia-tres-tercos-nic3",
+          "nome": "Displasia epitelial nos três terços (NIC 3 / alto grau)"
+        },
+        {
+          "id": "carcinoma-in-situ-criterio",
+          "nome": "Critério de carcinoma in situ (ausência de invasão)"
+        },
+        {
+          "id": "estroma-neoangiogenese-inflamacao",
+          "nome": "Neoangiogênese e intenso infiltrado inflamatório subepitelial"
+        },
+        {
+          "id": "endometrio-normal-vs-hiperplasia",
+          "nome": "Identificação do endométrio e inversão da relação glândula/estroma"
+        },
+        {
+          "id": "hiperplasia-glandular-espiriforme",
+          "nome": "Hiperplasia glandular, glândulas espiriformes e padrão back-to-back"
+        },
+        {
+          "id": "ausencia-atipia-polaridade",
+          "nome": "Ausência de atipias nucleares e manutenção da polaridade"
+        },
+        {
+          "id": "infiltrado-mononuclear-estroma",
+          "nome": "Infiltrado inflamatório mononuclear no estroma interglandular"
+        },
+        {
+          "id": "pulmao-normal-vs-enfisema",
+          "nome": "Identificação do pulmão e arquitetura alveolar normal"
+        },
+        {
+          "id": "ruptura-septos-alveolos-distendidos",
+          "nome": "Ruptura de septos alveolares e alvéolos distendidos"
+        },
+        {
+          "id": "adensamento-parede-congestao",
+          "nome": "Adensamento de parede alveolar, congestão vascular e antracose"
+        },
+        {
+          "id": "tireoide-normal-vs-hashimoto",
+          "nome": "Identificação da tireoide e desigualdade folicular"
+        },
+        {
+          "id": "infiltrado-linfocitario-intenso",
+          "nome": "Área de intenso infiltrado inflamatório linfocitário"
+        },
+        {
+          "id": "foliculos-atroficos-sem-coloide",
+          "nome": "Folículos tireoidianos atróficos com pouco ou nenhum coloide"
+        },
+        {
+          "id": "rim-cortex-glomerulos-difusos",
+          "nome": "Identificação do rim e acometimento glomerular difuso"
+        },
+        {
+          "id": "espessamento-mbg-alcas-hialinas",
+          "nome": "Espessamento difuso da parede capilar glomerular (MBG)"
+        },
+        {
+          "id": "limite-he-imunofluorescencia",
+          "nome": "Limites da coloração HE versus imunofluorescência e eletrônica"
+        },
+        {
+          "id": "gnmp-hipercelularidade-trevo",
+          "nome": "Hipercelularidade mesangial e lobulação em folhas de trevo"
+        },
+        {
+          "id": "gnmp-espessamento-capilar-subendotelial",
+          "nome": "Espessamento da parede capilar e depósitos subendoteliais"
+        }
+      ],
+      "testes": [
+        {
+          "id": "t1",
+          "conceito": "hiperplasia-estromal-intralobular",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t2",
+          "conceito": "mama-normal-identificacao",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t3",
+          "conceito": "capsula-ectasia-fibroblastos",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t4",
+          "conceito": "camada-dupla-benignidade",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t5",
+          "conceito": "hiperplasia-estromal-intralobular",
+          "nivel": 3,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t6",
+          "conceito": "colo-uterino-identificacao",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t7",
+          "conceito": "displasia-tres-tercos-nic3",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t8",
+          "conceito": "carcinoma-in-situ-criterio",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t9",
+          "conceito": "estroma-neoangiogenese-inflamacao",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t10",
+          "conceito": "carcinoma-in-situ-criterio",
+          "nivel": 3,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t11",
+          "conceito": "endometrio-normal-vs-hiperplasia",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t12",
+          "conceito": "hiperplasia-glandular-espiriforme",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t13",
+          "conceito": "ausencia-atipia-polaridade",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t14",
+          "conceito": "infiltrado-mononuclear-estroma",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t15",
+          "conceito": "hiperplasia-glandular-espiriforme",
+          "nivel": 3,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t16",
+          "conceito": "ruptura-septos-alveolos-distendidos",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t17",
+          "conceito": "pulmao-normal-vs-enfisema",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t18",
+          "conceito": "adensamento-parede-congestao",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t19",
+          "conceito": "adensamento-parede-congestao",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t20",
+          "conceito": "ruptura-septos-alveolos-distendidos",
+          "nivel": 3,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t21",
+          "conceito": "infiltrado-linfocitario-intenso",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t22",
+          "conceito": "tireoide-normal-vs-hashimoto",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t23",
+          "conceito": "infiltrado-linfocitario-intenso",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t24",
+          "conceito": "foliculos-atroficos-sem-coloide",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t25",
+          "conceito": "foliculos-atroficos-sem-coloide",
+          "nivel": 3,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t26",
+          "conceito": "espessamento-mbg-alcas-hialinas",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t27",
+          "conceito": "rim-cortex-glomerulos-difusos",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t28",
+          "conceito": "limite-he-imunofluorescencia",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t29",
+          "conceito": "limite-he-imunofluorescencia",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t30",
+          "conceito": "espessamento-mbg-alcas-hialinas",
+          "nivel": 3,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t31",
+          "conceito": "gnmp-hipercelularidade-trevo",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t32",
+          "conceito": "gnmp-hipercelularidade-trevo",
+          "nivel": 1,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t33",
+          "conceito": "gnmp-espessamento-capilar-subendotelial",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t34",
+          "conceito": "gnmp-espessamento-capilar-subendotelial",
+          "nivel": 2,
+          "correta": 0,
+          "n_alt": 4
+        },
+        {
+          "id": "t35",
+          "conceito": "gnmp-hipercelularidade-trevo",
+          "nivel": 3,
+          "correta": 0,
+          "n_alt": 4
+        }
+      ]
+    },
+    {
       "pasta": "quinolonas-sulfonamidas-polimixinas-metronidazol",
       "titulo": "Quinolonas, sulfonamidas, polimixinas e metronidazol",
       "subtitulo": "",
